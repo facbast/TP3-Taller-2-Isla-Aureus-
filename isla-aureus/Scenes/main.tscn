@@ -1,0 +1,103 @@
+[gd_scene format=3 uid="uid://chpyjd66ydt3v"]
+
+[ext_resource type="Texture2D" uid="uid://c5egrxgfvi4bf" path="res://icon.svg" id="1_jjgbg"]
+[ext_resource type="PackedScene" uid="uid://dnp8e3pwikosl" path="res://Scenes/player.tscn" id="2_bo1nx"]
+[ext_resource type="PackedScene" uid="uid://0666otbn87s3" path="res://Scenes/hud.tscn" id="3_8gbba"]
+[ext_resource type="PackedScene" uid="uid://bkgohogolomkn" path="res://Scenes/enemy_grunt.tscn" id="4_jjvhh"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_bo1nx"]
+texture = ExtResource("1_jjgbg")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+1:0/0 = 0
+1:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+5:0/0 = 0
+5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+6:0/0 = 0
+6:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+7:0/0 = 0
+7:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:1/0 = 0
+1:1/0 = 0
+2:1/0 = 0
+3:1/0 = 0
+4:1/0 = 0
+5:1/0 = 0
+6:1/0 = 0
+7:1/0 = 0
+0:2/0 = 0
+1:2/0 = 0
+2:2/0 = 0
+3:2/0 = 0
+4:2/0 = 0
+5:2/0 = 0
+6:2/0 = 0
+7:2/0 = 0
+0:3/0 = 0
+1:3/0 = 0
+2:3/0 = 0
+3:3/0 = 0
+4:3/0 = 0
+5:3/0 = 0
+6:3/0 = 0
+7:3/0 = 0
+0:4/0 = 0
+1:4/0 = 0
+2:4/0 = 0
+3:4/0 = 0
+4:4/0 = 0
+5:4/0 = 0
+6:4/0 = 0
+7:4/0 = 0
+0:5/0 = 0
+1:5/0 = 0
+2:5/0 = 0
+3:5/0 = 0
+4:5/0 = 0
+5:5/0 = 0
+6:5/0 = 0
+7:5/0 = 0
+0:6/0 = 0
+1:6/0 = 0
+2:6/0 = 0
+3:6/0 = 0
+4:6/0 = 0
+5:6/0 = 0
+6:6/0 = 0
+7:6/0 = 0
+0:7/0 = 0
+1:7/0 = 0
+2:7/0 = 0
+3:7/0 = 0
+4:7/0 = 0
+5:7/0 = 0
+6:7/0 = 0
+7:7/0 = 0
+
+[sub_resource type="TileSet" id="TileSet_8gbba"]
+physics_layer_0/collision_layer = 1
+sources/0 = SubResource("TileSetAtlasSource_bo1nx")
+
+[node name="Main" type="Node2D" unique_id=114685632]
+
+[node name="TileMap" type="TileMap" parent="." unique_id=876465848]
+tile_set = SubResource("TileSet_8gbba")
+format = 2
+layer_0/tile_data = PackedInt32Array(2162688, 65536, 0, 2162689, 65536, 0, 2162690, 65536, 0, 2162691, 65536, 0, 2162692, 65536, 0, 2162693, 65536, 0, 2162694, 65536, 0, 2162695, 65536, 0, 2162696, 65536, 0, 2162697, 65536, 0, 2162698, 65536, 0, 2162699, 65536, 0, 2162700, 65536, 0, 2162701, 65536, 0, 2162702, 65536, 0, 2162703, 65536, 0, 2162704, 65536, 0, 2162705, 65536, 0, 2162706, 65536, 0, 2162707, 65536, 0, 2162708, 65536, 0, 2162709, 65536, 0, 2162710, 65536, 0, 2162711, 65536, 0, 2162712, 65536, 0, 2162713, 65536, 0, 2162714, 65536, 0, 2162715, 65536, 0, 2162716, 65536, 0, 2162717, 65536, 0, 2162718, 65536, 0, 2162719, 65536, 0, 2162720, 65536, 0, 2162721, 65536, 0, 2162722, 65536, 0, 2162723, 65536, 0, 2162724, 65536, 0, 2162725, 65536, 0, 2162726, 65536, 0, 2162727, 65536, 0, 2162728, 65536, 0, 2162729, 65536, 0, 2162730, 65536, 0, 2162731, 65536, 0, 2162732, 65536, 0, 2162733, 65536, 0, 2162734, 65536, 0, 2162735, 65536, 0, 2162736, 65536, 0, 2162737, 65536, 0, 2162738, 65536, 0, 2162739, 65536, 0, 2162740, 65536, 0, 2162741, 65536, 0, 2162742, 65536, 0, 2162743, 65536, 0, 2162744, 65536, 0, 2162745, 65536, 0, 2162746, 65536, 0, 2162747, 65536, 0, 2162748, 65536, 0, 2162749, 65536, 0, 2162750, 65536, 0, 2162751, 65536, 0, 2162752, 65536, 0, 2162753, 65536, 0, 2162754, 65536, 0, 2162755, 65536, 0, 2162756, 65536, 0, 2162757, 65536, 0, 2162758, 65536, 0, 2162759, 65536, 0)
+
+[node name="HUD" parent="." unique_id=592268866 instance=ExtResource("3_8gbba")]
+
+[node name="Player" parent="." unique_id=1176689577 instance=ExtResource("2_bo1nx")]
+position = Vector2(75, 421)
+
+[node name="EnemyGrunt" parent="." unique_id=1094277759 instance=ExtResource("4_jjvhh")]
+position = Vector2(601, 463)
+
+[node name="EnemyGrunt2" parent="." unique_id=1409380540 instance=ExtResource("4_jjvhh")]
+position = Vector2(727, 462)

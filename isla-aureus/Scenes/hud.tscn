@@ -1,0 +1,70 @@
+[gd_scene format=3 uid="uid://0666otbn87s3"]
+
+[ext_resource type="Script" uid="uid://ck3s5ljult5sc" path="res://Scripts/hud.gd" id="1_e0onf"]
+[ext_resource type="Texture2D" uid="uid://q1j6e23mlk5a" path="res://Assets/salud_vacio.png" id="2_bjfho"]
+[ext_resource type="Script" uid="uid://b3wkm26mwv42w" path="res://Scripts/radar.gd" id="4_6fbih"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
+bg_color = Color(0.49608892, 0.40950617, 0, 0.6745098)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0onf"]
+bg_color = Color(1.2995303e-06, 0.37668917, 0.4584459, 0.67058825)
+
+[node name="HUD" type="CanvasLayer" unique_id=592268866]
+script = ExtResource("1_e0onf")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=541453228]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -143.0
+offset_top = 1.0
+offset_right = -2.0
+offset_bottom = 24.0
+grow_horizontal = 0
+
+[node name="LabelMunicion" type="Label" parent="MarginContainer" unique_id=924736653]
+layout_mode = 2
+text = "Munición: 60 / 600"
+
+[node name="MarcoHUD" type="TextureRect" parent="." unique_id=1242013307]
+offset_left = -0.9999999
+offset_top = -35.0
+offset_right = 913.0
+offset_bottom = 480.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_bjfho")
+
+[node name="BarraSalud" type="ProgressBar" parent="MarcoHUD" unique_id=2092188105]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 0
+offset_left = 327.5
+offset_top = 190.0
+offset_right = 785.0
+offset_bottom = 220.0
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
+show_percentage = false
+
+[node name="BarraEscudo" type="ProgressBar" parent="MarcoHUD" unique_id=843399636]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 0
+offset_left = 330.0
+offset_top = 252.5
+offset_right = 782.5
+offset_bottom = 285.0
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_e0onf")
+show_percentage = false
+
+[node name="Radar" type="Control" parent="." unique_id=1322947482]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 8.0
+offset_top = -128.0
+offset_right = 128.0
+offset_bottom = -8.0
+grow_vertical = 0
+script = ExtResource("4_6fbih")

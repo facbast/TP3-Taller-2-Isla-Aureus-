@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://c2y5ihbpmfcoj"]
+
+[ext_resource type="Script" uid="uid://bbr4nhqiqrlgv" path="res://Scripts/bala.gd" id="1_4qq6s"]
+
+[sub_resource type="Gradient" id="Gradient_yg4hx"]
+colors = PackedColorArray(1, 1, 1, 0, 1, 1, 0.34901962, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_4qq6s"]
+gradient = SubResource("Gradient_yg4hx")
+fill_to = Vector2(0.22173913, 0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_yg4hx"]
+size = Vector2(63, 18)
+
+[node name="Bala" type="Area2D" unique_id=2081609171]
+script = ExtResource("1_4qq6s")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=2119307835]
+scale = Vector2(0.35731578, 0.050228868)
+texture = SubResource("GradientTexture2D_4qq6s")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=28163447]
+position = Vector2(0.5, 0)
+scale = Vector2(0.35731578, 0.17859153)
+shape = SubResource("RectangleShape2D_yg4hx")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1515838229]
