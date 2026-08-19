@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://b8el2eura1wii"]
+
+[ext_resource type="Texture2D" uid="uid://b1pxxv3j5iqex" path="res://Assets/Armas/Pistola_Plasma.png" id="1_8nw1s"]
+[ext_resource type="Script" uid="uid://c8mep7i6v824y" path="res://Scripts/pistola_plasma.gd" id="1_o8glb"]
+
+[node name="PistolaPlasma" type="Node2D" unique_id=1502422774]
+script = ExtResource("1_o8glb")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1714144899]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_8nw1s")
+
+[node name="PuntoDisparo" type="Marker2D" parent="." unique_id=336094062]
+position = Vector2(32, -6)

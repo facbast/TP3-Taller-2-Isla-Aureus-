@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://bsj6oxpxo1hh0"]
+
+[ext_resource type="Script" uid="uid://cke7ijefxclx" path="res://Scripts/granada.gd" id="1_si1l5"]
+[ext_resource type="Texture2D" uid="uid://dl348x63dp50n" path="res://Assets/Granada HUD.png" id="1_v0rll"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_v0rll"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_si1l5"]
+radius = 120.0
+
+[node name="Granada" type="RigidBody2D" unique_id=1579001238]
+script = ExtResource("1_si1l5")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1031591512]
+position = Vector2(3, -6.0000005)
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_v0rll")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=535358560]
+shape = SubResource("CircleShape2D_v0rll")
+
+[node name="AreaExplosion" type="Area2D" parent="." unique_id=1773248522]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaExplosion" unique_id=1188971926]
+shape = SubResource("CircleShape2D_si1l5")
+debug_color = Color(0.7, 0, 0.011666489, 0.41960785)

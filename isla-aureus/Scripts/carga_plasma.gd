@@ -1,8 +1,8 @@
 extends Area2D
 
-var velocidad: float = 1200.0
-var dano: float = 10.0
-@export var tipo_dano: String = "Balistica"
+var velocidad: float = 600
+var dano: float = 60
+@export var tipo_dano: String = "Plasma"
 
 func _ready():
 	# Conectamos la señal de colisión por código para asegurar que detecte cuerpos

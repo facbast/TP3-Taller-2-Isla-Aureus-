@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://b508mvh4j8n66"]
+
+[ext_resource type="Script" uid="uid://bhygrn8ynnx7a" path="res://Scripts/arma_soltada.gd" id="1_3fawb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7lraw"]
+radius = 50.0
+
+[node name="ArmaSoltada" type="Area2D" unique_id=688121580]
+script = ExtResource("1_3fawb")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1955611673]
+scale = Vector2(0.5, 0.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1552327024]
+shape = SubResource("CircleShape2D_7lraw")

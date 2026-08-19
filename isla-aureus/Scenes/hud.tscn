@@ -5,10 +5,10 @@
 [ext_resource type="Script" uid="uid://b3wkm26mwv42w" path="res://Scripts/radar.gd" id="4_6fbih"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
-bg_color = Color(0.49608892, 0.40950617, 0, 0.6745098)
+bg_color = Color(0.5, 0.4166667, 0, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0onf"]
-bg_color = Color(1.2995303e-06, 0.37668917, 0.4584459, 0.67058825)
+bg_color = Color(0, 0.37566665, 0.46, 1)
 
 [node name="HUD" type="CanvasLayer" unique_id=592268866]
 script = ExtResource("1_e0onf")
@@ -27,6 +27,20 @@ grow_horizontal = 0
 layout_mode = 2
 text = "Munición: 60 / 600"
 
+[node name="MarginContainer2" type="MarginContainer" parent="." unique_id=1108820893]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -143.0
+offset_top = 23.0
+offset_right = -2.0
+offset_bottom = 46.0
+grow_horizontal = 0
+
+[node name="LabelGranadas" type="Label" parent="MarginContainer2" unique_id=2111655968]
+layout_mode = 2
+text = "Granada: 4/4"
+
 [node name="MarcoHUD" type="TextureRect" parent="." unique_id=1242013307]
 offset_left = -0.9999999
 offset_top = -35.0
@@ -39,8 +53,8 @@ texture = ExtResource("2_bjfho")
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 0
 offset_left = 327.5
-offset_top = 190.0
-offset_right = 785.0
+offset_top = 187.5
+offset_right = 782.5
 offset_bottom = 220.0
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
@@ -62,9 +76,23 @@ layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = -128.0
-offset_right = 128.0
-offset_bottom = -8.0
+offset_left = 5.0
+offset_top = -106.0
+offset_right = 125.0
+offset_bottom = 14.0
 grow_vertical = 0
 script = ExtResource("4_6fbih")
+
+[node name="MensajeNotificacion" type="Label" parent="." unique_id=46895549]
+modulate = Color(1, 1, 1, 0)
+offset_left = 8.0
+offset_top = 117.0
+offset_right = 229.0
+offset_bottom = 145.0
+theme_override_colors/font_color = Color(2.887845e-06, 0.9591798, 0.9365927, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 20
+text = "Has recogido munición"
+horizontal_alignment = 2

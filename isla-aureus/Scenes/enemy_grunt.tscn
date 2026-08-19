@@ -1,18 +1,34 @@
 [gd_scene format=3 uid="uid://bkgohogolomkn"]
 
 [ext_resource type="Script" uid="uid://bqjxxg42gg7a1" path="res://Scripts/enemy_grunt.gd" id="1_nf2s3"]
-[ext_resource type="Texture2D" uid="uid://c5egrxgfvi4bf" path="res://icon.svg" id="1_xk0lo"]
+[ext_resource type="Texture2D" uid="uid://cs52hdymagsnj" path="res://Assets/Grunt_torso.png" id="2_nf2s3"]
+[ext_resource type="PackedScene" uid="uid://b8el2eura1wii" path="res://Scenes/pistola_plasma.tscn" id="3_3jnox"]
+[ext_resource type="Texture2D" uid="uid://ckxwp1gdsby32" path="res://Assets/Grunt_mano.png" id="3_kdp71"]
 
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xk0lo"]
-radius = 31.0
-height = 64.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_nf2s3"]
+size = Vector2(26, 63)
 
 [node name="EnemyGrunt" type="CharacterBody2D" unique_id=1094277759 groups=["enemigos"]]
 script = ExtResource("1_nf2s3")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=343860437]
+[node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=343860437]
+position = Vector2(6, -6)
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("1_xk0lo")
+texture = ExtResource("2_nf2s3")
+flip_h = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1781480895]
-shape = SubResource("CapsuleShape2D_xk0lo")
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_nf2s3")
+
+[node name="PivoteBrazo" type="Node2D" parent="." unique_id=519085724]
+position = Vector2(31, -9)
+
+[node name="PistolaPlasma" parent="PivoteBrazo" unique_id=1502422774 instance=ExtResource("3_3jnox")]
+position = Vector2(36, -24)
+
+[node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=1924083054]
+position = Vector2(10, -3)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("3_kdp71")
+flip_h = true

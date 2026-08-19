@@ -17,8 +17,8 @@ func _draw():
 	var centro = Vector2(radio_radar, radio_radar)
 	
 	# 1. Dibujar el fondo del radar (Círculo semitransparente estilo HUD con borde)
-	draw_circle(centro, radio_radar, Color(0.263, 0.149, 0.251, 0.6))
-	draw_arc(centro, radio_radar, 0, TAU, 32, Color(0.573, 0.2, 1.0, 0.8), 2.0)
+	draw_circle(centro, radio_radar, Color(0.148, 0.21, 0.26, 0.6))
+	draw_arc(centro, radio_radar, 0, TAU, 32, Color(0.0, 0.523, 0.653, 0.8), 2.0)
 	
 	# 2. Dibujar al Jugador (Círculo amarillo centrado)
 	draw_circle(centro, 4.0, Color.YELLOW)
