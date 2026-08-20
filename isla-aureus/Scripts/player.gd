@@ -13,9 +13,15 @@ const FALL_GRAVITY_MULTIPLIER = 1.8
 @onready var _pistola = $PivoteBrazo/Pistola
 @onready var _pistola_plasma = $PivoteBrazo/PistolaPlasma
 
-var armas = []
+# Las armas que existen físicamente en la escena (estén equipadas o no)
+@onready var armas_en_escena = [_rifle, _pistola, _pistola_plasma]
+
+# Las ranuras del inventario del jugador
+var armas = [] 
 var indice_arma_actual = 0
-var _arma_actual = null # Ahora esta variable será dinámica
+var _arma_actual = null
+
+const ARMA_SOLTADA = preload("res://Scenes/arma_soltada.tscn")
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _mirando_derecha = true
@@ -37,12 +43,18 @@ var tiempo_sin_dano = 0.0
 var velocidad_recarga_escudo = 40.0 
 
 func _ready():
-	# Inicializamos el inventario y configuramos el arma inicial
-	armas = [_rifle, _pistola, _pistola_plasma]
-	_arma_actual = armas[indice_arma_actual]
+	# Inicializamos el inventario con solo 2 ranuras (Ej. Rifle y Pistola)
+	armas.append(_rifle)
+	armas.append(_pistola)
 	
-	_rifle.show()
-	_pistola.hide()
+	_arma_actual = armas[0]
+	
+	# Asegurarnos de que TODAS las armas de la escena estén ocultas primero
+	for arma in armas_en_escena:
+		arma.hide()
+		
+	# Mostramos SOLO el arma que tenemos equipada en la mano
+	_arma_actual.show()
 
 	await get_tree().process_frame
 	var hud = get_parent().get_node_or_null("HUD")
@@ -185,23 +197,84 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 		hud.actualizar_salud_hud(salud_actual, salud_maxima)
 		
 func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
+	# 1. VERIFICAMOS SI YA TENEMOS ESTA ARMA EN EL INVENTARIO
 	for arma in armas:
-		if arma.name == nombre_arma: 
-			arma.municion_reserva += cantidad_municion
-			
-			var hud = get_parent().get_node_or_null("HUD")
-			if hud != null:
-				# 1. Actualizamos los números si tenemos el arma en las manos
-				if arma == _arma_actual and arma.has_method("_actualizar_hud"):
-					arma._actualizar_hud()
+		if arma.name == nombre_arma:
+			if "municion_reserva" in arma:
+				arma.municion_reserva += cantidad_municion
+				var hud = get_parent().get_node_or_null("HUD")
+				if hud != null:
+					if arma == _arma_actual and arma.has_method("_actualizar_hud"):
+						arma._actualizar_hud()
+					hud.mostrar_notificacion("Has recogido munición de " + nombre_arma)
+				return true
 				
-				# 2. ENVIAMOS LA NOTIFICACIÓN AL HUD
-				var texto_mensaje = "Has recogido " + str(cantidad_municion) + " de munición de " + nombre_arma
-				hud.mostrar_notificacion(texto_mensaje)
-				
-			return true 
+			elif "bateria" in arma:
+				# Las armas de energía NO se suman. Solo robamos la batería si la del piso es mejor.
+				if cantidad_municion > arma.bateria:
+					arma.bateria = cantidad_municion
+					var hud = get_parent().get_node_or_null("HUD")
+					if hud != null:
+						if arma == _arma_actual and arma.has_method("_actualizar_hud"):
+							arma._actualizar_hud()
+						hud.mostrar_notificacion("Batería de " + nombre_arma + " recargada")
+					return true # Retorna true para destruir el arma del piso
+				else:
+					# Si la del piso tiene menos o igual batería, la rechazamos
+					return false
+
+	# 2. SI NO LA TENEMOS, DEBEMOS EQUIPARLA (Intercambio clásico)
+	var arma_a_equipar = null
+	for arma_en_escena in armas_en_escena:
+		if arma_en_escena.name == nombre_arma:
+			arma_a_equipar = arma_en_escena
+			break
 			
+	if arma_a_equipar != null:
+		_tirar_arma_actual_al_suelo()
+		armas[indice_arma_actual] = arma_a_equipar
+		
+		_arma_actual.hide()
+		_arma_actual = arma_a_equipar
+		_arma_actual.show()
+		
+		if "municion_reserva" in _arma_actual:
+			_arma_actual.municion_reserva = cantidad_municion 
+		elif "bateria" in _arma_actual:
+			_arma_actual.bateria = cantidad_municion
+			
+		if _arma_actual.has_method("_actualizar_hud"):
+			_arma_actual._actualizar_hud()
+			
+		var hud = get_parent().get_node_or_null("HUD")
+		if hud != null:
+			hud.mostrar_notificacion("Arma cambiada por: " + nombre_arma)
+		return true
+		
 	return false
+
+func _tirar_arma_actual_al_suelo():
+	var arma_caida = ARMA_SOLTADA.instantiate()
+	arma_caida.tipo_arma = _arma_actual.name 
+	
+	# Le pasamos la munición o batería según corresponda
+	if "municion_reserva" in _arma_actual:
+		arma_caida.cantidad_municion = _arma_actual.municion_reserva
+	elif "bateria" in _arma_actual:
+		arma_caida.cantidad_municion = _arma_actual.bateria
+	
+	if _arma_actual is Sprite2D:
+		arma_caida.textura_arma = _arma_actual.texture
+		arma_caida.scale = _arma_actual.scale
+	elif _arma_actual.has_node("Sprite2D"):
+		var sprite_arma = _arma_actual.get_node("Sprite2D")
+		arma_caida.textura_arma = sprite_arma.texture
+		arma_caida.scale = sprite_arma.scale
+		
+	get_tree().current_scene.call_deferred("add_child", arma_caida)
+	
+	var offset_x = 40.0 if _mirando_derecha else -40.0
+	arma_caida.global_position = global_position + Vector2(offset_x, 0)
 
 func lanzar_granada():
 	if granadas_actuales <= 0:

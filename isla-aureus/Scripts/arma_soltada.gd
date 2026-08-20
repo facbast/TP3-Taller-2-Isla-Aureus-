@@ -1,12 +1,12 @@
 extends Area2D
 
+var cantidad_municion: int = 16 
 var tipo_arma: String = "Pistola"
-var municion_contenida: int = 16 
 var textura_arma: Texture2D = null
 
-var _jugador: Node2D = null
-var _tiempo_mantenido: float = 0.0
-var _tiempo_necesario: float = 0.5 
+var jugador_cerca = null
+var tiempo_manteniendo = 0.0
+var tiempo_requerido = 0.4 
 
 func _ready():
 	body_entered.connect(_on_body_entered)
@@ -16,35 +16,41 @@ func _ready():
 		$Sprite2D.texture = textura_arma
 
 func _process(delta):
-	# Si el jugador está sobre el arma (y no recogió la munición automáticamente)
-	if _jugador != null:
+	if jugador_cerca != null:
 		if Input.is_physical_key_pressed(KEY_E):
-			_tiempo_mantenido += delta
-			if _tiempo_mantenido >= _tiempo_necesario:
-				_intercambiar_arma()
+			tiempo_manteniendo += delta
+			if tiempo_manteniendo >= tiempo_requerido:
+				var recogido = jugador_cerca.recoger_arma(tipo_arma, cantidad_municion)
+				if recogido:
+					queue_free()
+				else:
+					# Si la rechazó (ej. batería inferior), reiniciamos el temporizador
+					tiempo_manteniendo = 0.0
 		else:
-			_tiempo_mantenido = 0.0
+			tiempo_manteniendo = 0.0
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
-		# 1. Al tocarla, intentamos absorber la munición de inmediato
-		if body.has_method("recoger_arma"):
-			var recogio_municion = body.recoger_arma(tipo_arma, municion_contenida)
-			
-			if recogio_municion:
-				# Si ya teníamos el arma, absorbemos las balas y esta desaparece
-				queue_free()
-				return 
+		var ya_tiene_arma = false
+		var usa_bateria = false
+		
+		for arma in body.armas:
+			if arma.name == tipo_arma:
+				ya_tiene_arma = true
+				if "bateria" in arma:
+					usa_bateria = true
+				break
 				
-		# 2. Si NO teníamos el arma, se queda en el suelo y preparamos la lógica para intercambiarla
-		_jugador = body
+		# Solo absorbemos munición al instante si YA la tiene y NO es de batería
+		if ya_tiene_arma and not usa_bateria:
+			var recogido = body.recoger_arma(tipo_arma, cantidad_municion)
+			if recogido:
+				queue_free()
+		else:
+			# Obligamos al jugador a usar la tecla 'E' para armas nuevas o de energía
+			jugador_cerca = body
 
 func _on_body_exited(body):
-	if body == _jugador:
-		_jugador = null
-		_tiempo_mantenido = 0.0
-
-func _intercambiar_arma():
-	# (Aquí programaremos el intercambio de armas más adelante)
-	print("¡Has intercambiado tu arma por la ", tipo_arma, "!")
-	queue_free()
+	if body == jugador_cerca:
+		jugador_cerca = null
+		tiempo_manteniendo = 0.0

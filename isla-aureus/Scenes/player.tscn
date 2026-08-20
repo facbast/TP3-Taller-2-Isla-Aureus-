@@ -50,7 +50,6 @@ position = Vector2(18, 4)
 [node name="PistolaPlasma" parent="PivoteBrazo" unique_id=1502422774 instance=ExtResource("8_8erm5")]
 visible = false
 position = Vector2(38, -2)
-scale = Vector2(0.3, 0.3)
 
 [node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=662105213]
 position = Vector2(21, 7)
@@ -59,3 +58,5 @@ texture = ExtResource("3_6t5aa")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=506794172]
 position_smoothing_enabled = true
+
+[editable path="PivoteBrazo/PistolaPlasma"]

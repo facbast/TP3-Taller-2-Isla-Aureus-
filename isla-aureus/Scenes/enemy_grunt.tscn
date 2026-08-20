@@ -25,10 +25,15 @@ shape = SubResource("RectangleShape2D_nf2s3")
 position = Vector2(31, -9)
 
 [node name="PistolaPlasma" parent="PivoteBrazo" unique_id=1502422774 instance=ExtResource("3_3jnox")]
-position = Vector2(36, -24)
+position = Vector2(12, -3)
+
+[node name="PuntoDisparo" parent="PivoteBrazo/PistolaPlasma" index="1" unique_id=336094062]
+position = Vector2(7, -1)
 
 [node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=1924083054]
 position = Vector2(10, -3)
 scale = Vector2(0.5, 0.5)
 texture = ExtResource("3_kdp71")
 flip_h = true
+
+[editable path="PivoteBrazo/PistolaPlasma"]

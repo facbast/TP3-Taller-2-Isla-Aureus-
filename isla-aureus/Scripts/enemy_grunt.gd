@@ -8,7 +8,7 @@ extends CharacterBody2D
 @onready var _sprite_cuerpo = $SpriteCuerpo
 @onready var _pivote_brazo = $PivoteBrazo
 @onready var _sprite_brazo = $PivoteBrazo/SpriteBrazoArma
-@onready var _arma_actual = $PivoteBrazo/SpriteArma 
+@onready var _arma_actual = $PivoteBrazo/PistolaPlasma
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _jugador: Node2D = null
@@ -158,7 +158,20 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 
 func _soltar_arma():
 	var arma_caida = ARMA_SOLTADA.instantiate()
-	arma_caida.tipo_arma = "Pistola"
-	arma_caida.textura_arma = _arma_actual.texture
+	arma_caida.tipo_arma = "PistolaPlasma" 
+	
+	# --- LA CLAVE PARA LA BATERÍA ---
+	if arma_caida.tipo_arma == "PistolaPlasma":
+		arma_caida.cantidad_municion = 100 # Carga completa para el plasma
+	else:
+		arma_caida.cantidad_municion = 5   # Balas por defecto para otras armas
+	
+	var sprite_arma = _arma_actual.get_node("Sprite2D")
+	if sprite_arma:
+		arma_caida.textura_arma = sprite_arma.texture
+		
+		# Heredamos la escala para que no sea gigante
+		arma_caida.scale = sprite_arma.scale
+		
 	get_parent().call_deferred("add_child", arma_caida)
 	arma_caida.global_position = global_position
