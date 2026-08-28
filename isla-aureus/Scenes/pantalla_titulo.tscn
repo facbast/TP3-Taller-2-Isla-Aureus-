@@ -1,0 +1,62 @@
+[gd_scene format=3 uid="uid://ccafwax1xbta2"]
+
+[ext_resource type="Script" uid="uid://bdntmdud6kd65" path="res://Scripts/pantalla_titulo.gd" id="1_te6ch"]
+[ext_resource type="Texture2D" uid="uid://dq2yil1lwy432" path="res://Assets/Isla logo.png" id="1_y6c34"]
+
+[node name="PantallaTitulo" type="Control" unique_id=882656132]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_te6ch")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=489430645]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -442.0
+offset_top = 68.0
+offset_right = 448.0
+offset_bottom = 340.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 0.6509804)
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=211068458]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -452.0
+offset_top = 70.0
+offset_right = 452.0
+offset_bottom = 350.0
+grow_horizontal = 2
+texture = ExtResource("1_y6c34")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=867306847]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -59.0
+offset_top = 37.0
+offset_right = 59.0
+offset_bottom = 103.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BtnNuevaPartida" type="Button" parent="VBoxContainer" unique_id=71729852]
+layout_mode = 2
+text = "Nueva Partida"
+
+[node name="BtnContinuar" type="Button" parent="VBoxContainer" unique_id=1786767907]
+layout_mode = 2
+text = "Continuar"
+
+[connection signal="pressed" from="VBoxContainer/BtnNuevaPartida" to="." method="_on_btn_nueva_partida_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnContinuar" to="." method="_on_btn_continuar_pressed"]

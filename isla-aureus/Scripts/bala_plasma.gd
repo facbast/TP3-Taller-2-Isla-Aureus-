@@ -1,8 +1,10 @@
 extends Area2D
 
 var velocidad: float = 1200.0
-var dano: float = 8
+var es_de_enemigo: bool = false
+var dano: float = 10.0
 @export var tipo_dano: String = "Plasma"
+
 
 func _ready():
 	# Conectamos la señal de colisión por código para asegurar que detecte cuerpos
@@ -17,17 +19,24 @@ func _physics_process(delta):
 	position += transform.x * velocidad * delta
 
 func _on_body_entered(body):
-	# Ignoramos si la bala choca con el Jugador usando la etiqueta de grupo
-	if body.is_in_group("player"):
-		return
-		
-	# Si el objeto contra el que chocó tiene la función recibir_dano (como el Grunt)
-	if body.has_method("recibir_dano"):
-		# --- NUEVO: ENVIAMOS EL TIPO DE DAÑO ---
-		body.recibir_dano(dano, tipo_dano)
-		
-	# Se destruye la bala al impactar con un enemigo o con el suelo
-	queue_free()
+	# CASO A: La bala la disparó un GECKO / ENEMIGO
+	if es_de_enemigo:
+		if body.is_in_group("player"):
+			if body.has_method("recibir_dano"):
+				body.recibir_dano(dano)
+			queue_free()
+		elif not body.is_in_group("enemigos"):
+			# Si choca contra pared o suelo, se destruye sin dañar a otros Geckos
+			queue_free()
+
+	# CASO B: La bala la disparó el JUGADOR
+	else:
+		if body.is_in_group("enemigos"):
+			if body.has_method("recibir_dano"):
+				body.recibir_dano(dano, "Plasma")
+			queue_free()
+		elif not body.is_in_group("player"):
+			queue_free()
 
 func _on_screen_exited():
 	queue_free()

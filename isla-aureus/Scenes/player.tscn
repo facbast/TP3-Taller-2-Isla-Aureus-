@@ -8,9 +8,13 @@
 [ext_resource type="Texture2D" uid="uid://c1xap3pfahllk" path="res://Assets/Armas/Pistola.png" id="5_x3wgy"]
 [ext_resource type="Script" uid="uid://qe757kid0rex" path="res://Scripts/pistola.gd" id="6_3smsa"]
 [ext_resource type="PackedScene" uid="uid://b8el2eura1wii" path="res://Scenes/pistola_plasma.tscn" id="8_8erm5"]
+[ext_resource type="PackedScene" uid="uid://wef2aihmnohw" path="res://Scenes/rifle_plasma.tscn" id="9_f1ek2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6t5aa"]
 size = Vector2(35, 103)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_f1ek2"]
+size = Vector2(50, 80)
 
 [node name="Player" type="CharacterBody2D" unique_id=1176689577 groups=["player"]]
 script = ExtResource("1_cvnsp")
@@ -51,12 +55,27 @@ position = Vector2(18, 4)
 visible = false
 position = Vector2(38, -2)
 
+[node name="RiflePlasma" parent="PivoteBrazo" unique_id=867083200 instance=ExtResource("9_f1ek2")]
+visible = false
+position = Vector2(24, 5)
+
+[node name="PuntoDisparo" parent="PivoteBrazo/RiflePlasma" index="1" unique_id=599909725]
+position = Vector2(25, -3)
+
 [node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=662105213]
 position = Vector2(21, 7)
 scale = Vector2(0.3, 0.3)
 texture = ExtResource("3_6t5aa")
 
+[node name="AreaPatada" type="Area2D" parent="." unique_id=1713686239]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaPatada" unique_id=281111907]
+position = Vector2(35, 0)
+shape = SubResource("RectangleShape2D_f1ek2")
+debug_color = Color(0.99623126, 0, 0.19929612, 0.41960785)
+
 [node name="Camera2D" type="Camera2D" parent="." unique_id=506794172]
 position_smoothing_enabled = true
 
 [editable path="PivoteBrazo/PistolaPlasma"]
+[editable path="PivoteBrazo/RiflePlasma"]

@@ -77,5 +77,8 @@ func recargar():
 
 func _actualizar_hud():
 	var hud = owner.get_parent().get_node_or_null("HUD")
+	if hud == null:
+		hud = get_tree().current_scene.get_node_or_null("HUD")
+		
 	if hud != null:
-		hud.actualizar_municion(municion_cargador, municion_reserva)
+		hud.actualizar_municion(municion_cargador, municion_reserva, "Rifle")

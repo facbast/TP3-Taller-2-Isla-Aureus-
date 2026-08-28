@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://b044ty8a3ds2l"]
+
+[ext_resource type="Script" uid="uid://cu76l5kd44uf7" path="res://Scripts/checkpoint.gd" id="1_2cwi7"]
+[ext_resource type="Texture2D" uid="uid://b2qhdv1l7sjux" path="res://Assets/Flag_Enemy.png" id="1_lbcco"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_lbcco"]
+size = Vector2(62, 132)
+
+[node name="Checkpoint" type="Area2D" unique_id=741946313]
+script = ExtResource("1_2cwi7")
+
+[node name="SpriteBandera" type="Sprite2D" parent="." unique_id=1335786848]
+position = Vector2(0, -21)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_lbcco")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082879071]
+position = Vector2(1, -17)
+shape = SubResource("RectangleShape2D_lbcco")

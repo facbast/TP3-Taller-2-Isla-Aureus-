@@ -31,6 +31,12 @@ func _process(delta):
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
+		# Si es una granada, se intenta recoger al instante al pasar por encima
+		if tipo_arma == "Granada":
+			var recogido = body.recoger_arma(tipo_arma, cantidad_municion)
+			if recogido:
+				queue_free()
+			return
 		var ya_tiene_arma = false
 		var usa_bateria = false
 		

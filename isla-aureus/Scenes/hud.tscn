@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://0666otbn87s3"]
 
 [ext_resource type="Script" uid="uid://ck3s5ljult5sc" path="res://Scripts/hud.gd" id="1_e0onf"]
+[ext_resource type="Texture2D" uid="uid://dl348x63dp50n" path="res://Assets/Granada HUD.png" id="2_6fbih"]
 [ext_resource type="Texture2D" uid="uid://q1j6e23mlk5a" path="res://Assets/salud_vacio.png" id="2_bjfho"]
+[ext_resource type="Texture2D" uid="uid://b6ihxdakppg3a" path="res://Assets/Armas/Durian.png" id="3_t1xeu"]
 [ext_resource type="Script" uid="uid://b3wkm26mwv42w" path="res://Scripts/radar.gd" id="4_6fbih"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
@@ -13,7 +15,7 @@ bg_color = Color(0, 0.37566665, 0.46, 1)
 [node name="HUD" type="CanvasLayer" unique_id=592268866]
 script = ExtResource("1_e0onf")
 
-[node name="MarginContainer" type="MarginContainer" parent="." unique_id=541453228]
+[node name="ContenedorArma" type="MarginContainer" parent="." unique_id=541453228]
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -23,23 +25,61 @@ offset_right = -2.0
 offset_bottom = 24.0
 grow_horizontal = 0
 
-[node name="LabelMunicion" type="Label" parent="MarginContainer" unique_id=924736653]
+[node name="IconoArma" type="TextureRect" parent="ContenedorArma" unique_id=139400030]
+custom_minimum_size = Vector2(160, 90)
 layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LabelMunicion" type="Label" parent="ContenedorArma" unique_id=924736653]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 text = "Munición: 60 / 600"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="MarginContainer2" type="MarginContainer" parent="." unique_id=1108820893]
-anchors_preset = 1
+[node name="ContenedorGranada" type="MarginContainer" parent="." unique_id=1108820893]
+anchors_preset = 3
 anchor_left = 1.0
+anchor_top = 1.0
 anchor_right = 1.0
-offset_left = -143.0
-offset_top = 23.0
-offset_right = -2.0
-offset_bottom = 46.0
+anchor_bottom = 1.0
+offset_left = -79.0
+offset_top = -10.0
+offset_right = 36.0
+offset_bottom = -10.0
 grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_left = -120
+theme_override_constants/margin_top = -50
+theme_override_constants/margin_right = -10
+theme_override_constants/margin_bottom = -10
 
-[node name="LabelGranadas" type="Label" parent="MarginContainer2" unique_id=2111655968]
+[node name="HBoxContainer" type="HBoxContainer" parent="ContenedorGranada" unique_id=1194911207]
 layout_mode = 2
-text = "Granada: 4/4"
+
+[node name="IconoFrag" type="TextureRect" parent="ContenedorGranada/HBoxContainer" unique_id=736789560]
+layout_mode = 2
+texture = ExtResource("2_6fbih")
+expand_mode = 3
+
+[node name="LabelFrag" type="Label" parent="ContenedorGranada/HBoxContainer" unique_id=2111655968]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+vertical_alignment = 1
+
+[node name="IconoPlasma" type="TextureRect" parent="ContenedorGranada/HBoxContainer" unique_id=1488160567]
+layout_mode = 2
+texture = ExtResource("3_t1xeu")
+expand_mode = 3
+
+[node name="LabelPlasma" type="Label" parent="ContenedorGranada/HBoxContainer" unique_id=192289300]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+vertical_alignment = 1
 
 [node name="MarcoHUD" type="TextureRect" parent="." unique_id=1242013307]
 offset_left = -0.9999999

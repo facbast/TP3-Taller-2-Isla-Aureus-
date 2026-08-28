@@ -2,25 +2,37 @@ extends RigidBody2D
 
 @export var dano_explosion: float = 60.0
 @export var tiempo_detonacion: float = 2.0 # 2 segundos hasta explotar
-
+@export var fuerza_empuje: float = 800.0 # Nueva variable para la fuerza del impacto
 @onready var _area_explosion = $AreaExplosion
 
 func _ready():
-	# Agregamos la granada al grupo para que los enemigos la reconozcan
 	add_to_group("granadas")
-	
-	# Empezamos la cuenta regresiva en cuanto la granada es lanzada
 	var temporizador = get_tree().create_timer(tiempo_detonacion)
 	temporizador.timeout.connect(_explotar)
 
 func _explotar():
 	print("¡BOOM! Explosión de fragmentación.")
 	
-	# 1. Aplicamos el daño a los cuerpos cercanos
 	var cuerpos_afectados = _area_explosion.get_overlapping_bodies()
 	for cuerpo in cuerpos_afectados:
+		# 1. Aplicamos el daño
 		if cuerpo.has_method("recibir_dano"):
 			cuerpo.recibir_dano(dano_explosion, "Explosivo")
+			
+		# 2. Calculamos la dirección del empuje
+		var direccion_impulso = (cuerpo.global_position - global_position).normalized()
+		# Elevamos un poco el vector (Y negativo) para que los cuerpos salten hacia arriba
+		direccion_impulso.y -= 0.5 
+		direccion_impulso = direccion_impulso.normalized()
+		
+		# 3. Aplicamos el empuje según el tipo de cuerpo
+		if cuerpo is RigidBody2D and cuerpo != self:
+			# Para objetos con física pura (como armas tiradas u otras granadas)
+			cuerpo.apply_central_impulse(direccion_impulso * fuerza_empuje)
+			
+		elif cuerpo is CharacterBody2D:
+			# Para personajes (Geckos o el Jugador) inyectamos la fuerza en su velocidad
+			cuerpo.velocity += direccion_impulso * fuerza_empuje
 			
 	# --- 2. CREAMOS EL EFECTO VISUAL (PLACEHOLDER) ---
 	var efecto_explosion = Polygon2D.new()

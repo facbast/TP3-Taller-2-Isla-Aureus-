@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://364m6yjyxst8"]
+
+[ext_resource type="Texture2D" uid="uid://d01el8rrgc85f" path="res://Assets/Elite_torso.png" id="1_6o3al"]
+[ext_resource type="Script" uid="uid://m2hxh2tcp7e2" path="res://Scripts/enemy_elite.gd" id="1_sgdiv"]
+[ext_resource type="Texture2D" uid="uid://bkax1v3u14god" path="res://Assets/Elite_Brazos.png" id="2_6gnqs"]
+[ext_resource type="PackedScene" uid="uid://wef2aihmnohw" path="res://Scenes/rifle_plasma.tscn" id="3_sgdiv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6o3al"]
+size = Vector2(44, 97)
+
+[node name="EnemyElite" type="CharacterBody2D" unique_id=236204452 groups=["enemigos"]]
+script = ExtResource("1_sgdiv")
+
+[node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=1376675527]
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("1_6o3al")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=390953499]
+position = Vector2(12, 2.5)
+shape = SubResource("RectangleShape2D_6o3al")
+
+[node name="PivoteBrazo" type="Node2D" parent="." unique_id=497845955]
+position = Vector2(-3, -12)
+
+[node name="RiflePlasma" parent="PivoteBrazo" unique_id=867083200 instance=ExtResource("3_sgdiv")]
+position = Vector2(19, 32)
+cadencia = null
+bateria_maxima = null
+calor_por_disparo = null
+velocidad_enfriamiento = null
+
+[node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=309567689]
+position = Vector2(-1, 18)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_6gnqs")
+region_enabled = true
+region_rect = Rect2(0, 0, 54.001114, 120)
