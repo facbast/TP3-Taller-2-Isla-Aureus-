@@ -49,6 +49,14 @@ var es_alerta: bool = false               # Estado de combate activado
 var esta_aterrado: bool = false
 var tiempo_aterrado: float = 0.0
 
+# --- SORPRESA (reacción breve con filtro amarillo antes de alertar/huir) ---
+@export var duracion_sorpresa: float = 0.8
+var _sorpresa_tiempo: float = 0.0
+var _sorpresa_huir: bool = false
+var _sorpresa_huida_duracion: float = 4.0
+# El cono solo se dibuja patrullando (ni alerta, susto, pánico o sorpresa)
+var _cono_visible: bool = false
+
 # --- PATRULLA (deambular cuando está tranquilo) ---
 @export var patrullar: bool = true       # Desmarcar para centinelas estáticos
 @export var rango_patrulla: float = 150.0 # Píxeles a cada lado del punto de aparición
@@ -106,7 +114,7 @@ func _physics_process(delta):
 	if not es_alerta:
 		queue_redraw()
 		if _detectar_jugador_en_cono():
-			es_alerta = true
+			_sorprender(false)
 
 # (Recuerda restar el tiempo de miedo al inicio del _physics_process)
 	if esta_aterrado:
@@ -115,7 +123,14 @@ func _physics_process(delta):
 			esta_aterrado = false
 			_sprite_cuerpo.modulate = Color(1.0, 1.0, 1.0) # Vuelve al color normal
 
+	# Reloj de la sorpresa (corre incluso en pánico; al terminar alerta o huye)
+	if _sorpresa_tiempo > 0.0:
+		_sorpresa_tiempo -= delta
+		if _sorpresa_tiempo <= 0.0:
+			_terminar_sorpresa()
+
 	# 2. MÁQUINA DE ESTADOS (Huir vs Combatir)
+	_cono_visible = false # Solo la rama de patrulla lo vuelve a encender
 	if granada_mas_peligrosa != null:
 		# --- ESTADO: PÁNICO ---
 		var direccion_escape = sign(global_position.x - granada_mas_peligrosa.global_position.x)
@@ -126,6 +141,10 @@ func _physics_process(delta):
 		
 		if _jugador != null and is_instance_valid(_jugador):
 			_apuntar_al_jugador()
+
+	elif _sorpresa_tiempo > 0.0:
+		# --- ESTADO: SORPRESA (clavado y amarillo, sin disparar) ---
+		velocity.x = move_toward(velocity.x, 0, velocidad)
 			
 	elif esta_aterrado and is_instance_valid(_jugador):
 		# --- ESTADO: ATERRADO (HUIR DEL JUGADOR) ---
@@ -170,9 +189,11 @@ func _physics_process(delta):
 	else:
 		# --- ESTADO: PATRULLA (tranquilo, sin alerta ni peligros) ---
 		_patrullar()
+	queue_redraw() # Refresca cono y barra cada frame, sin restos entre estados
 	move_and_slide()
 
 func _patrullar():
+	_cono_visible = patrullar
 	if not patrullar:
 		velocity.x = move_toward(velocity.x, 0, velocidad)
 		return
@@ -345,17 +366,23 @@ func _detectar_jugador_en_cono() -> bool:
 	return false
 
 func _draw():
-	# Dibuja el cono de visión visual mientras esté desenfocado / sin alerta
-	if not es_alerta:
+	# Haz de linterna: 3 capas anidadas con degradado (brillante en el origen,
+	# transparente en el borde) en vez de un triángulo plano.
+	# Solo visible patrullando: en alerta, susto, pánico o sorpresa se apaga.
+	if _cono_visible:
 		var dir_x = 1.0 if _mirando_derecha else -1.0
 		var medio_angulo = deg_to_rad(angulo_vision / 2.0)
-		var p1 = Vector2(dir_x * cos(-medio_angulo), sin(-medio_angulo)) * distancia_vision
-		var p2 = Vector2(dir_x * cos(medio_angulo), sin(medio_angulo)) * distancia_vision
-		
-		draw_polygon(
-			PackedVector2Array([Vector2(0, -15), Vector2(0, -15) + p1, Vector2(0, -15) + p2]), 
-			PackedColorArray([Color(1.0, 0.9, 0.2, 0.15)]) # Amarillo translúcido
-		)
+		var apice = Vector2(0, -15)
+		for i in range(3, 0, -1):
+			var frac = float(i) / 3.0
+			var ang = medio_angulo * frac
+			var alfa = 0.20 - 0.10 * frac
+			var q1 = apice + Vector2(dir_x * cos(-ang), sin(-ang)) * distancia_vision
+			var q2 = apice + Vector2(dir_x * cos(ang), sin(ang)) * distancia_vision
+			draw_polygon(
+				PackedVector2Array([apice, q1, q2]),
+				PackedColorArray([Color(1.0, 0.95, 0.55, alfa), Color(1.0, 0.95, 0.55, 0.0), Color(1.0, 0.95, 0.55, 0.0)])
+			)
 	_dibujar_barra_dano()
 
 func _dibujar_barra_dano():
@@ -374,9 +401,32 @@ func _dibujar_barra_dano():
 		draw_rect(Rect2(origen, Vector2(BARRA_ANCHO * frac, BARRA_ALTO)), relleno)
 
 func asustar(duracion: float = 4.0):
-	# Si ya está asustado, no reiniciamos el contador
-	if not esta_aterrado:
+	# Si ya está asustado o procesando el susto, no reiniciamos
+	if esta_aterrado or _sorpresa_tiempo > 0.0:
+		return
+	# Primero la sorpresa amarilla, y al terminar arranca la huida
+	_sorprender(true, duracion)
+
+# Inicia la sorpresa: filtro amarillo (el mismo de asustado) y quieto.
+func _sorprender(huir: bool, duracion_huida: float = 4.0):
+	# Sin esto, cada frame en el cono reiniciaría el reloj y nunca alertaría
+	if _sorpresa_tiempo > 0.0:
+		return
+	_sorpresa_huir = huir
+	_sorpresa_huida_duracion = duracion_huida
+	_sorpresa_tiempo = duracion_sorpresa
+	_sprite_cuerpo.modulate = Color(1.0, 1.0, 0.0)
+	queue_redraw()
+
+func _terminar_sorpresa():
+	_sorpresa_tiempo = 0.0
+	if _sorpresa_huir:
+		_sorpresa_huir = false
 		esta_aterrado = true
-		tiempo_aterrado = duracion
-		_sprite_cuerpo.modulate = Color(1.0, 1.0, 0.0) # Filtro amarillo
+		tiempo_aterrado = _sorpresa_huida_duracion
+		# Mantiene el amarillo hasta que se le pasa el susto (tick de miedo)
+	else:
+		es_alerta = true
+		_sprite_cuerpo.modulate = Color(1.0, 1.0, 1.0)
+		queue_redraw()
 		

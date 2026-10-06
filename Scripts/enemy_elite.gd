@@ -46,6 +46,12 @@ var es_alerta: bool = false               # Estado de combate activado
 # no detecta, no ataca y no recibe daño hasta que el trigger lo despierta.
 @export var dormido_hasta_tutorial: bool = false
 
+# --- SORPRESA (reacción breve con filtro amarillo antes de alertar) ---
+@export var duracion_sorpresa: float = 0.8
+var _sorpresa_tiempo: float = 0.0
+# El cono solo se dibuja patrullando (ni alerta, susto, pánico o sorpresa)
+var _cono_visible: bool = false
+
 # --- PATRULLA (deambular cuando está tranquilo) ---
 @export var patrullar: bool = true       # Desmarcar para centinelas estáticos
 @export var rango_patrulla: float = 150.0 # Píxeles a cada lado del punto de aparición
@@ -112,6 +118,15 @@ func _physics_process(delta):
 		_barra_dano_tiempo -= delta
 		queue_redraw()
 
+	# Reloj de la sorpresa (al terminar, alerta)
+	if _sorpresa_tiempo > 0.0:
+		_sorpresa_tiempo -= delta
+		if _sorpresa_tiempo <= 0.0:
+			_sorpresa_tiempo = 0.0
+			es_alerta = true
+			_sprite_cuerpo.modulate = Color(1.0, 1.0, 1.0)
+			queue_redraw()
+
 	_procesar_recarga_escudo(delta)
 
 	# Cooldown de granada
@@ -141,9 +156,10 @@ func _physics_process(delta):
 	if not es_alerta:
 		queue_redraw()
 		if _detectar_jugador_en_cono():
-			es_alerta = true
+			_sorprender()
 
 	# 2. MÁQUINA DE ESTADOS (Evadir Granada vs Combate Normal)
+	_cono_visible = false # Solo la rama de patrulla lo vuelve a encender
 	if granada_mas_peligrosa != null:
 		# --- ESTADO: HUIR DE GRANADA ---
 		var direccion_escape = sign(global_position.x - granada_mas_peligrosa.global_position.x)
@@ -154,6 +170,10 @@ func _physics_process(delta):
 		
 		if is_instance_valid(_jugador):
 			_apuntar_al_jugador()
+
+	elif _sorpresa_tiempo > 0.0:
+		# --- ESTADO: SORPRESA (clavado y amarillo, sin disparar) ---
+		velocity.x = move_toward(velocity.x, 0, SPEED)
 
 	elif es_alerta and is_instance_valid(_jugador):
 		# --- ESTADO DE COMBATE NORMAL ---
@@ -185,9 +205,11 @@ func _physics_process(delta):
 		# --- ESTADO: PATRULLA (tranquilo, sin alerta ni peligros) ---
 		_patrullar()
 
+	queue_redraw() # Refresca cono y barra cada frame, sin restos entre estados
 	move_and_slide()
 	
 func _patrullar():
+	_cono_visible = patrullar
 	if not patrullar:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 		return
@@ -260,6 +282,14 @@ func _flip_personaje():
 	_mirando_derecha = not _mirando_derecha
 	_sprite_cuerpo.flip_h = not _sprite_cuerpo.flip_h
 	_pivote_brazo.position.x = -_pivote_brazo.position.x
+
+# Inicia la sorpresa: filtro amarillo (el mismo de grunt asustado) y quieto.
+func _sorprender():
+	if _sorpresa_tiempo > 0.0:
+		return
+	_sorpresa_tiempo = duracion_sorpresa
+	_sprite_cuerpo.modulate = Color(1.0, 1.0, 0.0)
+	queue_redraw()
 
 func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	# Dormido para el tutorial: los disparos previos no le hacen nada
@@ -435,17 +465,23 @@ func _detectar_jugador_en_cono() -> bool:
 	return false
 
 func _draw():
-	# Dibuja el cono de visión visual mientras esté desenfocado / sin alerta
-	if not es_alerta:
+	# Haz de linterna: 3 capas anidadas con degradado (brillante en el origen,
+	# transparente en el borde) en vez de un triángulo plano.
+	# Solo visible patrullando: en alerta, susto, pánico o sorpresa se apaga.
+	if _cono_visible:
 		var dir_x = 1.0 if _mirando_derecha else -1.0
 		var medio_angulo = deg_to_rad(angulo_vision / 2.0)
-		var p1 = Vector2(dir_x * cos(-medio_angulo), sin(-medio_angulo)) * distancia_vision
-		var p2 = Vector2(dir_x * cos(medio_angulo), sin(medio_angulo)) * distancia_vision
-		
-		draw_polygon(
-			PackedVector2Array([Vector2(0, -15), Vector2(0, -15) + p1, Vector2(0, -15) + p2]), 
-			PackedColorArray([Color(1.0, 0.9, 0.2, 0.15)]) # Amarillo translúcido
-		)
+		var apice = Vector2(0, -15)
+		for i in range(3, 0, -1):
+			var frac = float(i) / 3.0
+			var ang = medio_angulo * frac
+			var alfa = 0.20 - 0.10 * frac
+			var q1 = apice + Vector2(dir_x * cos(-ang), sin(-ang)) * distancia_vision
+			var q2 = apice + Vector2(dir_x * cos(ang), sin(ang)) * distancia_vision
+			draw_polygon(
+				PackedVector2Array([apice, q1, q2]),
+				PackedColorArray([Color(1.0, 0.95, 0.55, alfa), Color(1.0, 0.95, 0.55, 0.0), Color(1.0, 0.95, 0.55, 0.0)])
+			)
 	_dibujar_barra_dano()
 
 func _dibujar_barra_dano():

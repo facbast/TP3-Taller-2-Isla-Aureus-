@@ -10,6 +10,7 @@ size = Vector2(44, 115)
 
 [node name="EnemyElite" type="CharacterBody2D" unique_id=236204452 groups=["enemigos"]]
 script = ExtResource("1_sgdiv")
+duracion_sorpresa = 0.5
 
 [node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=1376675527]
 position = Vector2(1, -10)
