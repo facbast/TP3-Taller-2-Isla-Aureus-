@@ -1,0 +1,41 @@
+[gd_scene format=3 uid="uid://djygoatpx2hu0"]
+
+[ext_resource type="Script" uid="uid://dso7et4bxf2qh" path="res://Scripts/granada_plasma.gd" id="1_3eofb"]
+[ext_resource type="Texture2D" uid="uid://cgmc6oxqr5x2e" path="res://Assets/Armas/Granada.png" id="2_3eofb"]
+[ext_resource type="AudioStream" uid="uid://d4hk3r3pxyhqw" path="res://SFX/Explosion_Plasma.wav" id="3_4y0wt"]
+[ext_resource type="AudioStream" uid="uid://cpphyut415dvp" path="res://SFX/Salto.wav" id="4_v0itb"]
+[ext_resource type="AudioStream" uid="uid://bewg13775ovtd" path="res://SFX/Lanzamiento.wav" id="5_v0itb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_v0rll"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_si1l5"]
+radius = 120.0
+
+[node name="Granada" type="RigidBody2D" unique_id=1579001238]
+continuous_cd = 1
+contact_monitor = true
+max_contacts_reported = 1
+script = ExtResource("1_3eofb")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1031591512]
+position = Vector2(0, -2)
+scale = Vector2(0.04, 0.04)
+texture = ExtResource("2_3eofb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=535358560]
+shape = SubResource("CircleShape2D_v0rll")
+
+[node name="AreaExplosion" type="Area2D" parent="." unique_id=1773248522]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaExplosion" unique_id=1188971926]
+shape = SubResource("CircleShape2D_si1l5")
+debug_color = Color(0.7, 0, 0.011666489, 0.41960785)
+
+[node name="AudioExplosion" type="AudioStreamPlayer2D" parent="." unique_id=1906863990]
+stream = ExtResource("3_4y0wt")
+
+[node name="AudioPegado" type="AudioStreamPlayer2D" parent="." unique_id=955891085]
+stream = ExtResource("4_v0itb")
+
+[node name="AudioLanzamiento" type="AudioStreamPlayer2D" parent="." unique_id=231188398]
+stream = ExtResource("5_v0itb")

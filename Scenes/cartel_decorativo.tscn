@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://dhpcug24dgy75"]
+
+[ext_resource type="Texture2D" uid="uid://h7ncffwfl7i4" path="res://Assets/Palo.png" id="1_rj22k"]
+[ext_resource type="Script" uid="uid://de2owerlflpc0" path="res://Scripts/cartel_decorativo.gd" id="1_xuiup"]
+[ext_resource type="Texture2D" uid="uid://drp3bp3a5d7md" path="res://Assets/Flecha.png" id="3_kycgk"]
+
+[node name="CartelDecorativo" type="Node2D" unique_id=1078112402]
+script = ExtResource("1_xuiup")
+
+[node name="Poste" type="Sprite2D" parent="." unique_id=1739013256]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_rj22k")
+
+[node name="Flecha" type="Sprite2D" parent="." unique_id=1059917093]
+position = Vector2(0, -47.999996)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("3_kycgk")

@@ -1,0 +1,346 @@
+[gd_scene format=3 uid="uid://0666otbn87s3"]
+
+[ext_resource type="Script" uid="uid://ck3s5ljult5sc" path="res://Scripts/hud.gd" id="1_e0onf"]
+[ext_resource type="Texture2D" uid="uid://dl348x63dp50n" path="res://Assets/Granada HUD.png" id="2_6fbih"]
+[ext_resource type="Texture2D" uid="uid://q1j6e23mlk5a" path="res://Assets/salud_vacio.png" id="2_bjfho"]
+[ext_resource type="Texture2D" uid="uid://b6ihxdakppg3a" path="res://Assets/Armas/Durian.png" id="3_t1xeu"]
+[ext_resource type="Script" uid="uid://b3wkm26mwv42w" path="res://Scripts/radar.gd" id="4_6fbih"]
+[ext_resource type="FontFile" uid="uid://lxgbmbkwprcs" path="res://Fonts/NeulandOpti-Light.otf" id="6_36asn"]
+[ext_resource type="FontFile" uid="uid://bkbyspq713w1q" path="res://Fonts/OPTINeuland-Black.otf" id="7_8jye8"]
+[ext_resource type="AudioStream" uid="uid://dcdm7ot8nvehh" path="res://SFX/Peligro.wav" id="8_5ep0j"]
+[ext_resource type="AudioStream" uid="uid://dh6yx17uq3i8t" path="res://SFX/Critico.wav" id="9_4f5kr"]
+[ext_resource type="AudioStream" uid="uid://cfhg7mkwyi5cn" path="res://SFX/Recarga_Escudos.wav" id="10_piegi"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
+bg_color = Color(0.5, 0.4166667, 0, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0onf"]
+bg_color = Color(0, 0.37566665, 0.46, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_43w4t"]
+bg_color = Color(0, 0, 0, 0.92941177)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtn"]
+bg_color = Color(0.55, 0.38, 0.22, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnHover"]
+bg_color = Color(0.65, 0.46, 0.27, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnPressed"]
+bg_color = Color(0.42, 0.28, 0.16, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnDisabled"]
+bg_color = Color(0.3, 0.28, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[node name="HUD" type="CanvasLayer" unique_id=592268866]
+script = ExtResource("1_e0onf")
+
+[node name="ContenedorArma" type="MarginContainer" parent="." unique_id=541453228]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -143.0
+offset_top = 1.0
+offset_right = -2.0
+offset_bottom = 24.0
+grow_horizontal = 0
+
+[node name="IconoArma" type="TextureRect" parent="ContenedorArma" unique_id=139400030]
+custom_minimum_size = Vector2(160, 90)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LabelMunicion" type="Label" parent="ContenedorArma" unique_id=924736653]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+text = "Munición: 60 / 600"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ContenedorGranada" type="MarginContainer" parent="." unique_id=1108820893]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -79.0
+offset_top = -10.0
+offset_right = 36.0
+offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/margin_left = -120
+theme_override_constants/margin_top = -50
+theme_override_constants/margin_right = -10
+theme_override_constants/margin_bottom = -10
+
+[node name="HBoxContainer" type="HBoxContainer" parent="ContenedorGranada" unique_id=1194911207]
+layout_mode = 2
+
+[node name="IconoFrag" type="TextureRect" parent="ContenedorGranada/HBoxContainer" unique_id=736789560]
+layout_mode = 2
+texture = ExtResource("2_6fbih")
+expand_mode = 3
+
+[node name="LabelFrag" type="Label" parent="ContenedorGranada/HBoxContainer" unique_id=2111655968]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+vertical_alignment = 1
+
+[node name="IconoPlasma" type="TextureRect" parent="ContenedorGranada/HBoxContainer" unique_id=1488160567]
+layout_mode = 2
+texture = ExtResource("3_t1xeu")
+expand_mode = 3
+
+[node name="LabelPlasma" type="Label" parent="ContenedorGranada/HBoxContainer" unique_id=192289300]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+vertical_alignment = 1
+
+[node name="MarcoHUD" type="TextureRect" parent="." unique_id=1242013307]
+offset_left = -0.9999999
+offset_top = -35.0
+offset_right = 913.0
+offset_bottom = 480.0
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_bjfho")
+
+[node name="BarraSalud" type="ProgressBar" parent="MarcoHUD" unique_id=2092188105]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 0
+offset_left = 327.5
+offset_top = 187.5
+offset_right = 782.5
+offset_bottom = 220.0
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
+show_percentage = false
+
+[node name="BarraEscudo" type="ProgressBar" parent="MarcoHUD" unique_id=843399636]
+custom_minimum_size = Vector2(0, 30)
+layout_mode = 0
+offset_left = 330.0
+offset_top = 252.5
+offset_right = 782.5
+offset_bottom = 285.0
+size_flags_horizontal = 3
+theme_override_styles/background = SubResource("StyleBoxFlat_e0onf")
+show_percentage = false
+
+[node name="Radar" type="Control" parent="." unique_id=1322947482]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 5.0
+offset_top = -106.0
+offset_right = 125.0
+offset_bottom = 14.0
+grow_vertical = 0
+script = ExtResource("4_6fbih")
+
+[node name="MensajeNotificacion" type="Label" parent="." unique_id=46895549]
+modulate = Color(1, 1, 1, 0)
+offset_left = 8.0
+offset_top = 117.0
+offset_right = 229.0
+offset_bottom = 145.0
+theme_override_colors/font_color = Color(2.887845e-06, 0.9591798, 0.9365927, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 1
+theme_override_font_sizes/font_size = 20
+text = "Has recogido munición"
+horizontal_alignment = 2
+
+[node name="MenuPausa" type="ColorRect" parent="." unique_id=343443690]
+process_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.76862746)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPausa" unique_id=2017050050]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BtnReanudar" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1530288666]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("6_36asn")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
+theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
+text = "Reanudar"
+
+[node name="BtnCheckpoint" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1464652063]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("6_36asn")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
+theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
+text = "Recargar Checkpoint"
+
+[node name="BtnControles" type="Button" parent="MenuPausa/VBoxContainer" unique_id=699547347]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("6_36asn")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
+theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
+text = "Controles
+"
+
+[node name="BtnMenu" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1278838065]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("6_36asn")
+theme_override_font_sizes/font_size = 35
+theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
+theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
+text = "Volver al Menú Principal"
+
+[node name="PanelControles" type="Panel" parent="MenuPausa" unique_id=1328416816]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_43w4t")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MenuPausa/PanelControles" unique_id=616146687]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -186.5
+offset_right = 186.5
+offset_bottom = 172.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="MenuPausa/PanelControles/VBoxContainer" unique_id=926428834]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_36asn")
+theme_override_font_sizes/font_size = 60
+text = "Controles (teclado y mouse):"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="MenuPausa/PanelControles/VBoxContainer" unique_id=208203598]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "A / D: Moverse
+Espacio: Saltar
+Ctrl / C: Agacharse
+Click Izquierdo: Disparar
+Click Derecho: Lanzar Granada
+R: Recargar
+Tab: Cambiar Arma
+T: Alternar tipo de Granada
+E: Recoger Arma
+F: Ataque Cuerpo a Cuerpo (Patada)
+Esc: Pausar"
+horizontal_alignment = 1
+
+[node name="BtnCerrarControles" type="Button" parent="MenuPausa/PanelControles/VBoxContainer" unique_id=388306957]
+layout_mode = 2
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
+theme_override_fonts/font = ExtResource("7_8jye8")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+flat = true
+
+[node name="AudioPeligro" type="AudioStreamPlayer" parent="." unique_id=427805844]
+stream = ExtResource("8_5ep0j")
+
+[node name="AudioCritico" type="AudioStreamPlayer" parent="." unique_id=867286555]
+stream = ExtResource("9_4f5kr")
+
+[node name="AudioRecarga" type="AudioStreamPlayer" parent="." unique_id=816082740]
+stream = ExtResource("10_piegi")
+volume_db = -9.72
+
+[connection signal="pressed" from="MenuPausa/VBoxContainer/BtnReanudar" to="." method="_on_btn_reanudar_pressed"]
+[connection signal="pressed" from="MenuPausa/VBoxContainer/BtnCheckpoint" to="." method="_on_btn_checkpoint_pressed"]
+[connection signal="pressed" from="MenuPausa/VBoxContainer/BtnControles" to="." method="_on_btn_controles_pressed"]
+[connection signal="pressed" from="MenuPausa/VBoxContainer/BtnMenu" to="." method="_on_btn_menu_pressed"]
+[connection signal="pressed" from="MenuPausa/PanelControles/VBoxContainer/BtnCerrarControles" to="." method="_on_btn_cerrar_controles_pressed"]

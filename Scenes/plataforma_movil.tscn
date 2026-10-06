@@ -1,0 +1,53 @@
+[gd_scene format=3 uid="uid://cfm6omg0668i7"]
+
+[ext_resource type="Script" uid="uid://cur1ppky31p4u" path="res://Scripts/plataforma_movil.gd" id="1_plat"]
+[ext_resource type="Texture2D" uid="uid://bnpklonbcw4iy" path="res://Assets/Plataforma Flotante.png" id="2_plat"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
+size = Vector2(422.625, 96)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_abajo"]
+size = Vector2(169, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_izq"]
+size = Vector2(20, 160)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat_der"]
+size = Vector2(20, 160)
+
+[node name="PlataformaMovil" type="AnimatableBody2D" unique_id=1436603005]
+scale = Vector2(0.4, 0.4)
+script = ExtResource("1_plat")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=846110481]
+position = Vector2(0, -70)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_plat")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1224789998]
+position = Vector2(0, -81)
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="ZonaAplastarAbajo" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaAplastarAbajo"]
+shape = SubResource("RectangleShape2D_plat_abajo")
+
+[node name="ZonaAplastarIzq" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaAplastarIzq"]
+shape = SubResource("RectangleShape2D_plat_izq")
+
+[node name="ZonaAplastarDer" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 1
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaAplastarDer"]
+shape = SubResource("RectangleShape2D_plat_der")

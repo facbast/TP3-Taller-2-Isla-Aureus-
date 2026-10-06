@@ -1,0 +1,30 @@
+[gd_scene format=3 uid="uid://3u616bg8bcd7"]
+
+[ext_resource type="Script" uid="uid://dda4oe7qt26og" path="res://Scripts/hongo_trampolin.gd" id="1_hongo"]
+[ext_resource type="Texture2D" uid="uid://boj17so5dnuld" path="res://Assets/Hongo.png" id="2_hongo"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hongo_solido"]
+size = Vector2(300, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hongo_zona"]
+size = Vector2(300, 56)
+
+[node name="HongoTrampolin" type="StaticBody2D" unique_id=1813713962]
+collision_mask = 0
+script = ExtResource("1_hongo")
+
+[node name="Sprite" type="Sprite2D" parent="." unique_id=347030840]
+scale = Vector2(0.4, 0.4)
+texture = ExtResource("2_hongo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=62732802]
+position = Vector2(0, 61)
+shape = SubResource("RectangleShape2D_hongo_solido")
+
+[node name="ZonaRebote" type="Area2D" parent="." unique_id=634859443]
+position = Vector2(0, 83)
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaRebote" unique_id=110195184]
+position = Vector2(0, -111)
+shape = SubResource("RectangleShape2D_hongo_zona")

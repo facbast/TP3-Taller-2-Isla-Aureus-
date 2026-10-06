@@ -1,0 +1,287 @@
+[gd_scene format=3 uid="uid://ccafwax1xbta2"]
+
+[ext_resource type="Script" uid="uid://bdntmdud6kd65" path="res://Scripts/pantalla_titulo.gd" id="1_te6ch"]
+[ext_resource type="Texture2D" uid="uid://dq2yil1lwy432" path="res://Assets/Isla logo.png" id="1_y6c34"]
+[ext_resource type="FontFile" uid="uid://lxgbmbkwprcs" path="res://Fonts/NeulandOpti-Light.otf" id="3_5kigd"]
+[ext_resource type="FontFile" uid="uid://bkbyspq713w1q" path="res://Fonts/OPTINeuland-Black.otf" id="4_p4wl4"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_te6ch"]
+bg_color = Color(0, 0, 0, 0.96862745)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtn"]
+bg_color = Color(0.55, 0.38, 0.22, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnHover"]
+bg_color = Color(0.65, 0.46, 0.27, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnPressed"]
+bg_color = Color(0.42, 0.28, 0.16, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnDisabled"]
+bg_color = Color(0.3, 0.28, 0.25, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 6.0
+content_margin_bottom = 6.0
+
+[node name="PantallaTitulo" type="Control" unique_id=882656132]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_te6ch")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=489430645]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -442.0
+offset_top = 68.0
+offset_right = 448.0
+offset_bottom = 340.0
+grow_horizontal = 2
+color = Color(0, 0, 0, 0.6509804)
+
+[node name="TextureRect" type="TextureRect" parent="." unique_id=211068458]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -452.0
+offset_top = 70.0
+offset_right = 452.0
+offset_bottom = 350.0
+grow_horizontal = 2
+texture = ExtResource("1_y6c34")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=867306847]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -141.5
+offset_top = 68.0
+offset_right = 141.5
+offset_bottom = 265.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BtnNuevaPartida" type="Button" parent="VBoxContainer" unique_id=71729852]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
+theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
+text = "Nueva Partida"
+
+[node name="BtnContinuar" type="Button" parent="VBoxContainer" unique_id=1786767907]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
+theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
+text = "Continuar"
+
+[node name="BtnControles" type="Button" parent="VBoxContainer" unique_id=1182957602]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
+theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
+text = "Controles"
+
+[node name="BtnCreditos" type="Button" parent="VBoxContainer" unique_id=783889943]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
+theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 40
+theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
+theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
+theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
+theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
+theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
+text = "Créditos"
+
+[node name="PanelControles" type="Panel" parent="." unique_id=1810869829]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_te6ch")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelControles" unique_id=191323179]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -186.5
+offset_right = 186.5
+offset_bottom = 172.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="PanelControles/VBoxContainer" unique_id=1456748470]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 60
+text = "Controles (teclado y mouse):"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="PanelControles/VBoxContainer" unique_id=1562820545]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "A / D: Moverse
+Espacio: Saltar
+Ctrl / C: Agacharse
+Click Izquierdo: Disparar
+Click Derecho: Lanzar Granada
+R: Recargar
+Tab: Cambiar Arma
+T: Alternar tipo de Granada
+E: Recoger Arma
+F: Ataque Cuerpo a Cuerpo (Patada)
+Esc: Pausar"
+horizontal_alignment = 1
+
+[node name="BtnVolver" type="Button" parent="PanelControles/VBoxContainer" unique_id=920832448]
+layout_mode = 2
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
+theme_override_fonts/font = ExtResource("4_p4wl4")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+flat = true
+
+[node name="PanelCreditos" type="Panel" parent="." unique_id=784994591]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_te6ch")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelCreditos" unique_id=142325789]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -303.0
+offset_top = 47.0
+offset_right = 312.0
+offset_bottom = 685.0
+grow_horizontal = 2
+
+[node name="Label" type="Label" parent="PanelCreditos/VBoxContainer" unique_id=1326598911]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 60
+text = "Créditos:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Label2" type="Label" parent="PanelCreditos/VBoxContainer" unique_id=556103784]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("3_5kigd")
+theme_override_font_sizes/font_size = 30
+text = "Dirección, Diseño de niveles y Programación:
+Facundo Bastida
+
+Arte de Personajes y UI:
+Margarita Monutti
+
+Arte de escenarios y Música:
+Rocío Leno
+"
+horizontal_alignment = 1
+
+[node name="BtnVolver" type="Button" parent="PanelCreditos/VBoxContainer" unique_id=1224911382]
+layout_mode = 2
+theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
+theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
+theme_override_fonts/font = ExtResource("4_p4wl4")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+flat = true
+
+[node name="Transicion" type="ColorRect" parent="." unique_id=418563169]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[connection signal="pressed" from="VBoxContainer/BtnNuevaPartida" to="." method="_on_btn_nueva_partida_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnContinuar" to="." method="_on_btn_continuar_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnControles" to="." method="_on_btn_controles_pressed"]
+[connection signal="pressed" from="VBoxContainer/BtnCreditos" to="." method="_on_btn_creditos_pressed"]
+[connection signal="pressed" from="PanelControles/VBoxContainer/BtnVolver" to="." method="_on_btn_volver_pressed"]
+[connection signal="pressed" from="PanelCreditos/VBoxContainer/BtnVolver" to="." method="_on_btn_volver_pressed"]

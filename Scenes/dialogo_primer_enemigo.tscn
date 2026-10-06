@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://1y6gduvirvni"]
+
+[ext_resource type="Script" uid="uid://dgqys3ngbt14j" path="res://Scripts/dialogo_primer_enemigo.gd" id="1_8tdpf"]
+[ext_resource type="FontFile" uid="uid://ynlsna7i7s3e" path="res://Fonts/76London Fall.ttf" id="2_0ip7h"]
+[ext_resource type="AudioStream" uid="uid://qkeqs855cm5n" path="res://SFX/Bip.wav" id="3_dokcj"]
+
+[node name="Dialogo Primer Enemigo" type="CanvasLayer" unique_id=1668912211]
+process_mode = 3
+script = ExtResource("1_8tdpf")
+
+[node name="Panel" type="Panel" parent="." unique_id=740316755]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -170.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="IconoPersonaje" type="TextureRect" parent="Panel" unique_id=1987129706]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 113.0
+offset_bottom = 159.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextoDialogo" type="RichTextLabel" parent="Panel" unique_id=2104647870]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 15.0
+offset_right = 1132.0
+offset_bottom = 164.0
+theme_override_fonts/normal_font = ExtResource("2_0ip7h")
+theme_override_font_sizes/normal_font_size = 30
+text = "Hola hoola"
+
+[node name="AudioBlip" type="AudioStreamPlayer" parent="." unique_id=1859406934]
+stream = ExtResource("3_dokcj")

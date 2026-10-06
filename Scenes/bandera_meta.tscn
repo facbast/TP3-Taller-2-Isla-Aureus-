@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://cx6cmaqsv7t2n"]
+
+[ext_resource type="Script" uid="uid://cutb8b8ggjn2b" path="res://Scripts/bandera_meta.gd" id="1_ebnyn"]
+[ext_resource type="Texture2D" uid="uid://b3wcpq4eq353b" path="res://Assets/Flag_Finish.png" id="1_j5kq3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j5kq3"]
+size = Vector2(42, 119)
+
+[node name="BanderaMeta" type="Area2D" unique_id=1318110377]
+script = ExtResource("1_ebnyn")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=334119736]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_j5kq3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=517578835]
+position = Vector2(0, 0.5)
+shape = SubResource("RectangleShape2D_j5kq3")

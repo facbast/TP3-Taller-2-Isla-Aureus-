@@ -1,0 +1,67 @@
+[gd_scene format=3 uid="uid://cge6u5u3ge8rc"]
+
+[ext_resource type="Script" uid="uid://cwvqn7l5ftg36" path="res://Scripts/dialogo_tutorial.gd" id="1_eq35l"]
+[ext_resource type="AudioStream" uid="uid://qkeqs855cm5n" path="res://SFX/Bip.wav" id="2_hfxb0"]
+[ext_resource type="FontFile" uid="uid://ynlsna7i7s3e" path="res://Fonts/76London Fall.ttf" id="2_trwf0"]
+
+[node name="DialogoTutorial" type="CanvasLayer" unique_id=1668912211]
+process_mode = 3
+script = ExtResource("1_eq35l")
+
+[node name="Panel" type="Panel" parent="." unique_id=740316755]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -170.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="IconoPersonaje" type="TextureRect" parent="Panel" unique_id=1987129706]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 113.0
+offset_bottom = 159.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextoDialogo" type="RichTextLabel" parent="Panel" unique_id=2104647870]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 15.0
+offset_right = 1132.0
+offset_bottom = 164.0
+theme_override_fonts/normal_font = ExtResource("2_trwf0")
+theme_override_font_sizes/normal_font_size = 30
+text = "Hola hoola"
+
+[node name="OpcionesMenu" type="VBoxContainer" parent="Panel" unique_id=1844314354]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -143.0
+offset_right = 495.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 0
+alignment = 1
+
+[node name="BtnSi" type="Button" parent="Panel/OpcionesMenu" unique_id=1394669243]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_trwf0")
+theme_override_font_sizes/font_size = 40
+text = "Sí, necesito instrucciones."
+
+[node name="BtnNo" type="Button" parent="Panel/OpcionesMenu" unique_id=1399407294]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_trwf0")
+theme_override_font_sizes/font_size = 40
+text = "No, estoy bien."
+
+[node name="AudioBlip" type="AudioStreamPlayer" parent="." unique_id=1859406934]
+stream = ExtResource("2_hfxb0")

@@ -1,0 +1,65 @@
+[gd_scene format=3 uid="uid://c4reynipsvf64"]
+
+[ext_resource type="Script" uid="uid://bvbsqllwyjsdw" path="res://Scripts/arena_final.gd" id="1_vpple"]
+[ext_resource type="PackedScene" uid="uid://bkgohogolomkn" path="res://Scenes/enemy_grunt.tscn" id="2_0kfrn"]
+[ext_resource type="PackedScene" uid="uid://364m6yjyxst8" path="res://Scenes/enemy_elite.tscn" id="3_cuxq6"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hlg2x"]
+size = Vector2(155, 155)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vpple"]
+size = Vector2(20, 670)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hi4ne"]
+size = Vector2(19, 676)
+
+[node name="ArenaFinal" type="Area2D" unique_id=855175810 node_paths=PackedStringArray("barrera_entrada", "barrera_salida", "contenedor_spawns")]
+collision_layer = 0
+script = ExtResource("1_vpple")
+escenas_enemigos = Array[PackedScene]([ExtResource("2_0kfrn"), ExtResource("3_cuxq6")])
+barrera_entrada = NodePath("BarreraEntrada")
+barrera_salida = NodePath("BarreraSalida")
+contenedor_spawns = NodePath("PuntosSpawneo")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=858921673]
+position = Vector2(620, 558)
+shape = SubResource("RectangleShape2D_hlg2x")
+
+[node name="BarreraEntrada" type="StaticBody2D" parent="." unique_id=326115104]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BarreraEntrada" unique_id=1678762947]
+position = Vector2(0, 325)
+shape = SubResource("RectangleShape2D_vpple")
+
+[node name="MuroEnergia" type="ColorRect" parent="BarreraEntrada" unique_id=1587399451]
+offset_left = -10.0
+offset_top = -10.0
+offset_right = 10.0
+offset_bottom = 660.0
+mouse_filter = 2
+color = Color(0.2, 1, 0.4, 0.45)
+
+[node name="BarreraSalida" type="StaticBody2D" parent="." unique_id=1246703612]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BarreraSalida" unique_id=20826567]
+position = Vector2(1150, 328)
+shape = SubResource("RectangleShape2D_hi4ne")
+
+[node name="MuroEnergia" type="ColorRect" parent="BarreraSalida" unique_id=1663041468]
+offset_left = 1140.5
+offset_top = -10.0
+offset_right = 1159.5
+offset_bottom = 666.0
+mouse_filter = 2
+color = Color(0.2, 1, 0.4, 0.45)
+
+[node name="PuntosSpawneo" type="Node2D" parent="." unique_id=561453922]
+
+[node name="MarkerIzquierda" type="Marker2D" parent="PuntosSpawneo" unique_id=1390571666]
+position = Vector2(100, 514)
+
+[node name="MarkerDerecha" type="Marker2D" parent="PuntosSpawneo" unique_id=2077149841]
+position = Vector2(1050, 518)
+
+[node name="MarkerArriba" type="Marker2D" parent="PuntosSpawneo" unique_id=1559488290]
+position = Vector2(622, -109)
