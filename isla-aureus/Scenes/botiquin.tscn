@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://fsdnyrbq01bd"]
+
+[ext_resource type="Script" uid="uid://bk8j738lrhdcj" path="res://Scripts/botiquin.gd" id="1_ieeqc"]
+[ext_resource type="Texture2D" uid="uid://b7lbtni7aywey" path="res://Assets/Medkit.png" id="1_vyeob"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_vyeob"]
+size = Vector2(67.399994, 52.1)
+
+[node name="Botiquin" type="Area2D" unique_id=261059050]
+script = ExtResource("1_ieeqc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=298895567]
+position = Vector2(0.6000022, -5.099998)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("1_vyeob")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1289429500]
+position = Vector2(0.30000114, -0.049999237)
+shape = SubResource("RectangleShape2D_vyeob")

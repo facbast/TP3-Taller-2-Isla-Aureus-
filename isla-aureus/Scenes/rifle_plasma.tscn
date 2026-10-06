@@ -1,0 +1,14 @@
+[gd_scene format=3 uid="uid://wef2aihmnohw"]
+
+[ext_resource type="Script" uid="uid://b4kg5rmoyfto" path="res://Scripts/rifle_plasma.gd" id="1_odqu6"]
+[ext_resource type="Texture2D" uid="uid://ctgmpeqxycvsv" path="res://Assets/Armas/Rifle Plasma.png" id="1_q232n"]
+
+[node name="RiflePlasma" type="Node2D" unique_id=867083200]
+script = ExtResource("1_odqu6")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1416919841]
+scale = Vector2(0.05, 0.05)
+texture = ExtResource("1_q232n")
+
+[node name="PuntoDisparo" type="Marker2D" parent="." unique_id=599909725]
+position = Vector2(248, -28)
