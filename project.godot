@@ -18,6 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 Global="*uid://borue4sra0v0y"
+MusicManager="*res://Scripts/music_manager.gd"
 
 [display]
 
