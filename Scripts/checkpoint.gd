@@ -4,15 +4,13 @@ extends Area2D
 @export var radio_seguridad: float = 800.0
 @export var nombre_nivel: String = "res://Scenes/main.tscn"
 
-# Nueva variable para la bandera verde
-@export var textura_activada: Texture2D 
-
-# Referencia al nodo de la imagen
-@onready var sprite_bandera = $SpriteBandera
+# Bandera animada: "roja" sin activar, "verde" al guardar.
+@onready var sprite_bandera: AnimatedSprite2D = $SpriteBandera
 
 var fue_activado: bool = false
 
 func _ready():
+	sprite_bandera.play("roja")
 	if not body_entered.is_connected(_on_body_entered):
 		body_entered.connect(_on_body_entered)
 
@@ -52,9 +50,9 @@ func _on_body_entered(cuerpo):
 		Global.guardar_checkpoint(nombre_nivel, global_position, estado_jugador)
 		fue_activado = true 
 
-		# Feedback visual en el mapa y en el HUD
-		if textura_activada != null and sprite_bandera != null:
-			sprite_bandera.texture = textura_activada
+		# Bandera en verde con su animación de 3 cuadros
+		if sprite_bandera != null:
+			sprite_bandera.play("verde")
 
 		if hud != null and hud.has_method("mostrar_notificacion"):
 			hud.mostrar_notificacion("¡Progreso Guardado!")

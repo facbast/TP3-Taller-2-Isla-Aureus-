@@ -2,55 +2,15 @@
 
 [ext_resource type="Script" uid="uid://bdntmdud6kd65" path="res://Scripts/pantalla_titulo.gd" id="1_te6ch"]
 [ext_resource type="Texture2D" uid="uid://dq2yil1lwy432" path="res://Assets/Isla logo.png" id="1_y6c34"]
+[ext_resource type="Texture2D" uid="uid://djhqwvjhag37s" path="res://Assets/Menu/Lianas.png" id="2_p8m0a"]
 [ext_resource type="FontFile" uid="uid://lxgbmbkwprcs" path="res://Fonts/NeulandOpti-Light.otf" id="3_5kigd"]
 [ext_resource type="FontFile" uid="uid://bkbyspq713w1q" path="res://Fonts/OPTINeuland-Black.otf" id="4_p4wl4"]
+[ext_resource type="Texture2D" uid="uid://cwo4i7pqeuv0q" path="res://Assets/Menu/Cartel.png" id="5_cartel"]
+[ext_resource type="Texture2D" uid="uid://dsbekwerqm5av" path="res://Assets/Menu/Cartel_Hover.png" id="6_hover"]
+[ext_resource type="Texture2D" uid="uid://c2xla8f3dvt4" path="res://Assets/Menu/Cartel_Presionado.png" id="7_press"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_te6ch"]
 bg_color = Color(0, 0, 0, 0.96862745)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtn"]
-bg_color = Color(0.55, 0.38, 0.22, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnHover"]
-bg_color = Color(0.65, 0.46, 0.27, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnPressed"]
-bg_color = Color(0.42, 0.28, 0.16, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxMenuBtnDisabled"]
-bg_color = Color(0.3, 0.28, 0.25, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
 
 [node name="PantallaTitulo" type="Control" unique_id=882656132]
 layout_mode = 3
@@ -60,6 +20,22 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_te6ch")
+
+[node name="TextureRect2" type="TextureRect" parent="." unique_id=1487118610]
+layout_mode = 0
+offset_left = 108.0
+offset_top = -20.0
+offset_right = 768.0
+offset_bottom = 442.0
+texture = ExtResource("2_p8m0a")
+
+[node name="TextureRect3" type="TextureRect" parent="." unique_id=650813165]
+layout_mode = 0
+offset_left = 404.0
+offset_top = -10.0
+offset_right = 1064.0
+offset_bottom = 452.0
+texture = ExtResource("2_p8m0a")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=489430645]
 layout_mode = 1
@@ -85,83 +61,129 @@ offset_bottom = 350.0
 grow_horizontal = 2
 texture = ExtResource("1_y6c34")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=867306847]
+[node name="VBoxContainer" type="HBoxContainer" parent="." unique_id=1209893238]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -141.5
-offset_top = 68.0
-offset_right = 141.5
-offset_bottom = 265.0
+offset_left = -552.0
+offset_top = -76.0
+offset_right = 660.0
+offset_bottom = 416.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(0.9145703, 0.8960039)
+alignment = 1
 
-[node name="BtnNuevaPartida" type="Button" parent="VBoxContainer" unique_id=71729852]
+[node name="BtnNuevaPartida" type="TextureButton" parent="VBoxContainer" unique_id=71729852]
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="VBoxContainer/BtnNuevaPartida" unique_id=-1194967295]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_5kigd")
 theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
-theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
 text = "Nueva Partida"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnContinuar" type="Button" parent="VBoxContainer" unique_id=1786767907]
+[node name="BtnContinuar" type="TextureButton" parent="VBoxContainer" unique_id=1786767907]
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="VBoxContainer/BtnContinuar" unique_id=-1194967294]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_5kigd")
 theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
-theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
 text = "Continuar"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnControles" type="Button" parent="VBoxContainer" unique_id=1182957602]
+[node name="BtnControles" type="TextureButton" parent="VBoxContainer" unique_id=1182957602]
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="VBoxContainer/BtnControles" unique_id=-1194967293]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_5kigd")
 theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
-theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
 text = "Controles"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnCreditos" type="Button" parent="VBoxContainer" unique_id=783889943]
+[node name="BtnCreditos" type="TextureButton" parent="VBoxContainer" unique_id=783889943]
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="VBoxContainer/BtnCreditos" unique_id=-1194967292]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("3_5kigd")
 theme_override_font_sizes/font_size = 40
-theme_override_styles/normal = SubResource("StyleBoxMenuBtn")
-theme_override_styles/hover = SubResource("StyleBoxMenuBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxMenuBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxMenuBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxMenuBtnHover")
 text = "Créditos"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="PanelControles" type="Panel" parent="." unique_id=1810869829]
 visible = false
@@ -172,6 +194,37 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_te6ch")
+
+[node name="BtnVolver" type="TextureButton" parent="PanelControles" unique_id=920832448]
+custom_minimum_size = Vector2(300, 120)
+layout_mode = 0
+offset_left = -358.0
+offset_top = 511.0
+offset_right = 648.0
+offset_bottom = 631.0
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="PanelControles/BtnVolver" unique_id=-1194967291]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("4_p4wl4")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="PanelControles" unique_id=191323179]
 layout_mode = 1
@@ -207,15 +260,6 @@ F: Ataque Cuerpo a Cuerpo (Patada)
 Esc: Pausar"
 horizontal_alignment = 1
 
-[node name="BtnVolver" type="Button" parent="PanelControles/VBoxContainer" unique_id=920832448]
-layout_mode = 2
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
-theme_override_fonts/font = ExtResource("4_p4wl4")
-theme_override_font_sizes/font_size = 40
-text = "Volver"
-flat = true
-
 [node name="PanelCreditos" type="Panel" parent="." unique_id=784994591]
 visible = false
 layout_mode = 1
@@ -249,25 +293,43 @@ vertical_alignment = 1
 layout_mode = 2
 theme_override_fonts/font = ExtResource("3_5kigd")
 theme_override_font_sizes/font_size = 30
-text = "Dirección, Diseño de niveles y Programación:
+text = "Dirección, Diseño de niveles, Programación y voces:
 Facundo Bastida
 
-Arte de Personajes y UI:
+Arte de Personajes, props y UI:
 Margarita Monutti
 
-Arte de escenarios y Música:
+Arte de escenarios, props y Música:
 Rocío Leno
 "
 horizontal_alignment = 1
 
-[node name="BtnVolver" type="Button" parent="PanelCreditos/VBoxContainer" unique_id=1224911382]
+[node name="BtnVolver" type="TextureButton" parent="PanelCreditos/VBoxContainer" unique_id=1224911382]
+custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
+texture_normal = ExtResource("5_cartel")
+texture_pressed = ExtResource("7_press")
+texture_hover = ExtResource("6_hover")
+texture_disabled = ExtResource("5_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="PanelCreditos/VBoxContainer/BtnVolver" unique_id=-1194967290]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("4_p4wl4")
 theme_override_font_sizes/font_size = 40
 text = "Volver"
-flat = true
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="Transicion" type="ColorRect" parent="." unique_id=418563169]
 visible = false
@@ -283,5 +345,5 @@ color = Color(0, 0, 0, 1)
 [connection signal="pressed" from="VBoxContainer/BtnContinuar" to="." method="_on_btn_continuar_pressed"]
 [connection signal="pressed" from="VBoxContainer/BtnControles" to="." method="_on_btn_controles_pressed"]
 [connection signal="pressed" from="VBoxContainer/BtnCreditos" to="." method="_on_btn_creditos_pressed"]
-[connection signal="pressed" from="PanelControles/VBoxContainer/BtnVolver" to="." method="_on_btn_volver_pressed"]
+[connection signal="pressed" from="PanelControles/BtnVolver" to="." method="_on_btn_volver_pressed"]
 [connection signal="pressed" from="PanelCreditos/VBoxContainer/BtnVolver" to="." method="_on_btn_volver_pressed"]

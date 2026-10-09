@@ -7,7 +7,7 @@
 script = ExtResource("1_odqu6")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1416919841]
-scale = Vector2(0.05, 0.05)
+scale = Vector2(0.08, 0.08)
 texture = ExtResource("1_q232n")
 
 [node name="PuntoDisparo" type="Marker2D" parent="." unique_id=599909725]

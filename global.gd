@@ -14,24 +14,43 @@ var tutorial_visto: bool = false
 var tutorial_aceptado: bool = false # Declarada para evitar el error
 
 # Bajas y objetos ya consumidos (por ruta de nodo, estable entre recargas).
-# Así los enemigos derrotados y los rubíes/botiquines recogidos NO
-# reaparecen al recargar desde un checkpoint.
+# Solo cuentan cuando se llega a un checkpoint que guarda el progreso:
+# - enemigos_derrotados / items_recogidos = confirmados (guardados en archivo).
+# - bajas_pendientes / items_pendientes = progreso desde el último checkpoint,
+#   aún NO guardado. Se confirma al pisar checkpoint y se descarta al morir
+#   o reiniciar, para que esos enemigos/items reaparezcan.
 var enemigos_derrotados: Array = []
 var items_recogidos: Array = []
+var bajas_pendientes: Array = []
+var items_pendientes: Array = []
 
 func registrar_baja_enemigo(nodo: Node) -> void:
 	var id = str(nodo.get_path())
-	if not enemigos_derrotados.has(id):
-		enemigos_derrotados.append(id)
+	if not enemigos_derrotados.has(id) and not bajas_pendientes.has(id):
+		bajas_pendientes.append(id)
 
 func registrar_item_recogido(nodo: Node) -> void:
 	var id = str(nodo.get_path())
-	if not items_recogidos.has(id):
-		items_recogidos.append(id)
+	if not items_recogidos.has(id) and not items_pendientes.has(id):
+		items_pendientes.append(id)
 
 func estaba_eliminado(nodo: Node) -> bool:
 	var id = str(nodo.get_path())
-	return enemigos_derrotados.has(id) or items_recogidos.has(id)
+	return enemigos_derrotados.has(id) or bajas_pendientes.has(id) or items_recogidos.has(id) or items_pendientes.has(id)
+
+# Descarta lo avanzado desde el último checkpoint (muertes y reinicios).
+# Los enemigos derrotados y los items recogidos después del último guardado
+# vuelven a aparecer; lo confirmado en el archivo no se toca.
+func descartar_progreso_no_guardado() -> void:
+	bajas_pendientes.clear()
+	items_pendientes.clear()
+	# Re-sincroniza lo confirmado con el archivo por seguridad.
+	if hay_datos_guardados and FileAccess.file_exists(SAVE_PATH):
+		var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
+		var datos = file.get_var()
+		if datos is Dictionary:
+			enemigos_derrotados = Array(datos.get("bajas", []))
+			items_recogidos = Array(datos.get("items", []))
 
 # Los enemigos solo lanzan granadas después de pisar el trigger del
 # tutorial 3, haya aceptado o rechazado el tutorial el jugador.
@@ -55,6 +74,16 @@ func _ready():
 	cargar_juego()
 
 func guardar_checkpoint(nivel: String, posicion: Vector2, inventario: Dictionary):
+	# Al pisar el checkpoint, lo pendiente desde el último guardado
+	# pasa a confirmado: solo ahora las bajas/items cuentan de verdad.
+	for id in bajas_pendientes:
+		if not enemigos_derrotados.has(id):
+			enemigos_derrotados.append(id)
+	for id in items_pendientes:
+		if not items_recogidos.has(id):
+			items_recogidos.append(id)
+	bajas_pendientes.clear()
+	items_pendientes.clear()
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	var datos = {
 		"nivel": nivel,
@@ -91,6 +120,10 @@ func cargar_juego():
 		granadas_enemigas_desbloqueadas = datos.get("granadas_desbloqueadas", false)
 		enemigos_derrotados = Array(datos.get("bajas", []))
 		items_recogidos = Array(datos.get("items", []))
+		bajas_pendientes.clear()
+		items_pendientes.clear()
 		hay_datos_guardados = true
 	else:
 		hay_datos_guardados = false
+		bajas_pendientes.clear()
+		items_pendientes.clear()

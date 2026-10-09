@@ -28,6 +28,8 @@ var _en_combate: bool = false
 var _tiempo_sin_alerta: float = 999.0
 var _tiempo_chequeo: float = 0.0
 var _tween_fade: Tween = null
+## Música activada o silenciada (los SFX van por otros players y no se tocan).
+var musica_activada: bool = true
 
 func _ready() -> void:
 	# La música no se corta con la pausa ni con los cambios de escena.
@@ -94,8 +96,23 @@ func _hacer_crossfade(subir: AudioStreamPlayer, bajar: AudioStreamPlayer) -> voi
 		_tween_fade.kill()
 	_tween_fade = create_tween()
 	_tween_fade.set_parallel(true)
-	_tween_fade.tween_property(subir, "volume_db", volumen_base_db, duracion_crossfade)
+	var destino_subir := volumen_base_db if musica_activada else -80.0
+	_tween_fade.tween_property(subir, "volume_db", destino_subir, duracion_crossfade)
 	_tween_fade.tween_property(bajar, "volume_db", -80.0, duracion_crossfade)
+
+# Aplica el mute al instante sobre la pista que suena ahora.
+func _aplicar_volumen_actual() -> void:
+	if _tween_fade and _tween_fade.is_running():
+		_tween_fade.kill()
+	if not musica_activada:
+		_player_normal.volume_db = -80.0
+		_player_pelea.volume_db = -80.0
+	elif _en_combate:
+		_player_pelea.volume_db = volumen_base_db
+		_player_normal.volume_db = -80.0
+	else:
+		_player_normal.volume_db = volumen_base_db
+		_player_pelea.volume_db = -80.0
 
 ## Duplica el stream importado y fuerza bucle completo.
 ## Así no dependemos de que en la pestaña Import esté puesto
@@ -128,3 +145,13 @@ func forzar_normal() -> void:
 
 func esta_en_combate() -> bool:
 	return _en_combate
+
+## Silencia o restaura la música (los SFX no se tocan).
+func set_musica_activada(activa: bool) -> void:
+	musica_activada = activa
+	_aplicar_volumen_actual()
+
+## Alterna y devuelve el nuevo estado (true = sonando).
+func alternar_musica() -> bool:
+	set_musica_activada(not musica_activada)
+	return musica_activada

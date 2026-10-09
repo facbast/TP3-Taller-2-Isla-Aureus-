@@ -1,40 +1,110 @@
 [gd_scene format=3 uid="uid://364m6yjyxst8"]
 
-[ext_resource type="Texture2D" uid="uid://d01el8rrgc85f" path="res://Assets/Elite_torso.png" id="1_6o3al"]
 [ext_resource type="Script" uid="uid://m2hxh2tcp7e2" path="res://Scripts/enemy_elite.gd" id="1_sgdiv"]
 [ext_resource type="Texture2D" uid="uid://bkax1v3u14god" path="res://Assets/Elite_Brazos.png" id="2_6gnqs"]
+[ext_resource type="Texture2D" uid="uid://drly1e2buixwv" path="res://Assets/SPRITESHEET_CAIMAN.png" id="2_sgdiv"]
 [ext_resource type="PackedScene" uid="uid://wef2aihmnohw" path="res://Scenes/rifle_plasma.tscn" id="3_sgdiv"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_6o3al"]
 size = Vector2(44, 115)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sgdiv"]
+size = Vector2(65, 80)
+
+[sub_resource type="Animation" id="Animation_sgdiv"]
+resource_name = "Correr"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.0333, 0.06666667, 0.10000001, 0.13333334),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4]
+}
+
+[sub_resource type="Animation" id="Animation_7r61f"]
+resource_name = "Golpe"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.2, 0.26666668, 0.33333334, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [6, 7, 8, 9, 8, 7, 6]
+}
+
+[sub_resource type="Animation" id="Animation_u702s"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_u702s"]
+_data = {
+&"Correr": SubResource("Animation_sgdiv"),
+&"Golpe": SubResource("Animation_7r61f"),
+&"RESET": SubResource("Animation_u702s")
+}
 
 [node name="EnemyElite" type="CharacterBody2D" unique_id=236204452 groups=["enemigos"]]
 script = ExtResource("1_sgdiv")
 duracion_sorpresa = 0.5
 
 [node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=1376675527]
-position = Vector2(1, -10)
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("1_6o3al")
+position = Vector2(18, -16)
+scale = Vector2(0.16, 0.16)
+texture = ExtResource("2_sgdiv")
+hframes = 7
+vframes = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=390953499]
 position = Vector2(12, -6.5)
 shape = SubResource("RectangleShape2D_6o3al")
 
 [node name="PivoteBrazo" type="Node2D" parent="." unique_id=497845955]
-position = Vector2(-3, -12)
+position = Vector2(-5, -11)
 
 [node name="RiflePlasma" parent="PivoteBrazo" unique_id=867083200 instance=ExtResource("3_sgdiv")]
-position = Vector2(19, 32)
+position = Vector2(47, 5)
 
 [node name="PuntoDisparo" parent="PivoteBrazo/RiflePlasma" index="1" unique_id=599909725]
-position = Vector2(25, -3)
+position = Vector2(31, -2)
 
 [node name="SpriteBrazoArma" type="Sprite2D" parent="PivoteBrazo" unique_id=309567689]
-position = Vector2(-1, 9)
-scale = Vector2(0.6, 0.6)
+position = Vector2(31, -2)
+scale = Vector2(0.16226415, 0.18846156)
 texture = ExtResource("2_6gnqs")
 region_enabled = true
-region_rect = Rect2(0, 0, 54.001114, 120)
+region_rect = Rect2(0, 0, 530.5, 260.5)
+
+[node name="AreaGolpe" type="Area2D" parent="." unique_id=1617905668]
+position = Vector2(40, -16)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AreaGolpe" unique_id=135586216]
+position = Vector2(27.5, 0)
+shape = SubResource("RectangleShape2D_sgdiv")
+debug_color = Color(0.99623126, 0, 0.19929612, 0.41960785)
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=284827250]
+libraries/ = SubResource("AnimationLibrary_u702s")
 
 [editable path="PivoteBrazo/RiflePlasma"]

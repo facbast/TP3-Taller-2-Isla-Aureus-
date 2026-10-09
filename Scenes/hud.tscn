@@ -5,11 +5,17 @@
 [ext_resource type="Texture2D" uid="uid://q1j6e23mlk5a" path="res://Assets/salud_vacio.png" id="2_bjfho"]
 [ext_resource type="Texture2D" uid="uid://b6ihxdakppg3a" path="res://Assets/Armas/Durian.png" id="3_t1xeu"]
 [ext_resource type="Script" uid="uid://b3wkm26mwv42w" path="res://Scripts/radar.gd" id="4_6fbih"]
+[ext_resource type="Texture2D" uid="uid://djhqwvjhag37s" path="res://Assets/Menu/Lianas.png" id="6_1a2va"]
 [ext_resource type="FontFile" uid="uid://lxgbmbkwprcs" path="res://Fonts/NeulandOpti-Light.otf" id="6_36asn"]
 [ext_resource type="FontFile" uid="uid://bkbyspq713w1q" path="res://Fonts/OPTINeuland-Black.otf" id="7_8jye8"]
 [ext_resource type="AudioStream" uid="uid://dcdm7ot8nvehh" path="res://SFX/Peligro.wav" id="8_5ep0j"]
 [ext_resource type="AudioStream" uid="uid://dh6yx17uq3i8t" path="res://SFX/Critico.wav" id="9_4f5kr"]
 [ext_resource type="AudioStream" uid="uid://cfhg7mkwyi5cn" path="res://SFX/Recarga_Escudos.wav" id="10_piegi"]
+[ext_resource type="Texture2D" uid="uid://cwo4i7pqeuv0q" path="res://Assets/Menu/Cartel.png" id="11_cartel"]
+[ext_resource type="Texture2D" uid="uid://dsbekwerqm5av" path="res://Assets/Menu/Cartel_Hover.png" id="12_hover"]
+[ext_resource type="Texture2D" uid="uid://c2xla8f3dvt4" path="res://Assets/Menu/Cartel_Presionado.png" id="13_press"]
+[ext_resource type="Texture2D" uid="uid://die1j2l5cismp" path="res://Assets/Music On.png" id="14_musicon"]
+[ext_resource type="Texture2D" uid="uid://dbop0bca76xaf" path="res://Assets/Music Off.png" id="15_musicoff"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_fccik"]
 bg_color = Color(0.5, 0.4166667, 0, 1)
@@ -19,50 +25,6 @@ bg_color = Color(0, 0.37566665, 0.46, 1)
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_43w4t"]
 bg_color = Color(0, 0, 0, 0.92941177)
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtn"]
-bg_color = Color(0.55, 0.38, 0.22, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnHover"]
-bg_color = Color(0.65, 0.46, 0.27, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnPressed"]
-bg_color = Color(0.42, 0.28, 0.16, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="StyleBoxPausaBtnDisabled"]
-bg_color = Color(0.3, 0.28, 0.25, 1)
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 6.0
-content_margin_bottom = 6.0
 
 [node name="HUD" type="CanvasLayer" unique_id=592268866]
 script = ExtResource("1_e0onf")
@@ -134,19 +96,20 @@ theme_override_constants/outline_size = 4
 vertical_alignment = 1
 
 [node name="MarcoHUD" type="TextureRect" parent="." unique_id=1242013307]
-offset_left = -0.9999999
-offset_top = -35.0
-offset_right = 913.0
-offset_bottom = 480.0
+offset_left = -13.999999
+offset_top = -36.0
+offset_right = 910.9999
+offset_bottom = 486.49994
 scale = Vector2(0.4, 0.4)
 texture = ExtResource("2_bjfho")
+expand_mode = 1
 
 [node name="BarraSalud" type="ProgressBar" parent="MarcoHUD" unique_id=2092188105]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 0
-offset_left = 327.5
+offset_left = 347.5
 offset_top = 187.5
-offset_right = 782.5
+offset_right = 775.0
 offset_bottom = 220.0
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_fccik")
@@ -155,10 +118,10 @@ show_percentage = false
 [node name="BarraEscudo" type="ProgressBar" parent="MarcoHUD" unique_id=843399636]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 0
-offset_left = 330.0
-offset_top = 252.5
-offset_right = 782.5
-offset_bottom = 285.0
+offset_left = 347.5
+offset_top = 250.0
+offset_right = 775.0
+offset_bottom = 282.5
 size_flags_horizontal = 3
 theme_override_styles/background = SubResource("StyleBoxFlat_e0onf")
 show_percentage = false
@@ -198,6 +161,15 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0, 0, 0, 0.76862746)
 
+[node name="TextureRect" type="TextureRect" parent="MenuPausa" unique_id=1644100060]
+layout_mode = 0
+offset_left = 462.0
+offset_top = -2.0
+offset_right = 1317.835
+offset_bottom = 385.77927
+scale = Vector2(0.25822732, 1.2507116)
+texture = ExtResource("6_1a2va")
+
 [node name="VBoxContainer" type="VBoxContainer" parent="MenuPausa" unique_id=2017050050]
 layout_mode = 1
 anchors_preset = 8
@@ -211,73 +183,119 @@ offset_right = 20.0
 offset_bottom = 20.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 14
 
-[node name="BtnReanudar" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1530288666]
+[node name="BtnReanudar" type="TextureButton" parent="MenuPausa/VBoxContainer" unique_id=1530288666]
+custom_minimum_size = Vector2(330, 130)
 layout_mode = 2
+texture_normal = ExtResource("11_cartel")
+texture_pressed = ExtResource("13_press")
+texture_hover = ExtResource("12_hover")
+texture_disabled = ExtResource("11_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="MenuPausa/VBoxContainer/BtnReanudar" unique_id=-1194967289]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_36asn")
 theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
-theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
 text = "Reanudar"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnCheckpoint" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1464652063]
+[node name="BtnCheckpoint" type="TextureButton" parent="MenuPausa/VBoxContainer" unique_id=1464652063]
+custom_minimum_size = Vector2(330, 130)
 layout_mode = 2
+texture_normal = ExtResource("11_cartel")
+texture_pressed = ExtResource("13_press")
+texture_hover = ExtResource("12_hover")
+texture_disabled = ExtResource("11_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="MenuPausa/VBoxContainer/BtnCheckpoint" unique_id=-1194967288]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_36asn")
 theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
-theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
 text = "Recargar Checkpoint"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnControles" type="Button" parent="MenuPausa/VBoxContainer" unique_id=699547347]
+[node name="BtnControles" type="TextureButton" parent="MenuPausa/VBoxContainer" unique_id=699547347]
+custom_minimum_size = Vector2(330, 130)
 layout_mode = 2
+texture_normal = ExtResource("11_cartel")
+texture_pressed = ExtResource("13_press")
+texture_hover = ExtResource("12_hover")
+texture_disabled = ExtResource("11_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="MenuPausa/VBoxContainer/BtnControles" unique_id=-1194967287]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_36asn")
 theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
-theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
-text = "Controles
-"
+text = "Controles"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
-[node name="BtnMenu" type="Button" parent="MenuPausa/VBoxContainer" unique_id=1278838065]
+[node name="BtnMenu" type="TextureButton" parent="MenuPausa/VBoxContainer" unique_id=1278838065]
+custom_minimum_size = Vector2(330, 130)
 layout_mode = 2
+texture_normal = ExtResource("11_cartel")
+texture_pressed = ExtResource("13_press")
+texture_hover = ExtResource("12_hover")
+texture_disabled = ExtResource("11_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="MenuPausa/VBoxContainer/BtnMenu" unique_id=-1194967286]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_right = -26.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
-theme_override_colors/font_hover_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_pressed_color = Color(0.65, 0.62, 0.1, 1)
-theme_override_colors/font_disabled_color = Color(0.6, 0.6, 0.6, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
 theme_override_fonts/font = ExtResource("6_36asn")
 theme_override_font_sizes/font_size = 35
-theme_override_styles/normal = SubResource("StyleBoxPausaBtn")
-theme_override_styles/hover = SubResource("StyleBoxPausaBtnHover")
-theme_override_styles/pressed = SubResource("StyleBoxPausaBtnPressed")
-theme_override_styles/disabled = SubResource("StyleBoxPausaBtnDisabled")
-theme_override_styles/focus = SubResource("StyleBoxPausaBtnHover")
-text = "Volver al Menú Principal"
+text = "Menú Principal"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="PanelControles" type="Panel" parent="MenuPausa" unique_id=1328416816]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -285,6 +303,37 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_43w4t")
+
+[node name="BtnCerrarControles" type="TextureButton" parent="MenuPausa/PanelControles" unique_id=388306957]
+custom_minimum_size = Vector2(300, 120)
+layout_mode = 0
+offset_left = -361.0
+offset_top = 514.0
+offset_right = 645.0
+offset_bottom = 634.0
+texture_normal = ExtResource("11_cartel")
+texture_pressed = ExtResource("13_press")
+texture_hover = ExtResource("12_hover")
+texture_disabled = ExtResource("11_cartel")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="Etiqueta" type="Label" parent="MenuPausa/PanelControles/BtnCerrarControles" unique_id=-1194967285]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("7_8jye8")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="MenuPausa/PanelControles" unique_id=616146687]
 layout_mode = 1
@@ -320,14 +369,22 @@ F: Ataque Cuerpo a Cuerpo (Patada)
 Esc: Pausar"
 horizontal_alignment = 1
 
-[node name="BtnCerrarControles" type="Button" parent="MenuPausa/PanelControles/VBoxContainer" unique_id=388306957]
-layout_mode = 2
-theme_override_colors/font_focus_color = Color(0.8117647, 0.8039216, 0.13333334, 1)
-theme_override_colors/font_hover_color = Color(0.72509736, 0.7207342, 0.0668205, 1)
-theme_override_fonts/font = ExtResource("7_8jye8")
-theme_override_font_sizes/font_size = 40
-text = "Volver"
-flat = true
+[node name="BtnMusica" type="TextureButton" parent="MenuPausa" unique_id=-1194967284]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -76.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 76.0
+grow_horizontal = 0
+toggle_mode = true
+texture_normal = ExtResource("14_musicon")
+texture_pressed = ExtResource("15_musicoff")
+texture_hover = ExtResource("14_musicon")
+ignore_texture_size = true
+stretch_mode = 5
 
 [node name="AudioPeligro" type="AudioStreamPlayer" parent="." unique_id=427805844]
 stream = ExtResource("8_5ep0j")
@@ -343,4 +400,5 @@ volume_db = -9.72
 [connection signal="pressed" from="MenuPausa/VBoxContainer/BtnCheckpoint" to="." method="_on_btn_checkpoint_pressed"]
 [connection signal="pressed" from="MenuPausa/VBoxContainer/BtnControles" to="." method="_on_btn_controles_pressed"]
 [connection signal="pressed" from="MenuPausa/VBoxContainer/BtnMenu" to="." method="_on_btn_menu_pressed"]
-[connection signal="pressed" from="MenuPausa/PanelControles/VBoxContainer/BtnCerrarControles" to="." method="_on_btn_cerrar_controles_pressed"]
+[connection signal="pressed" from="MenuPausa/PanelControles/BtnCerrarControles" to="." method="_on_btn_cerrar_controles_pressed"]
+[connection signal="toggled" from="MenuPausa/BtnMusica" to="." method="_on_btn_musica_toggled"]

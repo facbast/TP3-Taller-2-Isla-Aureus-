@@ -53,6 +53,7 @@ var _escudo_vacio: bool = false
 @onready var menu_pausa = $MenuPausa
 @onready var contenedor_botones = $MenuPausa/VBoxContainer
 @onready var panel_controles = $MenuPausa/PanelControles
+@onready var btn_musica: TextureButton = $MenuPausa/BtnMusica
 
 # --- REFERENCIAS DE AUDIO DE ESCUDO ---
 @onready var audio_peligro: AudioStreamPlayer = $AudioPeligro
@@ -75,6 +76,8 @@ func _ready():
 	_material_recarga_init()
 	hacer_fade_in(1.0)
 	menu_pausa.hide()
+	# El botón refleja el estado real del MusicManager (persiste entre escenas).
+	btn_musica.set_pressed_no_signal(not MusicManager.musica_activada)
 	
 	# NUEVO: Conectar señales para bucle automático
 	if audio_peligro:
@@ -363,6 +366,8 @@ func _on_btn_reanudar_pressed():
 func _on_btn_checkpoint_pressed():
 	get_tree().paused = false # Siempre quitar la pausa antes de cambiar de escena
 	await hacer_fade_out(0.8).finished
+	# Volver al checkpoint descarta las bajas/items sin guardar.
+	Global.descartar_progreso_no_guardado()
 	get_tree().reload_current_scene()
 	# Si tienes una lógica de checkpoint global, úsala aquí.
 
@@ -374,6 +379,8 @@ func _on_btn_controles_pressed():
 func _on_btn_menu_pressed():
 	await hacer_fade_out(0.8).finished
 	get_tree().paused = false
+	# Salir al título sin pasar por un checkpoint no confirma nada.
+	Global.descartar_progreso_no_guardado()
 	get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn") # Ajusta a tu ruta real
 	
 # --- NUEVA FUNCIÓN para el botón de volver ---
@@ -381,6 +388,11 @@ func _on_btn_cerrar_controles_pressed():
 	# Ocultamos el panel y volvemos a mostrar los botones
 	panel_controles.hide()
 	contenedor_botones.show()
+
+# Icono de música del menú de pausa: solo silencia/restaura la música,
+# los SFX siguen sonando igual.
+func _on_btn_musica_toggled(boton_presionado: bool) -> void:
+	MusicManager.set_musica_activada(not boton_presionado)
 
 func _on_audio_peligro_finished():
 	# Si el escudo sigue en 0, vuelve a reproducir la alarma de peligro

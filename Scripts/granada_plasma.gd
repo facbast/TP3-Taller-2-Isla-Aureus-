@@ -10,6 +10,7 @@ extends RigidBody2D
 @onready var audio_lanzamiento: AudioStreamPlayer2D = get_node_or_null("AudioLanzamiento")
 
 var _pegada: bool = false
+var _explotada: bool = false
 
 func _ready():
 	add_to_group("granadas")
@@ -60,6 +61,12 @@ func _adherir_al_cuerpo(objetivo: Node2D):
 	global_position = posicion_global_actual
 
 func _explotar():
+	if _explotada:
+		return
+	_explotada = true
+	if not is_instance_valid(_area_explosion):
+		queue_free()
+		return
 	var cuerpos_afectados = _area_explosion.get_overlapping_bodies()
 	for cuerpo in cuerpos_afectados:
 		if cuerpo.has_method("recibir_dano"):
@@ -75,21 +82,30 @@ func _explotar():
 			cuerpo.velocity += direccion_impulso * fuerza_empuje
 			
 	# --- EFECTO VISUAL PLASMA ---
+	# Se captura la posición ANTES y se coloca DESPUÉS de añadirlo a la
+	# escena (esta granada se reparenta al pegarse a un enemigo, así que
+	# el orden importa). z alto para que nada lo tape.
+	var pos_explosion := global_position
 	var efecto_explosion = Polygon2D.new()
 	efecto_explosion.color = Color(0.2, 1.0, 0.2, 0.7)
-	efecto_explosion.global_position = global_position 
 	efecto_explosion.scale = Vector2(0.1, 0.1) # Inicia pequeño
-	
+	efecto_explosion.z_index = 100
+
 	var radio_visual = 120.0
 	var puntos_circulo = PackedVector2Array()
 	for i in range(32):
 		var angulo = (float(i) / 32.0) * PI * 2.0
 		puntos_circulo.append(Vector2(cos(angulo), sin(angulo)) * radio_visual)
 	efecto_explosion.polygon = puntos_circulo
-	
-	get_tree().current_scene.add_child(efecto_explosion)
-	
-	var tween = get_tree().create_tween()
+
+	var contenedor: Node = get_tree().current_scene
+	if contenedor == null:
+		contenedor = get_parent()
+	contenedor.add_child(efecto_explosion)
+	efecto_explosion.global_position = pos_explosion
+
+	# Tween ligado al efecto: si el efecto se libera, el tween muere con él.
+	var tween = efecto_explosion.create_tween()
 	# 1. Expansión explosiva rápida (0.08s) con curva de desaceleración
 	tween.tween_property(efecto_explosion, "scale", Vector2.ONE, 0.08).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	# 2. Desvanecimiento a transparente (0.3s)

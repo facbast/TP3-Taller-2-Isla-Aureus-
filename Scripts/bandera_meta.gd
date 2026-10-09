@@ -27,5 +27,7 @@ func _on_body_entered(body):
 		if hud != null and hud.has_method("hacer_fade_out"):
 			await hud.hacer_fade_out(1.5).finished
 
+		# La demo termina sin checkpoint final: no se confirma lo pendiente.
+		Global.descartar_progreso_no_guardado()
 		# Cambiamos de escena al menú principal
 		get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn")

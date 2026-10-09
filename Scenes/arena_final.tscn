@@ -62,4 +62,7 @@ position = Vector2(100, 514)
 position = Vector2(1050, 518)
 
 [node name="MarkerArriba" type="Marker2D" parent="PuntosSpawneo" unique_id=1559488290]
-position = Vector2(622, -109)
+position = Vector2(344, -114)
+
+[node name="MarkerArriba2" type="Marker2D" parent="PuntosSpawneo" unique_id=821381233]
+position = Vector2(797, -114)

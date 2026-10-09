@@ -29,6 +29,9 @@ var fuerza_lanzamiento_granada: float = 520.0
 @onready var _sprite_cuerpo = $SpriteCuerpo
 @onready var _pivote_brazo = $PivoteBrazo
 @onready var _arma_actual = $PivoteBrazo/RiflePlasma
+@onready var _area_golpe = $AreaGolpe
+@onready var _colision_golpe = $AreaGolpe/CollisionShape2D
+@onready var _anim_golpe = $AnimationPlayer
 
 const ARMA_SOLTADA = preload("res://Scenes/arma_soltada.tscn")
 
@@ -58,6 +61,33 @@ var _cono_visible: bool = false
 @export var factor_vel_patrulla: float = 0.35
 var _pos_origen_patrulla: Vector2
 var _dir_patrulla: float = 1.0
+# Anti-atasco entre patrulleros: si el bloqueo es otro enemigo, no giramos
+# al instante (eso los deja vibrando en el sitio), sino tras un tiempo
+# aleatorio para que no se sincronicen y se despeguen.
+var _tiempo_bloqueado_aliado: float = 0.0
+var _umbral_despegue: float = 0.5
+
+# --- ANIMACIÓN DE CAMINATA (cuadros 0-4 del spritesheet, en bucle) ---
+# Los cuadros 7-9 (golpe) se programan aparte cuando toque.
+@export var fps_caminar: float = 8.0
+const FRAME_QUIETO: int = 0
+const FRAMES_CAMINAR: int = 5
+var _tiempo_anim_caminar: float = 0.0
+# Hombro base (posición del tscn, mirando a la derecha): el balanceo
+# de marcha lo toma como referencia cada frame.
+var _base_pivote_brazo: Vector2
+
+# --- GOLPE MELEE (aviso rojo + animación Golpe + enfriamiento) ---
+@export var distancia_golpe: float = 120.0
+@export var dano_golpe: float = 30.0
+@export var tiempo_aviso_golpe: float = 0.5
+@export var cooldown_golpe: float = 15.0
+const COLOR_AVISO_GOLPE := Color(1.0, 0.3, 0.3)
+var temporizador_golpe: float = 0.0
+var _golpe_fase: int = 0 # 0 libre, 1 aviso quieto en rojo, 2 golpeando
+var _tiempo_golpe: float = 0.0
+var _base_area_golpe_x: float = 22.0
+var _base_colision_golpe_x: float = 35.0
 
 # --- BARRA DE DAÑO (indicador sobre la cabeza: 10s visible + desvanecido) ---
 const BARRA_TIEMPO_VISIBLE: float = 10.0
@@ -82,6 +112,11 @@ func _ready():
 		return
 	salud_actual = salud_maxima
 	escudo_actual = escudo_maximo
+	_base_pivote_brazo = _pivote_brazo.position
+	_base_area_golpe_x = _area_golpe.position.x - _sprite_cuerpo.position.x
+	_base_colision_golpe_x = _colision_golpe.position.x
+	_anim_golpe.animation_finished.connect(_on_golpe_anim_finished)
+	_actualizar_area_golpe()
 
 	if dormido_hasta_tutorial:
 		add_to_group("enemigos_dormidos_tutorial")
@@ -89,6 +124,7 @@ func _ready():
 	# Si la casilla está marcada en el Inspector, voltea al enemigo al nacer
 	if mirar_izquierda_al_inicio:
 		_flip_personaje()
+	_orientar_brazo_adelante()
 
 	_pos_origen_patrulla = global_position
 	_dir_patrulla = 1.0 if _mirando_derecha else -1.0
@@ -133,6 +169,10 @@ func _physics_process(delta):
 	if temporizador_granada > 0:
 		temporizador_granada -= delta
 
+	# Enfriamiento del golpe melee
+	if temporizador_golpe > 0:
+		temporizador_golpe -= delta
+
 	if not is_instance_valid(_jugador):
 		_buscar_jugador()
 
@@ -175,6 +215,14 @@ func _physics_process(delta):
 		# --- ESTADO: SORPRESA (clavado y amarillo, sin disparar) ---
 		velocity.x = move_toward(velocity.x, 0, SPEED)
 
+	elif _golpe_fase != 0:
+		# --- ESTADO: GOLPE MELEE (aviso rojo + golpe, sin moverse) ---
+		_procesar_golpe(delta)
+
+	elif es_alerta and is_instance_valid(_jugador) and _golpe_disponible():
+		# --- ATAQUE MELEE (jugador al alcance y golpe cargado) ---
+		_iniciar_golpe()
+
 	elif es_alerta and is_instance_valid(_jugador):
 		# --- ESTADO DE COMBATE NORMAL ---
 		var dist = global_position.distance_to(_jugador.global_position)
@@ -203,15 +251,17 @@ func _physics_process(delta):
 				velocity.x = move_toward(velocity.x, 0, SPEED)
 	else:
 		# --- ESTADO: PATRULLA (tranquilo, sin alerta ni peligros) ---
-		_patrullar()
+		_patrullar(delta)
 
 	queue_redraw() # Refresca cono y barra cada frame, sin restos entre estados
+	_actualizar_animacion_caminar(delta)
 	move_and_slide()
 	
-func _patrullar():
+func _patrullar(delta: float):
 	_cono_visible = patrullar
 	if not patrullar:
 		velocity.x = move_toward(velocity.x, 0, SPEED)
+		_orientar_brazo_adelante()
 		return
 	# Rebotar en los límites del rango y en paredes
 	if global_position.x > _pos_origen_patrulla.x + rango_patrulla:
@@ -219,15 +269,123 @@ func _patrullar():
 	elif global_position.x < _pos_origen_patrulla.x - rango_patrulla:
 		_dir_patrulla = 1.0
 	if is_on_wall():
-		_dir_patrulla = -_dir_patrulla
+		if _choca_con_muro_real():
+			_dir_patrulla = -_dir_patrulla
+			_tiempo_bloqueado_aliado = 0.0
+		else:
+			# Solo hay compañeros encima: esperar un poco antes de girar.
+			_tiempo_bloqueado_aliado += delta
+			if _tiempo_bloqueado_aliado >= _umbral_despegue:
+				_dir_patrulla = -_dir_patrulla
+				_tiempo_bloqueado_aliado = 0.0
+				_umbral_despegue = randf_range(0.35, 0.7)
+	else:
+		_tiempo_bloqueado_aliado = 0.0
 	# Girar el sprite según la dirección de marcha
 	if (_dir_patrulla > 0 and not _mirando_derecha) or (_dir_patrulla < 0 and _mirando_derecha):
 		_flip_personaje()
+	_orientar_brazo_adelante()
 	velocity.x = _dir_patrulla * (SPEED * factor_vel_patrulla)
+
+# True si alguna colisión de este frame es con algo que no sea otro enemigo
+# (muro, plataforma, jugador, granada...). Solo eso justifica girar al acto.
+func _choca_con_muro_real() -> bool:
+	for i in range(get_slide_collision_count()):
+		var col = get_slide_collision(i).get_collider()
+		if col != null and not col.is_in_group("enemigos"):
+			return true
+	return false
+
+# Avanza los cuadros 0-4 mientras se desplaza en el suelo; quieto
+# (patrulla estática, sorpresa, dormido) vuelve al cuadro 0.
+# Además balancea el brazo con cada paso, como el conejo jugador.
+func _actualizar_animacion_caminar(delta: float) -> void:
+	# Durante el golpe melee manda el AnimationPlayer, no el ciclo de marcha.
+	if _golpe_fase != 0:
+		return
+	if absf(velocity.x) > 20.0 and is_on_floor():
+		_tiempo_anim_caminar += delta
+		_sprite_cuerpo.frame = int(_tiempo_anim_caminar * fps_caminar) % FRAMES_CAMINAR
+	else:
+		_tiempo_anim_caminar = 0.0
+		_sprite_cuerpo.frame = FRAME_QUIETO
+	_sincronizar_brazo_marcha()
+
+func _sincronizar_brazo_marcha() -> void:
+	# Rebote por paso (los cuadros 1-3 son el apoyo): el pivote vuelve
+	# solo al hombro base cuando el cuerpo está quieto.
+	var offset := Vector2.ZERO
+	match _sprite_cuerpo.frame:
+		1:
+			offset = Vector2(1, -2)
+		2:
+			offset = Vector2(0, -3)
+		3:
+			offset = Vector2(-1, -2)
+	var px := _base_pivote_brazo.x + offset.x
+	if not _mirando_derecha:
+		px = 2.0 * _sprite_cuerpo.position.x - px
+	_pivote_brazo.position = Vector2(px, _base_pivote_brazo.y + offset.y)
 	
+# Golpe listo: enfriamiento cumplido, jugador al alcance y a la vista.
+func _golpe_disponible() -> bool:
+	if temporizador_golpe > 0.0 or not is_instance_valid(_jugador):
+		return false
+	if global_position.distance_to(_jugador.global_position) > distancia_golpe:
+		return false
+	return _tiene_linea_de_vision()
+
+func _iniciar_golpe() -> void:
+	# Mira al jugador, se clava y avisa en rojo (cuerpo y brazos).
+	var hacia = sign(_jugador.global_position.x - global_position.x)
+	if hacia != 0.0 and ((hacia < 0.0 and _mirando_derecha) or (hacia > 0.0 and not _mirando_derecha)):
+		_flip_personaje()
+	_orientar_brazo_adelante()
+	velocity.x = move_toward(velocity.x, 0, SPEED)
+	_golpe_fase = 1
+	_tiempo_golpe = 0.0
+	_sprite_cuerpo.modulate = COLOR_AVISO_GOLPE
+	_pivote_brazo.modulate = COLOR_AVISO_GOLPE
+
+func _procesar_golpe(delta: float) -> void:
+	velocity.x = move_toward(velocity.x, 0, SPEED)
+	if _golpe_fase != 1:
+		return
+	_tiempo_golpe += delta
+	if _tiempo_golpe >= tiempo_aviso_golpe:
+		_golpe_fase = 2
+		_ejecutar_golpe()
+
+func _ejecutar_golpe() -> void:
+	# Puños fuera: el rifle se oculta durante la animación de Golpe.
+	_pivote_brazo.hide()
+	_anim_golpe.play("Golpe")
+	for cuerpo in _area_golpe.get_overlapping_bodies():
+		if cuerpo != self and cuerpo.is_in_group("player") and cuerpo.has_method("recibir_dano"):
+			cuerpo.recibir_dano(dano_golpe, "Melee")
+
+func _on_golpe_anim_finished(nombre: String) -> void:
+	if nombre != "Golpe" or _golpe_fase != 2:
+		return
+	_terminar_golpe()
+
+func _terminar_golpe() -> void:
+	_sprite_cuerpo.modulate = Color(1.0, 1.0, 1.0)
+	_pivote_brazo.modulate = Color(1.0, 1.0, 1.0)
+	_pivote_brazo.show()
+	_sprite_cuerpo.frame = FRAME_QUIETO
+	_tiempo_anim_caminar = 0.0
+	_golpe_fase = 0
+	temporizador_golpe = cooldown_golpe
+
+# El área del golpe siempre queda delante, mire a donde mire.
+func _actualizar_area_golpe() -> void:
+	var lado := 1.0 if _mirando_derecha else -1.0
+	_area_golpe.position.x = _sprite_cuerpo.position.x + lado * _base_area_golpe_x
+	_colision_golpe.position.x = lado * _base_colision_golpe_x
+
 func _lanzar_granada():
 	if not is_instance_valid(_jugador): return
-
 	var nueva_granada = ESCENA_GRANADA.instantiate()
 	get_parent().add_child(nueva_granada)
 	
@@ -281,7 +439,22 @@ func _apuntar_al_jugador():
 func _flip_personaje():
 	_mirando_derecha = not _mirando_derecha
 	_sprite_cuerpo.flip_h = not _sprite_cuerpo.flip_h
-	_pivote_brazo.position.x = -_pivote_brazo.position.x
+	# Espejamos respecto al centro del sprite (está desplazado a x=18),
+	# no respecto al origen: así el pivote cae en el otro hombro.
+	_pivote_brazo.position.x = 2.0 * _sprite_cuerpo.position.x - _pivote_brazo.position.x
+	_actualizar_area_golpe()
+
+# Fuera de combate el brazo no usa look_at: lo clavamos hacia adelante
+# según a dónde mira el cuerpo. El flip solo espeja la posición del
+# pivote, así que sin esto el arma conserva la rotación del último
+# combate y apunta a cualquier lado al patrullar.
+func _orientar_brazo_adelante():
+	if _mirando_derecha:
+		_pivote_brazo.rotation = 0.0
+		_pivote_brazo.scale.y = 1.0
+	else:
+		_pivote_brazo.rotation = PI
+		_pivote_brazo.scale.y = -1.0
 
 # Inicia la sorpresa: filtro amarillo (el mismo de grunt asustado) y quieto.
 func _sorprender():

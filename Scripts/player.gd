@@ -170,6 +170,9 @@ func ejecutar_patada():
 				cuerpo.recibir_dano(5.0, "Melee")
 			else:
 				cuerpo.recibir_dano(dano_patada, "Melee")
+		elif cuerpo.is_in_group("granadas") and cuerpo.has_method("ser_desviada"):
+			# Solo la frag/cargada implementa ser_desviada; la plasma no.
+			cuerpo.ser_desviada(global_position)
 				
 func cambiar_arma():
 	_arma_actual.hide()
@@ -382,7 +385,10 @@ func _morir():
 	
 	# Esperar a que la pantalla se vuelva totalmente negra
 	await get_tree().create_timer(1.3).timeout
-	
+
+	# Morir descarta lo avanzado desde el último checkpoint: los enemigos
+	# derrotados y los items recogidos sin guardar reaparecen.
+	Global.descartar_progreso_no_guardado()
 	# Recargar la escena (al iniciar, el HUD ejecutará hacer_fade_in automáticamente)
 	get_tree().reload_current_scene()
 	

@@ -19,6 +19,7 @@ var _barra_dano_tiempo: float = 0.0
 @onready var _pivote_brazo = $PivoteBrazo
 @onready var _sprite_brazo = $PivoteBrazo/SpriteBrazoArma
 @onready var _arma_actual = $PivoteBrazo/PistolaPlasma
+@onready var _anim_correr = $AnimationPlayer
 @export var mirar_izquierda_al_inicio: bool = false
 
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
@@ -63,6 +64,11 @@ var _cono_visible: bool = false
 @export var factor_vel_patrulla: float = 0.35
 var _pos_origen_patrulla: Vector2
 var _dir_patrulla: float = 1.0
+# Anti-atasco entre patrulleros: si el bloqueo es otro enemigo, no giramos
+# al instante (eso los deja vibrando en el sitio), sino tras un tiempo
+# aleatorio para que no se sincronicen y se despeguen.
+var _tiempo_bloqueado_aliado: float = 0.0
+var _umbral_despegue: float = 0.5
 
 func _ready():
 	# Si ya lo derrotamos en esta partida (checkpoint), no reaparece.
@@ -78,6 +84,7 @@ func _ready():
 	# Si la casilla está marcada en el Inspector, voltea al enemigo al nacer
 	if mirar_izquierda_al_inicio:
 		_flip_enemigo()
+	_orientar_brazo_adelante()
 
 	_pos_origen_patrulla = global_position
 	_dir_patrulla = 1.0 if _mirando_derecha else -1.0
@@ -158,6 +165,7 @@ func _physics_process(delta):
 		var dir_x = _jugador.global_position.x - global_position.x
 		if (dir_x < 0 and _mirando_derecha) or (dir_x > 0 and not _mirando_derecha):
 			_flip_enemigo()
+		_orientar_brazo_adelante()
 	
 	elif es_alerta and _jugador != null and is_instance_valid(_jugador):
 		# --- ESTADO: COMBATE NORMAL (SOLO SI ESTÁ EN ALERTA) ---
@@ -188,14 +196,16 @@ func _physics_process(delta):
 			velocity.x = move_toward(velocity.x, 0, velocidad)
 	else:
 		# --- ESTADO: PATRULLA (tranquilo, sin alerta ni peligros) ---
-		_patrullar()
+		_patrullar(delta)
 	queue_redraw() # Refresca cono y barra cada frame, sin restos entre estados
+	_actualizar_animacion_marcha()
 	move_and_slide()
 
-func _patrullar():
+func _patrullar(delta: float):
 	_cono_visible = patrullar
 	if not patrullar:
 		velocity.x = move_toward(velocity.x, 0, velocidad)
+		_orientar_brazo_adelante()
 		return
 	# Rebotar en los límites del rango y en paredes
 	if global_position.x > _pos_origen_patrulla.x + rango_patrulla:
@@ -203,11 +213,43 @@ func _patrullar():
 	elif global_position.x < _pos_origen_patrulla.x - rango_patrulla:
 		_dir_patrulla = 1.0
 	if is_on_wall():
-		_dir_patrulla = -_dir_patrulla
+		if _choca_con_muro_real():
+			_dir_patrulla = -_dir_patrulla
+			_tiempo_bloqueado_aliado = 0.0
+		else:
+			# Solo hay compañeros encima: esperar un poco antes de girar.
+			_tiempo_bloqueado_aliado += delta
+			if _tiempo_bloqueado_aliado >= _umbral_despegue:
+				_dir_patrulla = -_dir_patrulla
+				_tiempo_bloqueado_aliado = 0.0
+				_umbral_despegue = randf_range(0.35, 0.7)
+	else:
+		_tiempo_bloqueado_aliado = 0.0
 	# Girar el sprite según la dirección de marcha
 	if (_dir_patrulla > 0 and not _mirando_derecha) or (_dir_patrulla < 0 and _mirando_derecha):
 		_flip_enemigo()
+	_orientar_brazo_adelante()
 	velocity.x = _dir_patrulla * (velocidad * factor_vel_patrulla)
+
+# True si alguna colisión de este frame es con algo que no sea otro enemigo
+# (muro, plataforma, jugador, granada...). Solo eso justifica girar al acto.
+func _choca_con_muro_real() -> bool:
+	for i in range(get_slide_collision_count()):
+		var col = get_slide_collision(i).get_collider()
+		if col != null and not col.is_in_group("enemigos"):
+			return true
+	return false
+
+# Reproduce la animación Correr del AnimationPlayer mientras se desplaza
+# en el suelo; quieto la detiene y vuelve al cuadro 0.
+func _actualizar_animacion_marcha() -> void:
+	if absf(velocity.x) > 20.0 and is_on_floor():
+		if not _anim_correr.is_playing() or _anim_correr.current_animation != "Correr":
+			_anim_correr.play("Correr")
+	else:
+		if _anim_correr.is_playing():
+			_anim_correr.stop()
+		_sprite_cuerpo.frame = 0
 
 # --- NUEVA FUNCIÓN ---
 func _lanzar_granada():
@@ -252,7 +294,21 @@ func _apuntar_al_jugador():
 func _flip_enemigo():
 	_mirando_derecha = not _mirando_derecha
 	_sprite_cuerpo.flip_h = not _sprite_cuerpo.flip_h
-	_pivote_brazo.position.x = -_pivote_brazo.position.x
+	# Espejamos respecto al centro del sprite, no respecto al origen:
+	# así el pivote siempre cae en el hombro correspondiente.
+	_pivote_brazo.position.x = 2.0 * _sprite_cuerpo.position.x - _pivote_brazo.position.x
+
+# Fuera de combate el brazo no usa look_at: lo clavamos hacia adelante
+# según a dónde mira el cuerpo. El flip solo espeja la posición del
+# pivote, así que sin esto el arma conserva la rotación del último
+# combate y apunta a cualquier lado al patrullar o huir.
+func _orientar_brazo_adelante():
+	if _mirando_derecha:
+		_pivote_brazo.rotation = 0.0
+		_pivote_brazo.scale.y = 1.0
+	else:
+		_pivote_brazo.rotation = PI
+		_pivote_brazo.scale.y = -1.0
 
 func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	# --- BAJA INSTANTÁNEA POR SIGILO ---

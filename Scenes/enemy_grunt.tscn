@@ -1,12 +1,50 @@
 [gd_scene format=3 uid="uid://bkgohogolomkn"]
 
 [ext_resource type="Script" uid="uid://bqjxxg42gg7a1" path="res://Scripts/enemy_grunt.gd" id="1_nf2s3"]
-[ext_resource type="Texture2D" uid="uid://cs52hdymagsnj" path="res://Assets/Grunt_torso.png" id="2_nf2s3"]
+[ext_resource type="Texture2D" uid="uid://bsk5awsn23wa3" path="res://Assets/SPRITESHEET_GECKO.png" id="2_3jnox"]
 [ext_resource type="PackedScene" uid="uid://b8el2eura1wii" path="res://Scenes/pistola_plasma.tscn" id="3_3jnox"]
 [ext_resource type="Texture2D" uid="uid://ckxwp1gdsby32" path="res://Assets/Grunt_mano.png" id="3_kdp71"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_nf2s3"]
 size = Vector2(26, 87)
+
+[sub_resource type="Animation" id="Animation_3jnox"]
+resource_name = "Correr"
+length = 0.25
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.033333335, 0.06666667, 0.10000001, 0.13333334, 0.16666667, 0.20000002),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6]
+}
+
+[sub_resource type="Animation" id="Animation_vnajb"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ur1y3"]
+_data = {
+&"Correr": SubResource("Animation_3jnox"),
+&"RESET": SubResource("Animation_vnajb")
+}
 
 [node name="EnemyGrunt" type="CharacterBody2D" unique_id=1094277759 groups=["enemigos"]]
 script = ExtResource("1_nf2s3")
@@ -14,9 +52,10 @@ duracion_sorpresa = 0.5
 
 [node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=343860437]
 position = Vector2(0, -13)
-scale = Vector2(0.6, 0.6)
-texture = ExtResource("2_nf2s3")
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_3jnox")
 flip_h = true
+hframes = 7
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1781480895]
 position = Vector2(0, -12.5)
@@ -36,5 +75,8 @@ position = Vector2(10, -3)
 scale = Vector2(0.6, 0.6)
 texture = ExtResource("3_kdp71")
 flip_h = true
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=555014022]
+libraries/ = SubResource("AnimationLibrary_ur1y3")
 
 [editable path="PivoteBrazo/PistolaPlasma"]

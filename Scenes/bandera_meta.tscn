@@ -10,6 +10,7 @@ size = Vector2(42, 119)
 script = ExtResource("1_ebnyn")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=334119736]
+position = Vector2(8.999999, 0.99999994)
 scale = Vector2(0.2, 0.2)
 texture = ExtResource("1_j5kq3")
 

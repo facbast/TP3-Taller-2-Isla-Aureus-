@@ -1,20 +1,55 @@
 [gd_scene format=3 uid="uid://b044ty8a3ds2l"]
 
 [ext_resource type="Script" uid="uid://cu76l5kd44uf7" path="res://Scripts/checkpoint.gd" id="1_2cwi7"]
-[ext_resource type="Texture2D" uid="uid://b2qhdv1l7sjux" path="res://Assets/Flag_Enemy.png" id="1_lbcco"]
-[ext_resource type="Texture2D" uid="uid://eosk8t40js8u" path="res://Assets/Flag_Player.png" id="2_e75gc"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Roja_1.png" id="1_r1"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Roja_2.png" id="2_r2"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Roja_3.png" id="3_r3"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Verde_1.png" id="4_v1"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Verde_2.png" id="5_v2"]
+[ext_resource type="Texture2D" path="res://Assets/Bandera_Verde_3.png" id="6_v3"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_lbcco"]
 size = Vector2(62, 132)
 
+[sub_resource type="SpriteFrames" id="SpriteFrames_ckpt"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_r3")
+}],
+"loop": true,
+"name": &"roja",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_v1")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_v2")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_v3")
+}],
+"loop": true,
+"name": &"verde",
+"speed": 5.0
+}]
+
 [node name="Checkpoint" type="Area2D" unique_id=741946313]
 script = ExtResource("1_2cwi7")
-textura_activada = ExtResource("2_e75gc")
 
-[node name="SpriteBandera" type="Sprite2D" parent="." unique_id=1335786848]
+[node name="SpriteBandera" type="AnimatedSprite2D" parent="." unique_id=1335786848]
 position = Vector2(0, -21)
-scale = Vector2(0.2, 0.2)
-texture = ExtResource("1_lbcco")
+scale = Vector2(0.25, 0.25)
+sprite_frames = SubResource("SpriteFrames_ckpt")
+animation = &"roja"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2082879071]
 position = Vector2(1, -17)

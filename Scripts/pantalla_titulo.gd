@@ -38,6 +38,8 @@ func _on_btn_nueva_partida_pressed():
 	Global.granadas_enemigas_desbloqueadas = false
 	Global.enemigos_derrotados = []
 	Global.items_recogidos = []
+	Global.bajas_pendientes = []
+	Global.items_pendientes = []
 	# Limpiamos restos del checkpoint anterior en memoria
 	Global.inventario_guardado = {}
 	Global.pos_x = 0.0
