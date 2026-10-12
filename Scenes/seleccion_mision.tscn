@@ -1,0 +1,104 @@
+[gd_scene format=3 uid="uid://0dcysnocxwd0"]
+
+[ext_resource type="Script" uid="uid://dfbmlhvamsk2i" path="res://Scripts/seleccion_mision.gd" id="1_sel"]
+[ext_resource type="FontFile" uid="uid://lxgbmbkwprcs" path="res://Fonts/NeulandOpti-Light.otf" id="2_font"]
+[ext_resource type="FontFile" uid="uid://bkbyspq713w1q" path="res://Fonts/OPTINeuland-Black.otf" id="3_fontb"]
+[ext_resource type="Texture2D" uid="uid://cwo4i7pqeuv0q" path="res://Assets/Menu/Cartel.png" id="4_cartel"]
+[ext_resource type="Texture2D" uid="uid://dsbekwerqm5av" path="res://Assets/Menu/Cartel_Hover.png" id="5_hover"]
+[ext_resource type="Texture2D" uid="uid://c2xla8f3dvt4" path="res://Assets/Menu/Cartel_Presionado.png" id="6_press"]
+
+[node name="SeleccionMision" type="Control" unique_id=2073651490]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_sel")
+
+[node name="Fondo" type="ColorRect" parent="." unique_id=958743399]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.04, 0.07, 0.05, 1)
+
+[node name="Titulo" type="Label" parent="." unique_id=1770857042]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 40.0
+offset_bottom = 140.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 8
+theme_override_fonts/font = ExtResource("2_font")
+theme_override_font_sizes/font_size = 64
+text = "Elegir Misión"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Centro" type="CenterContainer" parent="." unique_id=1094958106]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxMisiones" type="VBoxContainer" parent="Centro" unique_id=1827520651]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BtnVolver" type="TextureButton" parent="." unique_id=2095629370]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -569.0
+offset_top = -131.0
+offset_right = -269.0
+offset_bottom = -11.0
+grow_horizontal = 2
+grow_vertical = 0
+texture_normal = ExtResource("4_cartel")
+texture_pressed = ExtResource("6_press")
+texture_hover = ExtResource("5_hover")
+texture_disabled = ExtResource("4_cartel")
+ignore_texture_size = true
+stretch_mode = 0
+
+[node name="Etiqueta" type="Label" parent="BtnVolver" unique_id=2004175683]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("3_fontb")
+theme_override_font_sizes/font_size = 40
+text = "Volver"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Transicion" type="ColorRect" parent="." unique_id=1890728035]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[connection signal="pressed" from="BtnVolver" to="." method="_on_btn_volver_pressed"]

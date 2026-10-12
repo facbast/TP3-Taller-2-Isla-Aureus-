@@ -69,6 +69,10 @@ func _disparar():
 	# 1. Le asignamos el bando a la bala
 	if "es_de_enemigo" in nueva_bala:
 		nueva_bala.es_de_enemigo = es_de_enemigo
+	if "bando" in nueva_bala:
+		var dueno_bando = get_parent().get_parent()
+		if dueno_bando != null and dueno_bando.is_in_group("avispas"):
+			nueva_bala.bando = "avispas"
 		
 	if "tipo_dano" in nueva_bala:
 		nueva_bala.tipo_dano = "Plasma"

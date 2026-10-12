@@ -29,5 +29,7 @@ func _on_body_entered(body):
 
 		# La demo termina sin checkpoint final: no se confirma lo pendiente.
 		Global.descartar_progreso_no_guardado()
+		# Al título se vuelve en silencio.
+		MusicManager.detener_musica()
 		# Cambiamos de escena al menú principal
 		get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn")

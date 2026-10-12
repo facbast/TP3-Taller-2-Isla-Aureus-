@@ -75,6 +75,10 @@ func _instanciar_proyectil(escena_proyectil, tipo_de_ataque: String):
 	# Le informamos al proyectil quién lo disparó
 	if "es_de_enemigo" in nuevo_proyectil:
 		nuevo_proyectil.es_de_enemigo = es_de_enemigo
+	if "bando" in nuevo_proyectil:
+		var dueno_bando = get_parent().get_parent()
+		if dueno_bando != null and dueno_bando.is_in_group("avispas"):
+			nuevo_proyectil.bando = "avispas"
 		
 	# --- NUEVO: ASIGNAMOS EL TIPO DE DAÑO ---
 	if "tipo_dano" in nuevo_proyectil:

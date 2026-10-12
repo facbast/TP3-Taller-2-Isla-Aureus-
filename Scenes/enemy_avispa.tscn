@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://c5ho7tfdu48k7"]
+
+[ext_resource type="Script" uid="uid://nt3wwedrvv3v" path="res://Scripts/enemy_avispa.gd" id="1_avispa"]
+[ext_resource type="Texture2D" uid="uid://brohhi2f5bv3v" path="res://Assets/Avispa_A.png" id="2_avispa"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_avispa"]
+radius = 30.0
+
+[node name="EnemyAvispa" type="CharacterBody2D" unique_id=1388131478 groups=["avispas", "enemigos"]]
+motion_mode = 1
+script = ExtResource("1_avispa")
+dano_aguijon = 30.0
+
+[node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=1857298986]
+position = Vector2(16.999998, -12.999999)
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_avispa")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1513022516]
+shape = SubResource("CircleShape2D_avispa")

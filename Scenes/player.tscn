@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://cfpfxamw8y5mk" path="res://Assets/Armas/Rifle_Balistico.png" id="3_gymyn"]
 [ext_resource type="Script" uid="uid://dtpvuekt8qvls" path="res://Scripts/rifle.gd" id="4_fkybt"]
 [ext_resource type="Texture2D" uid="uid://c1xap3pfahllk" path="res://Assets/Armas/Pistola.png" id="5_x3wgy"]
+[ext_resource type="Texture2D" path="res://Assets/Armas/Pistola_Balistica.png" id="5_pistnb"]
 [ext_resource type="Script" uid="uid://qe757kid0rex" path="res://Scripts/pistola.gd" id="6_3smsa"]
 [ext_resource type="PackedScene" uid="uid://b8el2eura1wii" path="res://Scenes/pistola_plasma.tscn" id="8_8erm5"]
 [ext_resource type="PackedScene" uid="uid://wef2aihmnohw" path="res://Scenes/rifle_plasma.tscn" id="9_f1ek2"]
@@ -142,7 +143,7 @@ position = Vector2(425.00006, -83.333336)
 visible = false
 position = Vector2(48, -1)
 scale = Vector2(0.5, 0.5)
-texture = ExtResource("5_x3wgy")
+texture = ExtResource("5_pistnb")
 flip_h = true
 script = ExtResource("6_3smsa")
 

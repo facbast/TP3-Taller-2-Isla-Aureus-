@@ -2,7 +2,6 @@ extends Area2D
 
 # Configuración del checkpoint
 @export var radio_seguridad: float = 800.0
-@export var nombre_nivel: String = "res://Scenes/main.tscn"
 
 # Bandera animada: "roja" sin activar, "verde" al guardar.
 @onready var sprite_bandera: AnimatedSprite2D = $SpriteBandera
@@ -46,8 +45,9 @@ func _on_body_entered(cuerpo):
 				elif "bateria" in arma:
 					estado_jugador["municion"][arma.name] = arma.bateria
 					
-		# Le pasamos el diccionario a Global
-		Global.guardar_checkpoint(nombre_nivel, global_position, estado_jugador)
+		# Se guarda la escena en curso: el mismo checkpoint sirve en
+		# cualquier misión sin retocar exports por nivel.
+		Global.guardar_checkpoint(get_tree().current_scene.scene_file_path, global_position, estado_jugador)
 		fue_activado = true 
 
 		# Bandera en verde con su animación de 3 cuadros

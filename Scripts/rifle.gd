@@ -1,6 +1,9 @@
 extends Sprite2D
 
 const BALA_ESCENA = preload("res://Scenes/bala.tscn")
+
+# Para enemigos: en el inspector se puede poner la bala enemiga.
+@export var escena_bala: PackedScene = preload("res://Scenes/bala.tscn")
 @onready var _punto_disparo = $PuntoDisparo
 
 # --- VARIABLES DEL ARMA ---
@@ -20,6 +23,11 @@ var dispersion_maxima = 3.5 # Grados de desviación máxima de la bala
 func _process(delta):
 	temporizador_disparo += delta
 
+func _ready():
+	# Si quien sostiene el arma NO es el jugador, munición infinita.
+	if not owner.is_in_group("player"):
+		municion_reserva = 9999
+
 func intentar_disparar() -> bool:
 	if esta_recargando:
 		return false
@@ -37,7 +45,7 @@ func intentar_disparar() -> bool:
 	return false
 
 func _efectuar_disparo():
-	var nueva_bala = BALA_ESCENA.instantiate()
+	var nueva_bala = escena_bala.instantiate()
 	owner.get_parent().add_child(nueva_bala) 
 	
 	nueva_bala.global_position = _punto_disparo.global_position
@@ -55,19 +63,27 @@ func _efectuar_disparo():
 	# --- SISTEMA DE DAÑO DINÁMICO ---
 	# Le decimos a la bala que su daño ya no es el de por defecto, sino el de este rifle
 	nueva_bala.dano = dano_por_bala
+	if "tipo_dano" in nueva_bala:
+		nueva_bala.tipo_dano = "Balistica"
+	if "es_de_enemigo" in nueva_bala:
+		nueva_bala.es_de_enemigo = not owner.is_in_group("player")
+	if "bando" in nueva_bala and owner.is_in_group("avispas"):
+		nueva_bala.bando = "avispas"
 
 func recargar():
 	if esta_recargando or municion_cargador == municion_cargador_max or municion_reserva <= 0:
 		return
 		
 	esta_recargando = true
-	
-	# Barrido de recarga en el HUD (dura lo mismo que la recarga real)
-	var hud = owner.get_parent().get_node_or_null("HUD")
-	if hud == null:
-		hud = get_tree().current_scene.get_node_or_null("HUD")
-	if hud != null and hud.has_method("animar_recarga"):
-		hud.animar_recarga(tiempo_recarga)
+
+	# El barrido solo si el dueño es el jugador (no ensucia su HUD en avispa/enemigo).
+	if owner.is_in_group("player"):
+		# Barrido de recarga en el HUD (dura lo mismo que la recarga real)
+		var hud = owner.get_parent().get_node_or_null("HUD")
+		if hud == null:
+			hud = get_tree().current_scene.get_node_or_null("HUD")
+		if hud != null and hud.has_method("animar_recarga"):
+			hud.animar_recarga(tiempo_recarga)
 	
 	await get_tree().create_timer(tiempo_recarga).timeout 
 	
@@ -83,6 +99,9 @@ func recargar():
 	_actualizar_hud()
 
 func _actualizar_hud():
+	# Solo toca el HUD si el dueño es el jugador.
+	if not owner.is_in_group("player"):
+		return
 	var hud = owner.get_parent().get_node_or_null("HUD")
 	if hud == null:
 		hud = get_tree().current_scene.get_node_or_null("HUD")

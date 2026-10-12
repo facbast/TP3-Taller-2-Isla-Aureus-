@@ -1,0 +1,40 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/dialogo_interferencia.gd" id="1_interf"]
+[ext_resource type="FontFile" uid="uid://ynlsna7i7s3e" path="res://Fonts/76London Fall.ttf" id="2_7n7ks"]
+[ext_resource type="AudioStream" uid="uid://qkeqs855cm5n" path="res://SFX/Bip.wav" id="3_4maqu"]
+
+[node name="Dialogo Interferencia" type="CanvasLayer"]
+process_mode = 3
+script = ExtResource("1_interf")
+
+[node name="Panel" type="Panel" parent="."]
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -170.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="IconoPersonaje" type="TextureRect" parent="Panel"]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 15.0
+offset_right = 113.0
+offset_bottom = 159.0
+expand_mode = 1
+stretch_mode = 5
+
+[node name="TextoDialogo" type="RichTextLabel" parent="Panel"]
+layout_mode = 0
+offset_left = 129.0
+offset_top = 15.0
+offset_right = 1132.0
+offset_bottom = 164.0
+theme_override_fonts/normal_font = ExtResource("2_7n7ks")
+theme_override_font_sizes/normal_font_size = 30
+text = "Hola hoola"
+
+[node name="AudioBlip" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_4maqu")

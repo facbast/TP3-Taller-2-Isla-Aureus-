@@ -38,6 +38,9 @@ const ARMA_SOLTADA = preload("res://Scenes/arma_soltada.tscn")
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _mirando_derecha = true
 var _jugador = null
+# Objetivo actual de combate: el jugador o una avispa (bando contrario).
+# Los reptiles no se atacan entre sí; las avispas ya los cazan por su cuenta.
+var _objetivo: Node2D = null
 var _tween_escudo: Tween 
 
 # --- SISTEMA DE SIGILO Y VISIÓN ---
@@ -107,7 +110,10 @@ var _barra_dano_tiempo: float = 0.0
 
 func _ready():
 	# Si ya lo derrotamos en esta partida (checkpoint), no reaparece.
-	if Global.estaba_eliminado(self):
+	# Los spawns de arena se saltan el registro: sus rutas inestables
+	# harían que nacieran muertos.
+	if not has_meta("es_spawn_arena") and Global.estaba_eliminado(self):
+		print("Elite suprimido por checkpoint guardado: ", get_path())
 		queue_free()
 		return
 	salud_actual = salud_maxima
@@ -192,11 +198,16 @@ func _physics_process(delta):
 	if granada_mas_peligrosa != null:
 		es_alerta = true
 
-	# --- SISTEMA DE SIGILO Y DETECCIÓN ---
+	# --- SISTEMA DE SIGILO Y DETECCIÓN (jugador o avispas del bando contrario) ---
 	if not es_alerta:
 		queue_redraw()
-		if _detectar_jugador_en_cono():
-			_sorprender()
+		for candidato in _candidatos_hostiles():
+			if _detectar_en_cono(candidato):
+				_sorprender()
+				break
+	else:
+		# En combate reevalúa cada frame: cambia a lo hostil más cercano.
+		_actualizar_objetivo()
 
 	# 2. MÁQUINA DE ESTADOS (Evadir Granada vs Combate Normal)
 	_cono_visible = false # Solo la rama de patrulla lo vuelve a encender
@@ -208,8 +219,8 @@ func _physics_process(delta):
 			
 		velocity.x = direccion_escape * (SPEED * multiplicador_velocidad_panico)
 		
-		if is_instance_valid(_jugador):
-			_apuntar_al_jugador()
+		if is_instance_valid(_objetivo):
+			_apuntar_al_objetivo()
 
 	elif _sorpresa_tiempo > 0.0:
 		# --- ESTADO: SORPRESA (clavado y amarillo, sin disparar) ---
@@ -219,16 +230,16 @@ func _physics_process(delta):
 		# --- ESTADO: GOLPE MELEE (aviso rojo + golpe, sin moverse) ---
 		_procesar_golpe(delta)
 
-	elif es_alerta and is_instance_valid(_jugador) and _golpe_disponible():
-		# --- ATAQUE MELEE (jugador al alcance y golpe cargado) ---
+	elif es_alerta and _golpe_disponible():
+		# --- ATAQUE MELEE (objetivo al alcance y golpe cargado) ---
 		_iniciar_golpe()
 
-	elif es_alerta and is_instance_valid(_jugador):
+	elif es_alerta and is_instance_valid(_objetivo):
 		# --- ESTADO DE COMBATE NORMAL ---
-		var dist = global_position.distance_to(_jugador.global_position)
-		var tiene_visibilidad = _tiene_linea_de_vision()
-		
-		_apuntar_al_jugador()
+		var dist = global_position.distance_to(_objetivo.global_position)
+		var tiene_visibilidad = _tiene_linea_de_vision(_objetivo)
+
+		_apuntar_al_objetivo()
 
 		if dist <= distancia_ataque:
 			if tiene_visibilidad:
@@ -242,10 +253,10 @@ func _physics_process(delta):
 
 			# Kiting / Posicionamiento
 			if dist < distancia_minima:
-				var dir_huida = (global_position - _jugador.global_position).normalized()
+				var dir_huida = (global_position - _objetivo.global_position).normalized()
 				velocity.x = dir_huida.x * SPEED
 			elif dist > distancia_minima + 60.0:
-				var dir_avance = (_jugador.global_position - global_position).normalized()
+				var dir_avance = (_objetivo.global_position - global_position).normalized()
 				velocity.x = dir_avance.x * (SPEED * 0.7)
 			else:
 				velocity.x = move_toward(velocity.x, 0, SPEED)
@@ -327,17 +338,17 @@ func _sincronizar_brazo_marcha() -> void:
 		px = 2.0 * _sprite_cuerpo.position.x - px
 	_pivote_brazo.position = Vector2(px, _base_pivote_brazo.y + offset.y)
 	
-# Golpe listo: enfriamiento cumplido, jugador al alcance y a la vista.
+# Golpe listo: enfriamiento cumplido, objetivo al alcance y a la vista.
 func _golpe_disponible() -> bool:
-	if temporizador_golpe > 0.0 or not is_instance_valid(_jugador):
+	if temporizador_golpe > 0.0 or not is_instance_valid(_objetivo):
 		return false
-	if global_position.distance_to(_jugador.global_position) > distancia_golpe:
+	if global_position.distance_to(_objetivo.global_position) > distancia_golpe:
 		return false
-	return _tiene_linea_de_vision()
+	return _tiene_linea_de_vision(_objetivo)
 
 func _iniciar_golpe() -> void:
-	# Mira al jugador, se clava y avisa en rojo (cuerpo y brazos).
-	var hacia = sign(_jugador.global_position.x - global_position.x)
+	# Mira al objetivo, se clava y avisa en rojo (cuerpo y brazos).
+	var hacia = sign(_objetivo.global_position.x - global_position.x)
 	if hacia != 0.0 and ((hacia < 0.0 and _mirando_derecha) or (hacia > 0.0 and not _mirando_derecha)):
 		_flip_personaje()
 	_orientar_brazo_adelante()
@@ -361,7 +372,7 @@ func _ejecutar_golpe() -> void:
 	_pivote_brazo.hide()
 	_anim_golpe.play("Golpe")
 	for cuerpo in _area_golpe.get_overlapping_bodies():
-		if cuerpo != self and cuerpo.is_in_group("player") and cuerpo.has_method("recibir_dano"):
+		if cuerpo != self and cuerpo.has_method("recibir_dano") and (cuerpo.is_in_group("player") or cuerpo.is_in_group("avispas")):
 			cuerpo.recibir_dano(dano_golpe, "Melee")
 
 func _on_golpe_anim_finished(nombre: String) -> void:
@@ -385,16 +396,16 @@ func _actualizar_area_golpe() -> void:
 	_colision_golpe.position.x = lado * _base_colision_golpe_x
 
 func _lanzar_granada():
-	if not is_instance_valid(_jugador): return
+	if not is_instance_valid(_objetivo): return
 	var nueva_granada = ESCENA_GRANADA.instantiate()
 	get_parent().add_child(nueva_granada)
-	
-	var direccion_jugador = (_jugador.global_position - global_position).normalized()
-	direccion_jugador.y -= 0.6
-	direccion_jugador = direccion_jugador.normalized()
-	
+
+	var direccion_objetivo = (_objetivo.global_position - global_position).normalized()
+	direccion_objetivo.y -= 0.6
+	direccion_objetivo = direccion_objetivo.normalized()
+
 	var pos_origen = global_position + Vector2(0, -30)
-	var pos_destino = pos_origen + (direccion_jugador * 40.0)
+	var pos_destino = pos_origen + (direccion_objetivo * 40.0)
 	
 	var space_state = get_world_2d().direct_space_state
 	var query = PhysicsRayQueryParameters2D.create(pos_origen, pos_destino)
@@ -402,12 +413,12 @@ func _lanzar_granada():
 	var res = space_state.intersect_ray(query)
 	
 	if res:
-		nueva_granada.global_position = res.position - (direccion_jugador * 5.0)
+		nueva_granada.global_position = res.position - (direccion_objetivo * 5.0)
 	else:
 		nueva_granada.global_position = pos_destino
 
 	nueva_granada.add_collision_exception_with(self)
-	nueva_granada.apply_central_impulse(direccion_jugador * fuerza_lanzamiento_granada)
+	nueva_granada.apply_central_impulse(direccion_objetivo * fuerza_lanzamiento_granada)
 	
 func _procesar_recarga_escudo(delta):
 	if escudo_actual < escudo_maximo:
@@ -420,10 +431,11 @@ func _buscar_jugador():
 	if jugadores.size() > 0:
 		_jugador = jugadores[0]
 
-func _apuntar_al_jugador():
-	if not _jugador: return
-	
-	var pos_objetivo = _jugador.global_position + Vector2(0, -20)
+func _apuntar_al_objetivo():
+	if not is_instance_valid(_objetivo):
+		return
+
+	var pos_objetivo = _objetivo.global_position + Vector2(0, -20)
 	_pivote_brazo.look_at(pos_objetivo)
 
 	var dir_x = pos_objetivo.x - global_position.x
@@ -535,7 +547,8 @@ func _mostrar_efecto_escudo():
 	_tween_escudo.tween_property(self, "modulate", Color.WHITE, 0.5)
 
 func _morir():
-	Global.registrar_baja_enemigo(self)
+	if not has_meta("es_spawn_arena"):
+		Global.registrar_baja_enemigo(self)
 	_asustar_aliados(500.0) # 500 píxeles de radio para asustar
 	_soltar_arma()
 	_intentar_soltar_granada()
@@ -575,6 +588,7 @@ func _intentar_soltar_granada():
 		granada_caida.tipo_arma = "Granada"
 		granada_caida.cantidad_municion = 1
 		granada_caida.scale = Vector2(0.05, 0.05)
+		granada_caida.scale = Vector2(0.05, 0.05)
 		get_parent().call_deferred("add_child", granada_caida)
 		granada_caida.set_deferred("global_position", global_position)
 
@@ -587,20 +601,45 @@ func _mostrar_efecto_ruptura_escudo():
 	_tween_escudo = create_tween()
 	_tween_escudo.tween_property(self, "modulate", Color.WHITE, 0.5)
 
-func _tiene_linea_de_vision() -> bool:
-	if not is_instance_valid(_jugador): 
+# Candidatos a objetivo: el jugador siempre; las avispas (bando contrario)
+# solo si Roku está cerca (si no, la guerra esperaría sin público).
+# Los reptiles entre sí no se consideran hostiles.
+func _candidatos_hostiles() -> Array:
+	var lista := []
+	for j in get_tree().get_nodes_in_group("player"):
+		if is_instance_valid(j):
+			lista.append(j)
+	if Global.combate_facciones_permitido(global_position):
+		for a in get_tree().get_nodes_in_group("avispas"):
+			if is_instance_valid(a):
+				lista.append(a)
+	return lista
+
+# El objetivo es lo hostil más cercano dentro del rango de ataque.
+func _actualizar_objetivo() -> void:
+	var mejor: Node2D = null
+	var mejor_dist := distancia_ataque
+	for c in _candidatos_hostiles():
+		var d = global_position.distance_to((c as Node2D).global_position)
+		if d < mejor_dist:
+			mejor_dist = d
+			mejor = c
+	_objetivo = mejor
+
+func _tiene_linea_de_vision(nodo: Node2D) -> bool:
+	if not is_instance_valid(nodo):
 		return false
-	
+
 	var space_state = get_world_2d().direct_space_state
-	# Lanzamos un rayo desde el enemigo hacia el centro del jugador
-	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), _jugador.global_position + Vector2(0, -15))
+	# Lanzamos un rayo desde el enemigo hacia el centro del objetivo
+	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position + Vector2(0, -15))
 	parametro_rayo.exclude = [self] # Ignorar la colisión del propio enemigo
-	
+
 	var resultado = space_state.intersect_ray(parametro_rayo)
 	if resultado:
-		# Solo hay línea de visión si el rayo impacta directamente al jugador (y no a una pared)
-		return resultado.collider == _jugador
-	
+		# Solo hay línea de visión si el rayo impacta directamente al objetivo (y no a una pared)
+		return resultado.collider == nodo
+
 	return false
 
 func _obtener_posicion_segura_granada(direccion: Vector2) -> Vector2:
@@ -618,23 +657,23 @@ func _obtener_posicion_segura_granada(direccion: Vector2) -> Vector2:
 	
 	return pos_deseada
 
-func _detectar_jugador_en_cono() -> bool:
-	if not is_instance_valid(_jugador): 
+func _detectar_en_cono(nodo: Node2D) -> bool:
+	if not is_instance_valid(nodo):
 		return false
-	
-	var dist = global_position.distance_to(_jugador.global_position)
+
+	var dist = global_position.distance_to(nodo.global_position)
 	if dist > distancia_vision:
 		return false
-		
+
 	# Dirección en la que mira el enemigo
 	var dir_frente = Vector2.RIGHT if _mirando_derecha else Vector2.LEFT
-	var dir_hacia_jugador = (_jugador.global_position - global_position).normalized()
-	
-	# Cálculo del ángulo entre la mirada y el jugador
-	var angulo = rad_to_deg(dir_frente.angle_to(dir_hacia_jugador))
+	var dir_hacia_objetivo = (nodo.global_position - global_position).normalized()
+
+	# Cálculo del ángulo entre la mirada y el objetivo
+	var angulo = rad_to_deg(dir_frente.angle_to(dir_hacia_objetivo))
 	if abs(angulo) <= (angulo_vision / 2.0):
-		return _tiene_linea_de_vision() # Verifica que no haya muros de por medio
-		
+		return _tiene_linea_de_vision(nodo) # Verifica que no haya muros de por medio
+
 	return false
 
 func _draw():

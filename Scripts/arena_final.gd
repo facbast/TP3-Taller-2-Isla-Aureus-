@@ -66,23 +66,55 @@ func _iniciar_siguiente_oleada() -> void:
 
 	for i in range(enemigos_por_oleada):
 		await get_tree().create_timer(tiempo_entre_enemigos).timeout
+		# Si el jugador murió y la escena se recargó, esta arena ya no
+		# está en el árbol: no se spawnea nada (la nueva instancia manda).
+		if not is_inside_tree():
+			return
 		_spawnear_enemigo(puntos_spawn)
 
 func _spawnear_enemigo(puntos_spawn: Array[Node]) -> void:
+	if not is_inside_tree():
+		return
 	# Selecciona un punto de spawn y un tipo de enemigo al azar
 	var punto_elegido = puntos_spawn.pick_random() as Node2D
 	var escena_elegida = escenas_enemigos.pick_random() as PackedScene
 	
 	var enemigo = escena_elegida.instantiate() as Node2D
+
+	# Marca de spawn: los enemigos de arena NO usan el registro de checkpoint
+	# (sus rutas son inestables y harían que reaparecieran muertos o que
+	# envenenaran el guardado). Se marca antes del add_child para que el
+	# _ready del enemigo ya la vea.
+	enemigo.set_meta("es_spawn_arena", true)
+
+	# Primero al árbol y DESPUÉS la posición global: Oleadas/Oleada10 está
+	# desplazado (5332, 2) y hacerlo al revés suma ese offset dos veces,
+	# escupiendo a los enemigos 5k píxeles fuera de la arena.
+	get_parent().add_child(enemigo)
 	enemigo.global_position = punto_elegido.global_position
-	
+
+	# Si el enemigo sabe entrar en caza (ej. la avispa), la emboscada lo
+	# activa de inmediato: nacen en caza, sin ronda de detección.
+	if enemigo.has_method("forzar_caza"):
+		enemigo.forzar_caza()
+
+	# Las avispas atraviesan los muros de energía: vuelan por encima y los
+	# encuentros no son siempre encerrados. Geckos y caimanes siguen
+	# bloqueados (la excepción es solo para el grupo "avispas").
+	if enemigo.is_in_group("avispas"):
+		for muro in [barrera_entrada, barrera_salida]:
+			if is_instance_valid(muro) and muro.has_method("add_collision_exception_with"):
+				muro.add_collision_exception_with(enemigo)
+
 	# Detectar cuando el enemigo muera (cuando salga del árbol de escena / sea destruido)
 	enemigo.tree_exited.connect(_on_enemigo_derrotado)
-	
-	get_parent().add_child(enemigo)
 
 func _on_enemigo_derrotado() -> void:
 	if not arena_activa:
+		return
+	# Durante una recarga por muerte todos los nodos salen del árbol y
+	# llegan a este callback en la arena vieja: se ignora (get_tree() sería nulo).
+	if not is_inside_tree():
 		return
 		
 	enemigos_vivos -= 1

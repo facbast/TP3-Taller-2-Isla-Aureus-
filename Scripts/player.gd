@@ -85,7 +85,10 @@ var desplazamiento_maximo_camara = 60.0 # Ajusta este valor para mayor o menor l
 
 
 func _ready():
-	if Global.hay_datos_guardados:
+	# El loop de música vive solo dentro de los niveles (no en menús).
+	MusicManager.iniciar_musica_nivel()
+	Global.fijar_mision_por_escena(get_tree().current_scene.scene_file_path)
+	if Global.hay_datos_guardados and not Global.inicio_fresco_mision:
 		global_position = Vector2(Global.pos_x, Global.pos_y)
 		Global.restaurar_flags_checkpoint()
 		
@@ -120,7 +123,16 @@ func _ready():
 		armas.append(_rifle)
 		armas.append(_pistola)
 		_arma_actual = armas[0]
-	_arma_actual = armas[0]
+	# Consumido: las recargas por muerte vuelven al checkpoint, no al inicio.
+	Global.inicio_fresco_mision = false
+	# Respeta el arma activa restaurada del checkpoint; solo usa la
+	# primera si no hay ninguna válida (evita pisar el inventario).
+	if armas.is_empty():
+		armas.append(_rifle)
+		armas.append(_pistola)
+	if _arma_actual == null or not armas.has(_arma_actual):
+		_arma_actual = armas[0]
+		indice_arma_actual = 0
 	
 	for arma in armas_en_escena:
 		arma.hide()
@@ -333,6 +345,10 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	elif tipo_dano == "Balistica":
 		multiplicador_escudo = 0.5
 		multiplicador_salud = 1.5
+	elif tipo_dano == "Aguijon":
+		# El aguijón avispa casi no muerde escudos, pero siega piel expuesta.
+		multiplicador_escudo = 0.5
+		multiplicador_salud = 1.5
 		
 	if escudo_actual > 0:
 		var dano_al_escudo = cantidad * multiplicador_escudo
@@ -394,6 +410,17 @@ func _morir():
 	
 	
 func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
+	if nombre_arma == "Durian":
+		if granadas_plasma_actuales < granadas_maximas:
+			granadas_plasma_actuales = min(granadas_plasma_actuales + cantidad_municion, granadas_maximas)
+
+			var hud = get_parent().get_node_or_null("HUD")
+			if hud != null:
+				# --- LÍNEA ACTUALIZADA ---
+				hud.actualizar_granadas(granadas_frag_actuales, granadas_plasma_actuales, granadas_maximas, usando_granada_plasma)
+				hud.mostrar_notificacion("Durian recogido (" + str(granadas_plasma_actuales) + "/" + str(granadas_maximas) + ")")
+			return true
+		return false
 	if nombre_arma == "Granada":
 		if granadas_frag_actuales < granadas_maximas:
 			granadas_frag_actuales = min(granadas_frag_actuales + cantidad_municion, granadas_maximas)

@@ -1,0 +1,50 @@
+[gd_scene format=3 uid="uid://dy6bfan17h14b"]
+
+[ext_resource type="Script" uid="uid://dg4swbn8en6jt" path="res://Scripts/enemy_avispa_b.gd" id="1_avisb"]
+[ext_resource type="Texture2D" uid="uid://br4j5b7krnj1m" path="res://Assets/Avispa_B.png" id="2_avisb"]
+[ext_resource type="PackedScene" path="res://Scenes/rifle.tscn" id="3_avisb"]
+[ext_resource type="PackedScene" uid="uid://bsc4sr5i3nv5v" path="res://Scenes/pistola.tscn" id="4_avisb"]
+[ext_resource type="PackedScene" uid="uid://wef2aihmnohw" path="res://Scenes/rifle_plasma.tscn" id="5_avisb"]
+[ext_resource type="PackedScene" uid="uid://b8el2eura1wii" path="res://Scenes/pistola_plasma.tscn" id="6_avisb"]
+[ext_resource type="PackedScene" uid="uid://bmvdugukgnamt" path="res://Scenes/bala_enemiga.tscn" id="7_avisb"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_avisb"]
+radius = 30.0
+
+[node name="EnemyAvispaB" type="CharacterBody2D" unique_id=1283206599 groups=["avispas", "enemigos"]]
+motion_mode = 1
+script = ExtResource("1_avisb")
+arma_equipada = 0
+
+[node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=2080191962]
+scale = Vector2(0.2, 0.2)
+texture = ExtResource("2_avisb")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=308290109]
+shape = SubResource("CircleShape2D_avisb")
+
+[node name="PivoteBrazo" type="Node2D" parent="." unique_id=178273403]
+position = Vector2(-18, 60)
+rotation = 3.1416
+
+[node name="Rifle" parent="PivoteBrazo" unique_id=1566639830 instance=ExtResource("3_avisb")]
+visible = false
+escena_bala = ExtResource("7_avisb")
+
+[node name="Pistola" parent="PivoteBrazo" unique_id=490493140 instance=ExtResource("4_avisb")]
+visible = false
+escena_bala = ExtResource("7_avisb")
+
+[node name="PuntoDisparo" parent="PivoteBrazo/Pistola" index="0" unique_id=1421228180]
+position = Vector2(18, 4)
+
+[node name="RiflePlasma" parent="PivoteBrazo" unique_id=1868179404 instance=ExtResource("5_avisb")]
+
+[node name="PuntoDisparo" parent="PivoteBrazo/RiflePlasma" index="1" unique_id=599909725]
+position = Vector2(53.999973, -4.000386)
+
+[node name="PistolaPlasma" parent="PivoteBrazo" unique_id=677586949 instance=ExtResource("6_avisb")]
+visible = false
+
+[editable path="PivoteBrazo/Pistola"]
+[editable path="PivoteBrazo/RiflePlasma"]

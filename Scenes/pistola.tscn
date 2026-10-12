@@ -1,0 +1,14 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://qe757kid0rex" path="res://Scripts/pistola.gd" id="1_pistola"]
+[ext_resource type="Texture2D" path="res://Assets/Armas/Pistola_Balistica.png" id="2_pistnb"]
+
+[node name="Pistola" type="Sprite2D"]
+position = Vector2(48, -1)
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_pistnb")
+flip_h = true
+script = ExtResource("1_pistola")
+
+[node name="PuntoDisparo" type="Marker2D" parent="."]
+position = Vector2(18, 4)

@@ -22,9 +22,18 @@ var _barra_dano_tiempo: float = 0.0
 @onready var _anim_correr = $AnimationPlayer
 @export var mirar_izquierda_al_inicio: bool = false
 
+# --- MODO HUIDA (suspenso) ---
+# Marcado en el inspector: corre de derecha a izquierda sin detenerse,
+# sin detectar al jugador y sin pelear. Ideal antes de presentar una
+# amenaza nueva (ej. geckos huyendo anunciando las avispas).
+@export var huir_sin_pelear: bool = false
+
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _jugador: Node2D = null
 var _mirando_derecha: bool = true
+# Objetivo actual de combate: el jugador o una avispa (bando contrario).
+# Los reptiles no se atacan entre sí; las avispas ya los cazan por su cuenta.
+var _objetivo: Node2D = null
 
 # --- VARIABLES DE PÁNICO ---
 var distancia_peligro_granada: float = 180.0 
@@ -72,7 +81,10 @@ var _umbral_despegue: float = 0.5
 
 func _ready():
 	# Si ya lo derrotamos en esta partida (checkpoint), no reaparece.
-	if Global.estaba_eliminado(self):
+	# Los spawns de arena se saltan el registro: sus rutas inestables
+	# harían que nacieran muertos.
+	if not has_meta("es_spawn_arena") and Global.estaba_eliminado(self):
+		print("Grunt suprimido por checkpoint guardado: ", get_path())
 		queue_free()
 		return
 	_jugador = get_tree().get_first_node_in_group("player")
@@ -101,6 +113,19 @@ func _physics_process(delta):
 	if temporizador_granada > 0:
 		temporizador_granada -= delta
 
+	# --- MODO HUIDA: corre a la izquierda sin detenerse ni pelear ---
+	# Salta escaneo, detección, sorpresa y combate: ni las granadas ni
+	# ver al jugador lo frenan o lo ponen en alerta. El daño sí lo mata.
+	if huir_sin_pelear:
+		velocity.x = -velocidad * multiplicador_velocidad_panico
+		if _mirando_derecha:
+			_flip_enemigo()
+		_orientar_brazo_adelante()
+		_actualizar_animacion_marcha()
+		move_and_slide()
+		queue_redraw()
+		return
+
 	# 1. ESCANEO DE SUPERVIVENCIA (Rastrear granadas)
 	var granadas = get_tree().get_nodes_in_group("granadas")
 	var granada_mas_peligrosa: Node2D = null
@@ -117,11 +142,16 @@ func _physics_process(delta):
 	if granada_mas_peligrosa != null:
 		es_alerta = true
 
-	# --- SISTEMA DE SIGILO Y DETECCIÓN ---
+	# --- SISTEMA DE SIGILO Y DETECCIÓN (jugador o avispas del bando contrario) ---
 	if not es_alerta:
 		queue_redraw()
-		if _detectar_jugador_en_cono():
-			_sorprender(false)
+		for candidato in _candidatos_hostiles():
+			if _detectar_en_cono(candidato):
+				_sorprender(false)
+				break
+	else:
+		# En combate reevalúa cada frame: cambia a lo hostil más cercano.
+		_actualizar_objetivo()
 
 # (Recuerda restar el tiempo de miedo al inicio del _physics_process)
 	if esta_aterrado:
@@ -146,49 +176,51 @@ func _physics_process(delta):
 			
 		velocity.x = direccion_escape * (velocidad * multiplicador_velocidad_panico)
 		
-		if _jugador != null and is_instance_valid(_jugador):
-			_apuntar_al_jugador()
+		if is_instance_valid(_objetivo):
+			_apuntar_al_objetivo()
 
 	elif _sorpresa_tiempo > 0.0:
 		# --- ESTADO: SORPRESA (clavado y amarillo, sin disparar) ---
 		velocity.x = move_toward(velocity.x, 0, velocidad)
 			
-	elif esta_aterrado and is_instance_valid(_jugador):
-		# --- ESTADO: ATERRADO (HUIR DEL JUGADOR) ---
-		var direccion_escape = sign(global_position.x - _jugador.global_position.x)
-		if direccion_escape == 0:
-			direccion_escape = 1 if randf() > 0.5 else -1
-			
-		velocity.x = direccion_escape * (velocidad * multiplicador_velocidad_panico)
-		
-		# Hacemos que miren hacia atrás mientras corren (opcional pero divertido)
-		var dir_x = _jugador.global_position.x - global_position.x
-		if (dir_x < 0 and _mirando_derecha) or (dir_x > 0 and not _mirando_derecha):
-			_flip_enemigo()
+	elif esta_aterrado:
+		# --- ESTADO: ATERRADO (HUIR DE LA AMENAZA) ---
+		var amenaza: Node2D = _objetivo if is_instance_valid(_objetivo) else _jugador
+		if is_instance_valid(amenaza):
+			var direccion_escape = sign(global_position.x - amenaza.global_position.x)
+			if direccion_escape == 0:
+				direccion_escape = 1 if randf() > 0.5 else -1
+			velocity.x = direccion_escape * (velocidad * multiplicador_velocidad_panico)
+			# Hacemos que miren hacia atrás mientras corren (opcional pero divertido)
+			var dir_x = amenaza.global_position.x - global_position.x
+			if (dir_x < 0 and _mirando_derecha) or (dir_x > 0 and not _mirando_derecha):
+				_flip_enemigo()
+		else:
+			velocity.x = move_toward(velocity.x, 0, velocidad)
 		_orientar_brazo_adelante()
 	
-	elif es_alerta and _jugador != null and is_instance_valid(_jugador):
+	elif es_alerta and is_instance_valid(_objetivo):
 		# --- ESTADO: COMBATE NORMAL (SOLO SI ESTÁ EN ALERTA) ---
-		var distancia_jugador = global_position.distance_to(_jugador.global_position)
-		var tiene_visibilidad = _tiene_linea_de_vision()
+		var distancia_objetivo = global_position.distance_to(_objetivo.global_position)
+		var tiene_visibilidad = _tiene_linea_de_vision(_objetivo)
 		
-		if distancia_jugador < distancia_deteccion:
-			_apuntar_al_jugador()
+		if distancia_objetivo < distancia_deteccion:
+			_apuntar_al_objetivo()
 			
 			if tiene_visibilidad:
 				# Granadas enemigas bloqueadas hasta el tutorial de granadas.
-				if Global.enemigos_pueden_usar_granadas() and temporizador_granada <= 0 and distancia_jugador > distancia_min_lanzar and distancia_jugador < distancia_max_lanzar:
+				if Global.enemigos_pueden_usar_granadas() and temporizador_granada <= 0 and distancia_objetivo > distancia_min_lanzar and distancia_objetivo < distancia_max_lanzar:
 					_lanzar_granada()
 					temporizador_granada = randf_range(4.0, 8.0)
 				
 				_arma_actual.intentar_disparar()
 			
 			# Lógica de kiting (Acercarse o alejarse)
-			if distancia_jugador > distancia_minima + 15.0:
-				var direccion_x = sign(_jugador.global_position.x - global_position.x)
+			if distancia_objetivo > distancia_minima + 15.0:
+				var direccion_x = sign(_objetivo.global_position.x - global_position.x)
 				velocity.x = direccion_x * velocidad
-			elif distancia_jugador < distancia_minima - 15.0:
-				var direccion_x = sign(global_position.x - _jugador.global_position.x)
+			elif distancia_objetivo < distancia_minima - 15.0:
+				var direccion_x = sign(global_position.x - _objetivo.global_position.x)
 				velocity.x = direccion_x * velocidad
 			else:
 				velocity.x = move_toward(velocity.x, 0, velocidad)
@@ -253,15 +285,17 @@ func _actualizar_animacion_marcha() -> void:
 
 # --- NUEVA FUNCIÓN ---
 func _lanzar_granada():
+	if not is_instance_valid(_objetivo):
+		return
 	var nueva_granada = ESCENA_GRANADA.instantiate()
 	get_parent().add_child(nueva_granada)
 	
-	var direccion_jugador = (_jugador.global_position - global_position).normalized()
-	direccion_jugador.y -= 0.6
-	direccion_jugador = direccion_jugador.normalized()
+	var direccion_objetivo = (_objetivo.global_position - global_position).normalized()
+	direccion_objetivo.y -= 0.6
+	direccion_objetivo = direccion_objetivo.normalized()
 	
 	var pos_origen = global_position + Vector2(0, -30)
-	var pos_destino = pos_origen + (direccion_jugador * 40.0)
+	var pos_destino = pos_origen + (direccion_objetivo * 40.0)
 	
 	# Raycast para no atravesar paredes al aparecer
 	var space_state = get_world_2d().direct_space_state
@@ -270,23 +304,25 @@ func _lanzar_granada():
 	var res = space_state.intersect_ray(query)
 	
 	if res:
-		nueva_granada.global_position = res.position - (direccion_jugador * 5.0)
+		nueva_granada.global_position = res.position - (direccion_objetivo * 5.0)
 	else:
 		nueva_granada.global_position = pos_destino
 		
 	nueva_granada.add_collision_exception_with(self)
-	nueva_granada.apply_central_impulse(direccion_jugador * fuerza_lanzamiento_granada)
+	nueva_granada.apply_central_impulse(direccion_objetivo * fuerza_lanzamiento_granada)
 
-func _apuntar_al_jugador():
-	_pivote_brazo.look_at(_jugador.global_position)
-	var direccion_hacia_jugador = _jugador.global_position.x - global_position.x
-	
-	if direccion_hacia_jugador < 0 and _mirando_derecha:
+func _apuntar_al_objetivo():
+	if not is_instance_valid(_objetivo):
+		return
+	_pivote_brazo.look_at(_objetivo.global_position)
+	var direccion_hacia_objetivo = _objetivo.global_position.x - global_position.x
+
+	if direccion_hacia_objetivo < 0 and _mirando_derecha:
 		_flip_enemigo()
-	elif direccion_hacia_jugador > 0 and not _mirando_derecha:
+	elif direccion_hacia_objetivo > 0 and not _mirando_derecha:
 		_flip_enemigo()
-		
-	if _jugador.global_position.x < global_position.x:
+
+	if _objetivo.global_position.x < global_position.x:
 		_pivote_brazo.scale.y = -1
 	else:
 		_pivote_brazo.scale.y = 1
@@ -314,14 +350,17 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	# --- BAJA INSTANTÁNEA POR SIGILO ---
 	if tipo_dano == "Melee" and not es_alerta:
 		salud = 0
-		Global.registrar_baja_enemigo(self)
+		if not has_meta("es_spawn_arena"):
+			Global.registrar_baja_enemigo(self)
 		_soltar_arma()
 		_intentar_soltar_granada()
 		queue_free()
 		return
 
 	# Si no estaba en alerta y recibe daño, se entera inmediatamente
-	es_alerta = true
+	# (salvo en modo huida: sigue corriendo sin pelear hasta morir).
+	if not huir_sin_pelear:
+		es_alerta = true
 	queue_redraw()
 	_barra_dano_tiempo = BARRA_TIEMPO_VISIBLE # Mostrar indicador de daño
 
@@ -331,11 +370,14 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 		multiplicador_salud = 0.5
 	elif tipo_dano == "Balistica":
 		multiplicador_salud = 1.5
+	elif tipo_dano == "Aguijon":
+		multiplicador_salud = 1.5 # El aguijón siega reptiles
 		
 	salud -= (cantidad * multiplicador_salud)
 	
 	if salud <= 0:
-		Global.registrar_baja_enemigo(self)
+		if not has_meta("es_spawn_arena"):
+			Global.registrar_baja_enemigo(self)
 		_soltar_arma()
 		_intentar_soltar_granada()
 		queue_free()
@@ -374,17 +416,42 @@ func _intentar_soltar_granada():
 		get_parent().call_deferred("add_child", granada_caida)
 		granada_caida.set_deferred("global_position", global_position)
 
-func _tiene_linea_de_vision() -> bool:
-	if not is_instance_valid(_jugador): 
+# Candidatos a objetivo: el jugador siempre; las avispas (bando contrario)
+# solo si Roku está cerca (si no, la guerra esperaría sin público).
+# Los reptiles entre sí no se consideran hostiles.
+func _candidatos_hostiles() -> Array:
+	var lista := []
+	for j in get_tree().get_nodes_in_group("player"):
+		if is_instance_valid(j):
+			lista.append(j)
+	if Global.combate_facciones_permitido(global_position):
+		for a in get_tree().get_nodes_in_group("avispas"):
+			if is_instance_valid(a):
+				lista.append(a)
+	return lista
+
+# El objetivo es lo hostil más cercano dentro del rango de combate.
+func _actualizar_objetivo() -> void:
+	var mejor: Node2D = null
+	var mejor_dist := distancia_deteccion
+	for c in _candidatos_hostiles():
+		var d = global_position.distance_to((c as Node2D).global_position)
+		if d < mejor_dist:
+			mejor_dist = d
+			mejor = c
+	_objetivo = mejor
+
+func _tiene_linea_de_vision(nodo: Node2D) -> bool:
+	if not is_instance_valid(nodo):
 		return false
-	
+
 	var space_state = get_world_2d().direct_space_state
-	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), _jugador.global_position + Vector2(0, -15))
+	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position + Vector2(0, -15))
 	parametro_rayo.exclude = [self]
-	
+
 	var resultado = space_state.intersect_ray(parametro_rayo)
 	if resultado:
-		return resultado.collider == _jugador
+		return resultado.collider == nodo
 	return false
 
 func _obtener_posicion_segura_granada(direccion: Vector2) -> Vector2:
@@ -402,23 +469,23 @@ func _obtener_posicion_segura_granada(direccion: Vector2) -> Vector2:
 	
 	return pos_deseada
 
-func _detectar_jugador_en_cono() -> bool:
-	if not is_instance_valid(_jugador): 
+func _detectar_en_cono(nodo: Node2D) -> bool:
+	if not is_instance_valid(nodo):
 		return false
-	
-	var dist = global_position.distance_to(_jugador.global_position)
+
+	var dist = global_position.distance_to(nodo.global_position)
 	if dist > distancia_vision:
 		return false
-		
+
 	# Dirección en la que mira el enemigo
 	var dir_frente = Vector2.RIGHT if _mirando_derecha else Vector2.LEFT
-	var dir_hacia_jugador = (_jugador.global_position - global_position).normalized()
-	
-	# Cálculo del ángulo entre la mirada y el jugador
-	var angulo = rad_to_deg(dir_frente.angle_to(dir_hacia_jugador))
+	var dir_hacia_objetivo = (nodo.global_position - global_position).normalized()
+
+	# Cálculo del ángulo entre la mirada y el objetivo
+	var angulo = rad_to_deg(dir_frente.angle_to(dir_hacia_objetivo))
 	if abs(angulo) <= (angulo_vision / 2.0):
-		return _tiene_linea_de_vision() # Verifica que no haya muros de por medio
-		
+		return _tiene_linea_de_vision(nodo) # Verifica que no haya muros de por medio
+
 	return false
 
 func _draw():
@@ -457,6 +524,9 @@ func _dibujar_barra_dano():
 		draw_rect(Rect2(origen, Vector2(BARRA_ANCHO * frac, BARRA_ALTO)), relleno)
 
 func asustar(duracion: float = 4.0):
+	# En modo huida ya corre sin parar: no hay nada que asustar.
+	if huir_sin_pelear:
+		return
 	# Si ya está asustado o procesando el susto, no reiniciamos
 	if esta_aterrado or _sorpresa_tiempo > 0.0:
 		return

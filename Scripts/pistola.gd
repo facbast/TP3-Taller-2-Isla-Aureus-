@@ -52,6 +52,12 @@ func _efectuar_disparo():
 	# Sobrescribimos el daño de la bala con el de esta pistola
 	if "dano" in nueva_bala:
 		nueva_bala.dano = dano_por_bala
+	if "tipo_dano" in nueva_bala:
+		nueva_bala.tipo_dano = "Balistica"
+	if "es_de_enemigo" in nueva_bala:
+		nueva_bala.es_de_enemigo = not owner.is_in_group("player")
+	if "bando" in nueva_bala and owner.is_in_group("avispas"):
+		nueva_bala.bando = "avispas"
 
 func recargar():
 	if esta_recargando or municion_cargador == municion_cargador_max or municion_reserva <= 0:

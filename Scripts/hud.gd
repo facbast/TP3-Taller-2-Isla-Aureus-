@@ -354,6 +354,8 @@ func alternar_pausa():
 	var nuevo_estado_pausa = not get_tree().paused
 	get_tree().paused = nuevo_estado_pausa
 	menu_pausa.visible = nuevo_estado_pausa
+	# La música se congela con la pausa y sigue al reanudar.
+	MusicManager.set_nivel_pausado(nuevo_estado_pausa)
 	
 	# Nos aseguramos de resetear la vista cada vez que se abre la pausa
 	if nuevo_estado_pausa:
@@ -365,11 +367,21 @@ func _on_btn_reanudar_pressed():
 
 func _on_btn_checkpoint_pressed():
 	get_tree().paused = false # Siempre quitar la pausa antes de cambiar de escena
+	MusicManager.set_nivel_pausado(false)
 	await hacer_fade_out(0.8).finished
 	# Volver al checkpoint descarta las bajas/items sin guardar.
 	Global.descartar_progreso_no_guardado()
 	get_tree().reload_current_scene()
 	# Si tienes una lógica de checkpoint global, úsala aquí.
+
+func _on_btn_reiniciar_pressed():
+	get_tree().paused = false # Siempre quitar la pausa antes de cambiar de escena
+	MusicManager.set_nivel_pausado(false)
+	await hacer_fade_out(0.8).finished
+	# Reinicio completo: el nivel arranca desde cero en memoria, pero el
+	# archivo y su snapshot quedan intactos hasta pisar otro checkpoint.
+	Global.seleccionar_mision(get_tree().current_scene.scene_file_path, true)
+	get_tree().reload_current_scene()
 
 func _on_btn_controles_pressed():
 	# Ocultamos los botones y mostramos el panel
@@ -379,6 +391,7 @@ func _on_btn_controles_pressed():
 func _on_btn_menu_pressed():
 	await hacer_fade_out(0.8).finished
 	get_tree().paused = false
+	MusicManager.detener_musica() # Al título se vuelve en silencio
 	# Salir al título sin pasar por un checkpoint no confirma nada.
 	Global.descartar_progreso_no_guardado()
 	get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn") # Ajusta a tu ruta real

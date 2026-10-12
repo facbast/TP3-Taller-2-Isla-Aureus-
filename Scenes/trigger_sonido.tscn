@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/trigger_sonido.gd" id="1_sonido"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_sonido"]
+size = Vector2(400, 300)
+
+[node name="TriggerSonido" type="Area2D"]
+collision_layer = 0
+monitorable = false
+script = ExtResource("1_sonido")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_sonido")
+debug_color = Color(0.29803899, 0.8, 1, 0.41960785)

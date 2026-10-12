@@ -1,0 +1,13 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://dtpvuekt8qvls" path="res://Scripts/rifle.gd" id="1_rifle"]
+[ext_resource type="Texture2D" uid="uid://cfpfxamw8y5mk" path="res://Assets/Armas/Rifle_Balistico.png" id="2_rifle"]
+
+[node name="Rifle" type="Sprite2D"]
+position = Vector2(29.999998, 9)
+scale = Vector2(0.08, 0.08)
+texture = ExtResource("2_rifle")
+script = ExtResource("1_rifle")
+
+[node name="PuntoDisparo" type="Marker2D" parent="."]
+position = Vector2(425.00006, -83.333336)

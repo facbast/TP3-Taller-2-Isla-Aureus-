@@ -3,10 +3,10 @@ extends Node
 ## - Normal (por defecto, en bucle)
 ## - Pelea (cuando algún enemigo detecta al jugador)
 ##
-## Uso: al ser Autoload suena de forma persistente entre main.tscn,
-## arena_final, muertes (reload) y checkpoints sin reiniciarse.
-## Los enemigos ya avisan con su variable `es_alerta`, aquí solo
-## se sondea el grupo "enemigos" cada 0.2s.
+## La música NO suena en menús (splash, título, selector): arranca con
+## iniciar_musica_nivel(), se pausa con set_nivel_pausado() y se corta
+## con detener_musica() al volver a un menú. Entre muertes y checkpoints
+## (reload) sigue sonando sin reiniciarse.
 
 const MUSICA_NORMAL: AudioStream = preload("res://Music/Placeholder-Normal.wav")
 const MUSICA_PELEA: AudioStream = preload("res://Music/Placeholder-Pelea.wav")
@@ -30,6 +30,9 @@ var _tiempo_chequeo: float = 0.0
 var _tween_fade: Tween = null
 ## Música activada o silenciada (los SFX van por otros players y no se tocan).
 var musica_activada: bool = true
+## True mientras hay un nivel abierto (entre iniciar y detener).
+## En menús es false y no suena nada.
+var _musica_iniciada: bool = false
 
 func _ready() -> void:
 	# La música no se corta con la pausa ni con los cambios de escena.
@@ -50,10 +53,15 @@ func _ready() -> void:
 	_player_pelea.volume_db = -80.0
 	add_child(_player_pelea)
 
-	_player_normal.play()
-	_player_pelea.play()
+	# Sin autoplay: la música arranca al entrar a un nivel
+	# (ver iniciar_musica_nivel). En splash/título/selector hay silencio.
 
 func _process(delta: float) -> void:
+	# Sin nivel abierto o con el juego pausado no se sondea combate:
+	# evita crossfades y cambios Normal/Pelea mientras no se escucha.
+	if not _musica_iniciada or get_tree().paused:
+		_tiempo_chequeo = 0.0
+		return
 	_tiempo_chequeo += delta
 	if _tiempo_chequeo < intervalo_chequeo:
 		return
@@ -155,3 +163,35 @@ func set_musica_activada(activa: bool) -> void:
 func alternar_musica() -> bool:
 	set_musica_activada(not musica_activada)
 	return musica_activada
+
+# --- Ciclo de vida por nivel (la piden player/hud/triggers) ---
+
+## Arranca el loop al entrar a un nivel. Idempotente: en reloads por
+## muerte o checkpoint, si ya suena solo garantiza que no quede pausada
+## y respeta el estado Normal/Pelea en curso (no reinicia la pista).
+func iniciar_musica_nivel() -> void:
+	_musica_iniciada = true
+	_player_normal.stream_paused = false
+	_player_pelea.stream_paused = false
+	if not _player_normal.playing:
+		_player_normal.play()
+	if not _player_pelea.playing:
+		_player_pelea.play()
+	_aplicar_volumen_actual()
+
+## Corta la música al volver a un menú (título/selector).
+func detener_musica() -> void:
+	_musica_iniciada = false
+	_en_combate = false
+	_tiempo_sin_alerta = 999.0
+	if _tween_fade and _tween_fade.is_running():
+		_tween_fade.kill()
+	_player_normal.stop()
+	_player_pelea.stop()
+
+## Pausa o reanuda la música junto con el menú de pausa del nivel.
+func set_nivel_pausado(pausado: bool) -> void:
+	if not _musica_iniciada:
+		return
+	_player_normal.stream_paused = pausado
+	_player_pelea.stream_paused = pausado

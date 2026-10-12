@@ -2,6 +2,9 @@ extends Area2D
 
 var velocidad: float = 1200.0
 var es_de_enemigo: bool = false
+# Bando del tirador: "reptiles" o "avispas". Cada bando daña al otro,
+# nunca al propio (ni reptiles entre sí ni avispas entre sí).
+var bando: String = "reptiles"
 var dano: float = 6.0
 @export var tipo_dano: String = "Plasma"
 @export var efecto_impacto: PackedScene
@@ -23,7 +26,7 @@ func _physics_process(delta):
 
 func _on_body_entered(body):
 	if es_de_enemigo:
-		if body.is_in_group("player"):
+		if body.is_in_group("player") or _es_blanco_de_bando(body):
 			if body.has_method("recibir_dano"):
 				body.recibir_dano(dano, tipo_dano)
 			_generar_impacto()
@@ -31,6 +34,8 @@ func _on_body_entered(body):
 		elif not body.is_in_group("enemigos"):
 			_generar_impacto()
 			queue_free()
+		# Mismo bando: la bala sigue sin impactar.
+		# ...pero entre reptiles no hay fuego amigo: el disparo sigue.
 	else:
 		if body.is_in_group("enemigos"):
 			if body.has_method("recibir_dano"):
@@ -40,6 +45,12 @@ func _on_body_entered(body):
 		elif not body.is_in_group("player"):
 			_generar_impacto()
 			queue_free()
+
+# Según quién disparó: los reptiles pegan a avispas y las avispas a reptiles.
+func _es_blanco_de_bando(body: Node) -> bool:
+	if bando == "avispas":
+		return body.is_in_group("enemigos") and not body.is_in_group("avispas")
+	return body.is_in_group("avispas")
 
 func _generar_impacto():
 	if efecto_impacto:

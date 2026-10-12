@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://Scripts/trigger_dialogo.gd" id="1_trgdlg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_trgdlg"]
+size = Vector2(320, 500)
+
+[node name="TriggerDialogo" type="Area2D"]
+collision_layer = 0
+monitorable = false
+script = ExtResource("1_trgdlg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("RectangleShape2D_trgdlg")
+debug_color = Color(0.29803899, 0.8, 1, 0.41960785)

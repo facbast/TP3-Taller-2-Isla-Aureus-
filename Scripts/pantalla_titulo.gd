@@ -12,6 +12,7 @@ var _transicionando: bool = false
 
 func _ready():
 	# Fundido de entrada al llegar (desde splash, meta o menú de pausa)
+	transicion.visible = true
 	transicion.modulate.a = 1.0
 	var tween = create_tween()
 	tween.tween_property(transicion, "modulate:a", 0.0, 1.0)
@@ -40,6 +41,13 @@ func _on_btn_nueva_partida_pressed():
 	Global.items_recogidos = []
 	Global.bajas_pendientes = []
 	Global.items_pendientes = []
+	# Nueva partida = Misión 1 desde cero; el menú de misiones se habilita
+	# con el primer guardado.
+	Global.mision_actual = "res://Scenes/main.tscn"
+	Global.misiones_completadas = []
+	Global.checkpoints = {}
+	Global.inicio_fresco_mision = true
+	Global.sesion_desde_cero = false
 	# Limpiamos restos del checkpoint anterior en memoria
 	Global.inventario_guardado = {}
 	Global.pos_x = 0.0
@@ -61,12 +69,14 @@ func _on_btn_continuar_pressed():
 	if Global.hay_datos_guardados and not _transicionando:
 		get_tree().paused = false
 		await _fundido_salida()
-		# Cargamos la escena guardada en el checkpoint
-		get_tree().change_scene_to_file(Global.ruta_nivel)
+		# Continuar abre el selector de misiones (elegir misión decide
+		# si ir al checkpoint o reiniciarla).
+		get_tree().change_scene_to_file("res://Scenes/seleccion_mision.tscn")
 
 # Funde a negro y devuelve el tween por si alguien quiere esperarlo.
 func _fundido_salida() -> Tween:
 	_transicionando = true
+	transicion.visible = true
 	transicion.modulate.a = 0.0
 	var tween = create_tween()
 	tween.tween_property(transicion, "modulate:a", 1.0, 0.8)
