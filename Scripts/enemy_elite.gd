@@ -103,6 +103,10 @@ const COLOR_VACIO = Color(0.35, 0.05, 0.05) # Rojo oscuro
 var _barra_dano_tiempo: float = 0.0
 
 @export var mirar_izquierda_al_inicio: bool = false
+# Si pierde la visión del blanco este tiempo, lo suelta y cambia a otro
+# visible (no se encapricha con quien está tras un muro mientras lo pican).
+@export var tiempo_perder_blanco: float = 2.5
+var _tiempo_sin_vision: float = 0.0
 
 # --- VARIABLES DE EVASIÓN DE GRANADAS ---
 @export var distancia_peligro_granada: float = 180.0
@@ -132,6 +136,12 @@ func _ready():
 		_flip_personaje()
 	_orientar_brazo_adelante()
 
+	_pos_origen_patrulla = global_position
+	_dir_patrulla = 1.0 if _mirando_derecha else -1.0
+
+## La emboscada lo llama tras posicionar el spawn: patrulla y correa
+## miden desde el marker, no desde el (0,0) previo al posicionado.
+func fijar_origen() -> void:
 	_pos_origen_patrulla = global_position
 	_dir_patrulla = 1.0 if _mirando_derecha else -1.0
 
@@ -239,6 +249,15 @@ func _physics_process(delta):
 		var dist = global_position.distance_to(_objetivo.global_position)
 		var tiene_visibilidad = _tiene_linea_de_vision(_objetivo)
 
+		# Sin visión un rato, se suelta el blanco (lo pican gratis si no).
+		if tiene_visibilidad:
+			_tiempo_sin_vision = 0.0
+		else:
+			_tiempo_sin_vision += delta
+			if _tiempo_sin_vision >= tiempo_perder_blanco:
+				_tiempo_sin_vision = 0.0
+				_objetivo = null
+				return
 		_apuntar_al_objetivo()
 
 		if dist <= distancia_ataque:
@@ -615,13 +634,20 @@ func _candidatos_hostiles() -> Array:
 				lista.append(a)
 	return lista
 
-# El objetivo es lo hostil más cercano dentro del rango de ataque.
+# El objetivo es lo hostil más cercano dentro del rango de ataque,
+# pero solo si está a la vista (nada de fijarse en quien está tras un muro).
+# Con correa de arena (lejos de su spawn), ignora a las avispas y vuelve
+# con el jugador para no trabar la oleada fuera de los muros.
 func _actualizar_objetivo() -> void:
 	var mejor: Node2D = null
 	var mejor_dist := distancia_ataque
+	var con_correa := has_meta("es_spawn_arena") \
+			and global_position.distance_to(_pos_origen_patrulla) > Global.LEASH_ARENA
 	for c in _candidatos_hostiles():
+		if con_correa and c.is_in_group("avispas"):
+			continue
 		var d = global_position.distance_to((c as Node2D).global_position)
-		if d < mejor_dist:
+		if d < mejor_dist and _tiene_linea_de_vision(c as Node2D):
 			mejor_dist = d
 			mejor = c
 	_objetivo = mejor

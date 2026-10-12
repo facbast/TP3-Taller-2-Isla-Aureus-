@@ -1,7 +1,6 @@
 extends Area2D
-## Trigger final del nivel 1 (boca de la cueva): inicia la conversación
-## de salida. Al terminar, funde y cambia a ruta_siguiente.
-## Provisorio: lleva al menú principal; apuntar al nivel 2 cuando exista.
+## Trigger final de misión (ej. boca de la cueva): inicia la conversación
+## de salida. Al terminar, funde y cambia a ruta_siguiente (otro nivel o menú).
 
 @export var dialogo_canvas: CanvasLayer
 @export var ruta_siguiente: String = "res://Scenes/pantalla_titulo.tscn"
@@ -38,6 +37,11 @@ func _ir_al_siguiente_nivel() -> void:
 	# (entre niveles sigue sonando sin reiniciarse).
 	if not _es_escena_de_mision(ruta_siguiente):
 		MusicManager.detener_musica()
+	else:
+		# Cambio de misión: protege el snapshot actual y prepara el working
+		# (checkpoint de la entrante o arranque limpio). Sin esto, el nivel
+		# nuevo spawnearía en las coords del checkpoint del anterior.
+		Global.seleccionar_mision(ruta_siguiente, false)
 	get_tree().change_scene_to_file(ruta_siguiente)
 
 func _es_escena_de_mision(ruta: String) -> bool:

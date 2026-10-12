@@ -87,6 +87,10 @@ var desplazamiento_maximo_camara = 60.0 # Ajusta este valor para mayor o menor l
 func _ready():
 	# El loop de música vive solo dentro de los niveles (no en menús).
 	MusicManager.iniciar_musica_nivel()
+	# Linterna cálida solo en niveles oscuros (los que traen ModuladorCueva):
+	# en la Misión 1, al aire libre de día, no tiene sentido.
+	if get_tree().current_scene.has_node("ModuladorCueva"):
+		_crear_linterna()
 	Global.fijar_mision_por_escena(get_tree().current_scene.scene_file_path)
 	if Global.hay_datos_guardados and not Global.inicio_fresco_mision:
 		global_position = Vector2(Global.pos_x, Global.pos_y)
@@ -149,6 +153,28 @@ func _ready():
 	
 	if _arma_actual.has_method("_actualizar_hud"):
 		_arma_actual._actualizar_hud()
+
+# Luz propia del jugador para niveles oscuros (sin sombras: barata).
+func _crear_linterna() -> void:
+	if get_node_or_null("Linterna") != null:
+		return
+	var gradiente := Gradient.new()
+	gradiente.offsets = PackedFloat32Array([0.0, 1.0])
+	gradiente.colors = PackedColorArray([Color(1, 0.95, 0.8, 1), Color(1, 0.85, 0.6, 0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradiente
+	tex.width = 256
+	tex.height = 256
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1, 0.5)
+	var luz := PointLight2D.new()
+	luz.name = "Linterna"
+	luz.texture = tex
+	luz.color = Color(1.0, 0.88, 0.68)
+	luz.energy = 0.9
+	luz.texture_scale = 3.0
+	add_child(luz)
 
 func _unhandled_input(event):
 	if _esta_muerto:

@@ -66,6 +66,7 @@ _data = {
 }
 
 [node name="EnemyElite" type="CharacterBody2D" unique_id=236204452 groups=["enemigos"]]
+collision_mask = 3
 script = ExtResource("1_sgdiv")
 duracion_sorpresa = 0.5
 

@@ -20,7 +20,7 @@ var dialogos = [
 	{"icono": ICONO_RADIO, "texto": "Apunta un poco arriba del enemigo y haz CLICK DERECHO PARA LANZAR"},
 	{"icono": ICONO_RADIO, "texto": "Hay dos tipos de granadas. Las Cargadas causan mas daño, y las Durian se aferran a los enemigos que toquen."},
 	{"icono": ICONO_RADIO, "texto": "Para cambiar de tipo, pulsa T."},
-	{"icono": ICONO_RADIO, "texto": "Un consejo, nuestras armas balísticas son más efectivas a la piel expuesta."}
+	{"icono": ICONO_RADIO, "texto": "¡No olvides que tus patadas pueden empujar las granadas que te lanzen de frente!"}
 ]
 
 func _ready():

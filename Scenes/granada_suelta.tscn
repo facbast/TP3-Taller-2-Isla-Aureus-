@@ -1,0 +1,21 @@
+[gd_scene format=3 uid="uid://dvohtonrguorc"]
+
+[ext_resource type="Script" uid="uid://bmd6k045yp43y" path="res://Scripts/granada_suelta.gd" id="1_gransuelta"]
+[ext_resource type="Texture2D" uid="uid://cgmc6oxqr5x2e" path="res://Assets/Armas/Granada.png" id="2_pgfbh"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_gransuelta"]
+radius = 40.0
+
+[node name="GranadaSuelta" type="Area2D" unique_id=1924636274]
+scale = Vector2(0.1, 0.1)
+collision_layer = 0
+monitorable = false
+script = ExtResource("1_gransuelta")
+tipo = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1077215005]
+texture = ExtResource("2_pgfbh")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1795748287]
+shape = SubResource("CircleShape2D_gransuelta")
+debug_color = Color(1, 0.85, 0.3, 0.41960785)

@@ -71,6 +71,24 @@ const ESCALA_POR_ARMA: Dictionary = {
 		textura_arma = valor
 		_vista_previa_textura()
 
+# Jerarquía de valor (mayor a menor): Rifle > Cañón Cítrico >
+# Pistola Cítrica > Pistola Leguminosa. Evita rebajas por accidente:
+# con E solo se cambia a un arma de valor igual o mayor.
+const VALOR_ARMA: Dictionary = {
+	"Rifle": 4,
+	"RiflePlasma": 3,
+	"PistolaPlasma": 2,
+	"Pistola": 1,
+}
+# Las mejores se recogen más rápido: entre dos ítems solapados gana el
+# de mayor valor en vez de arbitrarlo el primer temporizador.
+const TIEMPO_POR_VALOR: Dictionary = {
+	4: 0.25,
+	3: 0.35,
+	2: 0.45,
+	1: 0.6,
+}
+
 # Nombre interno del arma (lo usan los drops de enemigos/jugador).
 var tipo_arma: String = "Pistola"
 
@@ -96,17 +114,21 @@ func _ready():
 			scale = ESCALA_POR_ARMA.get(tipo_arma, Vector2.ONE)
 
 func _process(delta):
-	if jugador_cerca != null:
-		if Input.is_physical_key_pressed(KEY_E):
-			tiempo_manteniendo += delta
-			if tiempo_manteniendo >= tiempo_requerido:
-				var recogido = jugador_cerca.recoger_arma(tipo_arma, cantidad_municion)
-				if recogido:
-					queue_free()
-				else:
-					# Si la rechazó (ej. batería inferior), reiniciamos el temporizador
-					tiempo_manteniendo = 0.0
+	if jugador_cerca == null:
+		return
+	if not Input.is_physical_key_pressed(KEY_E):
+		tiempo_manteniendo = 0.0
+		return
+	# Sin restricciones: E siempre intercambia. Entre ítems amontonados,
+	# el de mayor valor carga más rápido y gana la pulsación.
+	var valor_item: int = VALOR_ARMA.get(tipo_arma, 0)
+	tiempo_manteniendo += delta
+	if tiempo_manteniendo >= float(TIEMPO_POR_VALOR.get(valor_item, tiempo_requerido)):
+		var recogido = jugador_cerca.recoger_arma(tipo_arma, cantidad_municion)
+		if recogido:
+			queue_free()
 		else:
+			# Si la rechazó (ej. batería inferior), reiniciamos el temporizador
 			tiempo_manteniendo = 0.0
 
 func _on_body_entered(body):

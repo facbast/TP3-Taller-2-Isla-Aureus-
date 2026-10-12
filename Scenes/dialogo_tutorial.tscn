@@ -5,6 +5,7 @@
 [ext_resource type="FontFile" uid="uid://ynlsna7i7s3e" path="res://Fonts/76London Fall.ttf" id="2_trwf0"]
 
 [node name="DialogoTutorial" type="CanvasLayer" unique_id=1668912211]
+layer = 10
 process_mode = 3
 script = ExtResource("1_eq35l")
 

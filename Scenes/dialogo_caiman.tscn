@@ -5,6 +5,7 @@
 [ext_resource type="AudioStream" uid="uid://qkeqs855cm5n" path="res://SFX/Bip.wav" id="3_4maqu"]
 
 [node name="Dialogo Caiman" type="CanvasLayer" unique_id=1668912211]
+layer = 10
 process_mode = 3
 script = ExtResource("1_774v7")
 

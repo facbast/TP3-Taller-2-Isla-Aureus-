@@ -57,6 +57,29 @@ func ser_desviada(origen: Vector2) -> void:
 	angular_velocity = 12.0 * sign(direccion.x)
 	apply_central_impulse(direccion * fuerza_desvio_melee)
 
+# Destello de luz cálida sobre la explosión (para cuevas oscuras).
+func _destello_explosion(pos: Vector2, contenedor: Node) -> void:
+	var gradiente := Gradient.new()
+	gradiente.offsets = PackedFloat32Array([0.0, 1.0])
+	gradiente.colors = PackedColorArray([Color(1, 0.92, 0.7, 1), Color(1, 0.8, 0.5, 0)])
+	var tex := GradientTexture2D.new()
+	tex.gradient = gradiente
+	tex.width = 256
+	tex.height = 256
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1, 0.5)
+	var luz := PointLight2D.new()
+	luz.texture = tex
+	luz.color = Color(1, 0.85, 0.6)
+	luz.energy = 2.0
+	luz.texture_scale = 3.0
+	contenedor.add_child(luz)
+	luz.global_position = pos
+	var tween_luz = luz.create_tween()
+	tween_luz.tween_property(luz, "energy", 0.0, 0.35)
+	tween_luz.tween_callback(luz.queue_free)
+
 func _explotar():
 	if _explotada:
 		return
@@ -101,6 +124,7 @@ func _explotar():
 		contenedor = get_parent()
 	contenedor.add_child(efecto_explosion)
 	efecto_explosion.global_position = pos_explosion
+	_destello_explosion(pos_explosion, contenedor)
 
 	# Tween ligado al efecto: si el efecto se libera, el tween muere con él.
 	var tween = efecto_explosion.create_tween()

@@ -49,6 +49,11 @@ func _ready():
 	_pos_origen = global_position
 	_fase_vagar = randf() * TAU
 
+## La emboscada lo llama tras posicionar el spawn: deriva y correa
+## miden desde el marker, no desde el (0,0) previo al posicionado.
+func fijar_origen() -> void:
+	_pos_origen = global_position
+
 func _physics_process(delta):
 	if _muerta:
 		return
@@ -86,6 +91,10 @@ func _buscar_objetivo() -> void:
 	var tenia_objetivo := is_instance_valid(_objetivo)
 	var mejor_dist := distancia_deteccion
 	var guerra := Global.combate_facciones_permitido(global_position)
+	# Con correa de arena (lejos de su spawn), ignora a los reptiles y
+	# vuelve con el jugador para no trabar la oleada fuera de los muros.
+	var con_correa := has_meta("es_spawn_arena") \
+			and global_position.distance_to(_pos_origen) > Global.LEASH_ARENA
 	var candidatos := get_tree().get_nodes_in_group("player") + get_tree().get_nodes_in_group("enemigos")
 	for n in candidatos:
 		if n == self or not (n is Node2D) or not is_instance_valid(n):
@@ -97,6 +106,8 @@ func _buscar_objetivo() -> void:
 		# Sin Roku cerca, los reptiles se ignoran (aún no empieza la guerra).
 		if guerra == false and n.is_in_group("enemigos"):
 			continue
+		if con_correa and n.is_in_group("enemigos"):
+			continue
 		var d = global_position.distance_to((n as Node2D).global_position)
 		if d < mejor_dist:
 			if _tiene_linea_de_vision(n as Node2D):
@@ -104,7 +115,7 @@ func _buscar_objetivo() -> void:
 				mejor = n
 	# Histéresis: si no hay nada nuevo en rango pero el actual sigue
 	# relativamente cerca y válido (incluido no-muerto), se mantiene la caza.
-	if mejor == null and tenia_objetivo and is_instance_valid(_objetivo) \
+	if mejor == null and not con_correa and tenia_objetivo and is_instance_valid(_objetivo) \
 			and _objetivo.get("_esta_muerto") != true \
 			and global_position.distance_to(_objetivo.global_position) <= distancia_deteccion * 1.6:
 		mejor = _objetivo

@@ -7,6 +7,7 @@
 radius = 30.0
 
 [node name="EnemyAvispa" type="CharacterBody2D" unique_id=1388131478 groups=["avispas", "enemigos"]]
+collision_mask = 3
 motion_mode = 1
 script = ExtResource("1_avispa")
 dano_aguijon = 30.0

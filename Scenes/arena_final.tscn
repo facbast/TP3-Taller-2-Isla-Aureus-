@@ -26,6 +26,7 @@ position = Vector2(620, 558)
 shape = SubResource("RectangleShape2D_hlg2x")
 
 [node name="BarreraEntrada" type="StaticBody2D" parent="." unique_id=326115104]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BarreraEntrada" unique_id=1678762947]
 position = Vector2(0, 325)
@@ -40,6 +41,7 @@ mouse_filter = 2
 color = Color(0.2, 1, 0.4, 0.45)
 
 [node name="BarreraSalida" type="StaticBody2D" parent="." unique_id=1246703612]
+collision_layer = 2
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="BarreraSalida" unique_id=20826567]
 position = Vector2(1150, 328)

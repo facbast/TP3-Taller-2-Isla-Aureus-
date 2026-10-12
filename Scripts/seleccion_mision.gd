@@ -14,6 +14,7 @@ const FUENTE_TITULOS = preload("res://Fonts/NeulandOpti-Light.otf")
 var _eligiendo: bool = false
 
 func _ready() -> void:
+	transicion.visible = true
 	transicion.modulate.a = 1.0
 	var entrada = create_tween()
 	entrada.tween_property(transicion, "modulate:a", 0.0, 0.8)
@@ -83,6 +84,7 @@ func _on_btn_volver_pressed() -> void:
 	get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn")
 
 func _fundido_salida() -> Tween:
+	transicion.visible = true
 	transicion.modulate.a = 0.0
 	var tween = create_tween()
 	tween.tween_property(transicion, "modulate:a", 1.0, 0.8)

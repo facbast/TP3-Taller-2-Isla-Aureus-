@@ -14,6 +14,7 @@ fill_to = Vector2(0.22173913, 0)
 size = Vector2(63, 18)
 
 [node name="Bala" type="Area2D" unique_id=2081609171]
+collision_mask = 3
 script = ExtResource("1_teg1w")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=2119307835]

@@ -16,14 +16,14 @@ const ZUMBIDO_AVISTA = preload("res://SFX/Panal/Zumbido_Suspenso.wav")
 
 # Verde enfermizo para la voz avispa; blanco normal para el resto.
 const COLOR_TEXTO_NORMAL := Color.WHITE
-const COLOR_TEXTO_AVISPA := Color(0.78, 1.0, 0.55)
+const COLOR_TEXTO_AVISPA := Color(1.0, 0.804, 0.496, 1.0)
 
 var dialogos = [
 	{"icono": ICONO_RADIO, "texto": "*Click*", "voz": "radio"},
 	{"icono": ICONO_RADIO, "texto": "BZZZBZNBNZMNZNUZZNUUM", "voz": "avispa"},
 	{"icono": ICONO_CONEJO, "texto": "!?", "voz": "roku"},
 	{"icono": ICONO_CONEJO, "texto": "¿¡Quien eres!?", "voz": "roku"},
-	{"icono": ICONO_RADIO, "texto": "BZZZBZBZ-LARGO-BZNZBNZBZBZ-AQUÍ-BBZZMBBMBZZZBM-AHORA", "voz": "avispa"},
+	{"icono": ICONO_RADIO, "texto": "BZZZBZBZ-L4RG0-BZNZBNZBZBZ-4QU1-BBZZMBBMBZZZBM-4H0R4", "voz": "avispa"},
 	{"icono": ICONO_RADIO, "texto": "*Click*", "voz": "radio"},
 	{"icono": ICONO_CONEJO, "texto": "...", "voz": "roku"},
 ]

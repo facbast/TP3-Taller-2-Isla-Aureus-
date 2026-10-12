@@ -61,6 +61,13 @@ func estaba_eliminado(nodo: Node) -> bool:
 func descartar_progreso_no_guardado() -> void:
 	bajas_pendientes.clear()
 	items_pendientes.clear()
+	if sesion_desde_cero or not checkpoints.has(mision_actual):
+		# Sesión fresca (reinicio/replay sin checkpoint nuevo) o misión sin
+		# snapshot (primera visita): se vuelve al inicio del nivel, NO a un
+		# checkpoint viejo ni a la coordenada (0,0).
+		_reset_working()
+		inicio_fresco_mision = true
+		return
 	# Re-sincroniza lo confirmado con el checkpoint de la misión actual.
 	if hay_datos_guardados:
 		if checkpoints.has(mision_actual):
@@ -88,6 +95,10 @@ func enemigos_pueden_usar_granadas() -> bool:
 # Distancia a la que Roku debe estar para que reptiles y avispas peleen
 # entre ellos: evita que la guerra termine antes de que llegue a verla.
 const RADIO_COMBATE_FACCIONES := 700.0
+# Correa de emboscada: un spawn de arena que se aleja esto de su punto de
+# aparición deja de cazar al bando contrario y vuelve con el jugador
+# (si no, persiguen avispas fuera de los muros y la oleada no cierra).
+const LEASH_ARENA := 800.0
 
 # Combate entre bandos permitido solo con el jugador cerca. El jugador
 # siempre es objetivo válido; esto solo filtra reptil-vs-avispa.

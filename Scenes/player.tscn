@@ -109,6 +109,7 @@ _data = {
 }
 
 [node name="Player" type="CharacterBody2D" unique_id=1176689577 groups=["player"]]
+collision_mask = 3
 floor_snap_length = 16.0
 script = ExtResource("1_cvnsp")
 

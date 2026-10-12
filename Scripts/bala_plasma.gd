@@ -13,6 +13,15 @@ var dano: float = 6.0
 
 func _ready():
 	body_entered.connect(_on_body_entered)
+
+	# Capas según el bando: la enemiga va por capa 1 (la frenan los muros),
+	# la del jugador por capa 3 (los atraviesa pero pega en bichos y tiles).
+	if es_de_enemigo:
+		collision_layer = 1
+		collision_mask = 3
+	else:
+		collision_layer = 3
+		collision_mask = 1
 	
 	var notificador = get_node_or_null("VisibleOnScreenNotifier2D")
 	if notificador != null:

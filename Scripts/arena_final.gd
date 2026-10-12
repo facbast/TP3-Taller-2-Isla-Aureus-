@@ -87,11 +87,21 @@ func _spawnear_enemigo(puntos_spawn: Array[Node]) -> void:
 	# _ready del enemigo ya la vea.
 	enemigo.set_meta("es_spawn_arena", true)
 
+	# Las avispas B sortean su arma en emboscada (si no, salen todas iguales).
+	# Va antes del add_child porque el _ready monta el arma elegida.
+	if enemigo.has_method("set_arma_aleatoria"):
+		enemigo.set_arma_aleatoria()
+
 	# Primero al árbol y DESPUÉS la posición global: Oleadas/Oleada10 está
 	# desplazado (5332, 2) y hacerlo al revés suma ese offset dos veces,
 	# escupiendo a los enemigos 5k píxeles fuera de la arena.
 	get_parent().add_child(enemigo)
 	enemigo.global_position = punto_elegido.global_position
+
+	# El _ready del enemigo corrió antes de posicionarlo: se le avisa para
+	# que mida patrulla/correa desde el marker y no desde el (0,0).
+	if enemigo.has_method("fijar_origen"):
+		enemigo.fijar_origen()
 
 	# Si el enemigo sabe entrar en caza (ej. la avispa), la emboscada lo
 	# activa de inmediato: nacen en caza, sin ronda de detección.

@@ -37,6 +37,7 @@
 [ext_resource type="Script" uid="uid://bd68n4jtb4hb" path="res://Scripts/tutorial_granada.gd" id="28_granada"]
 [ext_resource type="PackedScene" uid="uid://bu2dd6sju5dxt" path="res://Scenes/dialogo_sigilo.tscn" id="29_sigilo"]
 [ext_resource type="Script" uid="uid://nesk3p62k1aj" path="res://Scripts/tutorial_sigilo.gd" id="30_sigilo_trig"]
+[ext_resource type="PackedScene" uid="uid://dvohtonrguorc" path="res://Scenes/granada_suelta.tscn" id="30_v2nl5"]
 [ext_resource type="PackedScene" uid="uid://cnmatve50jyey" path="res://Scenes/dialogo_agacharse.tscn" id="31_agach"]
 [ext_resource type="PackedScene" uid="uid://dpuxpwtk2xs23" path="res://Scenes/dialogo_burla.tscn" id="32_burla"]
 [ext_resource type="Script" uid="uid://mkorg81akwtf" path="res://Scripts/tutorial_agacharse.gd" id="33_agach_trig"]
@@ -16505,6 +16506,12 @@ mirar_izquierda_al_inicio = true
 position = Vector2(2465, 484)
 mirar_izquierda_al_inicio = true
 
+[node name="ArmaSoltada" parent="Oleadas/Oleada1" unique_id=688121580 instance=ExtResource("25_jut3y")]
+position = Vector2(3815, 504)
+scale = Vector2(0.08, 0.08)
+tipo_item = 0
+cantidad_municion = 120
+
 [node name="Oleada2" type="Node2D" parent="Oleadas" unique_id=1845974271]
 
 [node name="EnemyElite" parent="Oleadas/Oleada2" unique_id=236204452 instance=ExtResource("5_kry3j")]
@@ -16515,8 +16522,9 @@ mirar_izquierda_al_inicio = true
 position = Vector2(3702, 469)
 mirar_izquierda_al_inicio = true
 
-[node name="ArmaSoltada" parent="Oleadas/Oleada2" unique_id=688121580 instance=ExtResource("25_jut3y")]
+[node name="ArmaSoltada" parent="Oleadas/Oleada2" unique_id=1206302158 instance=ExtResource("25_jut3y")]
 position = Vector2(4124, 513)
+scale = Vector2(0.08, 0.08)
 tipo_item = 0
 cantidad_municion = 120
 
@@ -16633,6 +16641,22 @@ position = Vector2(10765, 551)
 [node name="Botiquin" parent="Oleadas/Oleada6" unique_id=1541684921 instance=ExtResource("7_6bp64")]
 position = Vector2(11357, 804)
 
+[node name="GranadaSuelta" parent="Oleadas/Oleada6" unique_id=373778299 instance=ExtResource("30_v2nl5")]
+position = Vector2(9618, 802)
+tipo = 1
+
+[node name="GranadaSuelta2" parent="Oleadas/Oleada6" unique_id=1924636274 instance=ExtResource("30_v2nl5")]
+position = Vector2(15011, 1650)
+tipo = 1
+
+[node name="GranadaSuelta3" parent="Oleadas/Oleada6" unique_id=1972528019 instance=ExtResource("30_v2nl5")]
+position = Vector2(23404, 1280)
+tipo = 1
+
+[node name="GranadaSuelta4" parent="Oleadas/Oleada6" unique_id=50212036 instance=ExtResource("30_v2nl5")]
+position = Vector2(26604, 722)
+tipo = 1
+
 [node name="Oleada7" type="Node2D" parent="Oleadas" unique_id=2117084224]
 
 [node name="Checkpoint" parent="Oleadas/Oleada7" unique_id=165889875 instance=ExtResource("8_344ge")]
@@ -16734,6 +16758,7 @@ position = Vector2(990, -114)
 
 [node name="ArmaSoltada2" parent="Oleadas/Oleada10" unique_id=1496872015 instance=ExtResource("25_jut3y")]
 position = Vector2(9694, 1658)
+scale = Vector2(0.08, 0.08)
 tipo_item = 0
 cantidad_municion = 120
 
@@ -16868,6 +16893,7 @@ velocidad = 150.0
 
 [node name="ArmaSoltada3" parent="Oleadas/Oleada17" unique_id=2046707423 instance=ExtResource("25_jut3y")]
 position = Vector2(22839, 207)
+scale = Vector2(0.08, 0.08)
 tipo_item = 0
 cantidad_municion = 120
 
@@ -17041,6 +17067,7 @@ collision_layer = 0
 monitorable = false
 script = ExtResource("41_trigfin")
 dialogo_canvas = NodePath("../DialogoFinal")
+ruta_siguiente = "res://Scenes/Nivel2.tscn"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/Final/TriggerFinal" unique_id=-1094967293]
 shape = SubResource("RectangleShape2D_final")

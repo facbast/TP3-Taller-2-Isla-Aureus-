@@ -47,6 +47,7 @@ _data = {
 }
 
 [node name="EnemyGrunt" type="CharacterBody2D" unique_id=1094277759 groups=["enemigos"]]
+collision_mask = 3
 script = ExtResource("1_nf2s3")
 duracion_sorpresa = 0.5
 
