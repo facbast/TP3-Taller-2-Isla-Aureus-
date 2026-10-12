@@ -9,7 +9,7 @@ extends Node
 ## (reload) sigue sonando sin reiniciarse.
 
 const MUSICA_NORMAL: AudioStream = preload("res://Music/Placeholder-Normal.wav")
-const MUSICA_PELEA: AudioStream = preload("res://Music/Placeholder-Pelea.wav")
+const MUSICA_PELEA: AudioStream = preload("res://Music/Placeholder Jungla.wav")
 
 ## Segundos que se mantiene Pelea después de que el último enemigo
 ## deje de estar en alerta. Evita parpadeos si matas al último

@@ -124,9 +124,15 @@ func _ready():
 			armas.append(_pistola)
 			_arma_actual = armas[0]
 	else:
-		armas.append(_rifle)
-		armas.append(_pistola)
+		# Dotación inicial por nivel: Misión 1 solo Pistola Leguminosa;
+		# resto de misiones, Rifle + Cañón Ácido.
+		if Global.mision_actual == Global.ESCENA_MISION_1:
+			armas.append(_pistola)
+		else:
+			armas.append(_rifle)
+			armas.append(_rifle_plasma)
 		_arma_actual = armas[0]
+		indice_arma_actual = 0
 	# Consumido: las recargas por muerte vuelven al checkpoint, no al inicio.
 	Global.inicio_fresco_mision = false
 	# Respeta el arma activa restaurada del checkpoint; solo usa la
@@ -489,9 +495,15 @@ func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
 			break
 			
 	if arma_a_equipar != null:
-		_tirar_arma_actual_al_suelo()
-		armas[indice_arma_actual] = arma_a_equipar
-		
+		if armas.size() <= 1:
+			# Con un solo slot, lo encontrado se suma como secundaria
+			# (sin tirar nada) y se equipa.
+			armas.append(arma_a_equipar)
+			indice_arma_actual = armas.size() - 1
+		else:
+			_tirar_arma_actual_al_suelo()
+			armas[indice_arma_actual] = arma_a_equipar
+
 		_arma_actual.hide()
 		_arma_actual = arma_a_equipar
 		_arma_actual.show()
