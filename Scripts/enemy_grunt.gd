@@ -16,6 +16,7 @@ const COLOR_VACIO = Color(0.35, 0.05, 0.05) # Rojo oscuro
 var _barra_dano_tiempo: float = 0.0
 
 @onready var _sprite_cuerpo = $SpriteCuerpo
+@onready var _brazo_desarmado = $BrazoDesarmado
 @onready var _pivote_brazo = $PivoteBrazo
 @onready var _sprite_brazo = $PivoteBrazo/SpriteBrazoArma
 @onready var _arma_actual = $PivoteBrazo/PistolaPlasma
@@ -352,6 +353,10 @@ func _flip_enemigo():
 	# Espejamos respecto al centro del sprite, no respecto al origen:
 	# así el pivote siempre cae en el hombro correspondiente.
 	_pivote_brazo.position.x = 2.0 * _sprite_cuerpo.position.x - _pivote_brazo.position.x
+	# El brazo desarmado acompaña al cuerpo (lado y espejo).
+	if is_instance_valid(_brazo_desarmado):
+		_brazo_desarmado.flip_h = not _brazo_desarmado.flip_h
+		_brazo_desarmado.position.x = 2.0 * _sprite_cuerpo.position.x - _brazo_desarmado.position.x
 
 # Fuera de combate el brazo no usa look_at: lo clavamos hacia adelante
 # según a dónde mira el cuerpo. El flip solo espeja la posición del

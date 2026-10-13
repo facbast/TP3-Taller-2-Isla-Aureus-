@@ -122,8 +122,10 @@ func _mostrar_linea():
 	tween_texto.tween_property(texto_label, "visible_characters", total_caracteres, duracion)
 
 func _cancelar_otros_dialogos():
+	# Solo se cancela lo que está visible: los cuadros ocultos pertenecen
+	# a triggers que aún no dispararon y deben sobrevivir.
 	for n in get_tree().get_nodes_in_group("dialogos_tutorial"):
-		if n != self and is_instance_valid(n) and n.has_method("cancelar_dialogo"):
+		if n != self and is_instance_valid(n) and n.visible and n.has_method("cancelar_dialogo"):
 			n.cancelar_dialogo()
 
 func cancelar_dialogo():

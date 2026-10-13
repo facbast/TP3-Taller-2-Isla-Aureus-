@@ -16330,6 +16330,18 @@ scale = Vector2(0.08, 0.08)
 tipo_item = 0
 cantidad_municion = 120
 
+[node name="ArmaSoltada2" parent="Oleadas/Oleada1" unique_id=2060607229 instance=ExtResource("25_jut3y")]
+position = Vector2(15680, 1041)
+scale = Vector2(0.08, 0.08)
+tipo_item = 0
+cantidad_municion = 120
+
+[node name="ArmaSoltada3" parent="Oleadas/Oleada1" unique_id=1165600304 instance=ExtResource("25_jut3y")]
+position = Vector2(18836, 349)
+scale = Vector2(0.08, 0.08)
+tipo_item = 0
+cantidad_municion = 120
+
 [node name="Oleada2" type="Node2D" parent="Oleadas" unique_id=1845974271]
 
 [node name="EnemyElite" parent="Oleadas/Oleada2" unique_id=236204452 instance=ExtResource("5_kry3j")]
@@ -16461,19 +16473,15 @@ position = Vector2(11357, 804)
 
 [node name="GranadaSuelta" parent="Oleadas/Oleada6" unique_id=373778299 instance=ExtResource("30_v2nl5")]
 position = Vector2(9618, 802)
-tipo = 1
 
 [node name="GranadaSuelta2" parent="Oleadas/Oleada6" unique_id=1924636274 instance=ExtResource("30_v2nl5")]
 position = Vector2(15011, 1650)
-tipo = 1
 
 [node name="GranadaSuelta3" parent="Oleadas/Oleada6" unique_id=1972528019 instance=ExtResource("30_v2nl5")]
 position = Vector2(23404, 1280)
-tipo = 1
 
 [node name="GranadaSuelta4" parent="Oleadas/Oleada6" unique_id=50212036 instance=ExtResource("30_v2nl5")]
 position = Vector2(26604, 722)
-tipo = 1
 
 [node name="Oleada7" type="Node2D" parent="Oleadas" unique_id=2117084224]
 
@@ -16812,6 +16820,7 @@ script = ExtResource("25_u50mg")
 dialogo_canvas = NodePath("../Dialogo Caiman")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Triggers/Tutorial2/TutorialCaiman" unique_id=800821551]
+position = Vector2(286, -148)
 shape = SubResource("RectangleShape2D_ee4r6")
 
 [node name="Dialogo Caiman" parent="Triggers/Tutorial2" unique_id=2090067104 instance=ExtResource("26_caiman")]

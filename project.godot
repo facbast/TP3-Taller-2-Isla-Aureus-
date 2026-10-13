@@ -24,6 +24,7 @@ MusicManager="*res://Scripts/music_manager.gd"
 
 mouse_cursor/custom_image="uid://cwd652ggsx788"
 mouse_cursor/custom_image_hotspot=Vector2(16, 16)
+"#VistaidÃ©nticaentodoslosequipos:elcanvasescalaalaventana#manteniendolos1152x648lÃ³gicos(bandasnegrassielaspectodifiere).#Sinesto,cadaresoluciÃ³nmostrabamÃ¡s/menosmundo(pop-indelparallax)#ylaUIabsolutasedesacomodaba.window/stretch/mode"="canvas_items"
 
 [input]
 
