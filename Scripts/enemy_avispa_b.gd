@@ -273,7 +273,7 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 func _soltar_arma() -> void:
 	var caida = ARMA_SOLTADA.instantiate()
 	caida.tipo_arma = NOMBRES_ARMA.get(arma_equipada, "PistolaPlasma")
-	caida.scale = _arma.scale if _arma != null else Vector2.ONE
+	# Sin escala explícita: el drop usa la de muestra del tipo.
 	if _arma != null:
 		if "municion_reserva" in _arma:
 			var tope := 60 if _arma.name == "Rifle" else 24

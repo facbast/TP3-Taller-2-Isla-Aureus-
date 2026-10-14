@@ -34,6 +34,7 @@ escena_bala = ExtResource("7_avisb")
 
 [node name="Pistola" parent="PivoteBrazo" unique_id=490493140 instance=ExtResource("4_avisb")]
 visible = false
+scale = Vector2(0.08, 0.08)
 escena_bala = ExtResource("7_avisb")
 
 [node name="RiflePlasma" parent="PivoteBrazo" unique_id=1868179404 instance=ExtResource("5_avisb")]

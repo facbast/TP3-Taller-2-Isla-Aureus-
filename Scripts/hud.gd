@@ -93,6 +93,55 @@ func _input(event):
 		else:
 			# En cualquier otro caso, alterna la pausa normalmente
 			alternar_pausa()
+		return
+	# Truco de testers: S-A-L-T-A-R salta a la siguiente misión.
+	if event is InputEventKey and event.pressed and not event.echo:
+		_procesar_truco(event)
+
+# --- TRUCO DE TESTERS (S-A-L-T-A-R: saltar a la siguiente misión) ---
+const SECUENCIA_TRUCO := [KEY_S, KEY_A, KEY_L, KEY_T, KEY_A, KEY_R]
+const TIEMPO_TRUCO := 2.5 # Segundos máximos entre tecla y tecla
+var _indice_truco: int = 0
+var _ultimo_truco_msec: int = 0
+
+func _procesar_truco(evento: InputEventKey) -> void:
+	# Con el menú de pausa abierto no se acepta el truco.
+	if get_tree().paused:
+		_indice_truco = 0
+		return
+	var ahora := Time.get_ticks_msec()
+	if ahora - _ultimo_truco_msec > int(TIEMPO_TRUCO * 1000.0):
+		_indice_truco = 0
+	_ultimo_truco_msec = ahora
+	if evento.physical_keycode == SECUENCIA_TRUCO[_indice_truco]:
+		_indice_truco += 1
+		if _indice_truco >= SECUENCIA_TRUCO.size():
+			_indice_truco = 0
+			_activar_truco_saltar_nivel()
+	elif evento.physical_keycode == SECUENCIA_TRUCO[0]:
+		_indice_truco = 1
+	else:
+		_indice_truco = 0
+
+func _activar_truco_saltar_nivel() -> void:
+	var escena = get_tree().current_scene
+	if escena == null:
+		return
+	var actual: String = escena.scene_file_path
+	var destino := ""
+	for i in range(Global.MISIONES.size()):
+		if str(Global.MISIONES[i]["escena"]) == actual and i + 1 < Global.MISIONES.size():
+			destino = str(Global.MISIONES[i + 1]["escena"])
+	if destino == "":
+		return
+	mostrar_notificacion("Truco Activado")
+	await get_tree().create_timer(1.2).timeout
+	await hacer_fade_out(1.0).finished
+	get_tree().paused = false
+	MusicManager.set_nivel_pausado(false)
+	# Handoff como el TriggerFinal: protege el snapshot y prepara el working.
+	Global.seleccionar_mision(destino, false)
+	get_tree().change_scene_to_file(destino)
 
 func _crear_overlay_negro():
 	if _overlay_negro != null:

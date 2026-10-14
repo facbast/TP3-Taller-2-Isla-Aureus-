@@ -45,7 +45,7 @@ const MUNICION_DEFECTO: Dictionary = {
 # escala propia (gecko, jugador, avispa B...) no se tocan.
 const ESCALA_POR_ARMA: Dictionary = {
 	"Rifle": Vector2(0.08, 0.08),
-	"Pistola": Vector2(0.5, 0.5),
+	"Pistola": Vector2(0.15, 0.15),
 	"RiflePlasma": Vector2(0.08, 0.08),
 	"PistolaPlasma": Vector2(0.07, 0.07),
 	"Granada": Vector2(0.05, 0.05),

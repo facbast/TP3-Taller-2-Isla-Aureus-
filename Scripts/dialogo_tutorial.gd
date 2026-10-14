@@ -21,6 +21,10 @@ var _ultimo_caracter: int = 0
 # Variables para controlar el flujo final
 var en_rama_final: bool = false
 var respuesta_aceptada: bool = false
+# Repetición (tutorial ya aceptado en otra vida): las líneas avanzan solas.
+var _repeticion: bool = false
+var _tiempo_auto: float = 0.0
+const PAUSA_AUTO := 1.2
 
 var dialogos = [
 	{"icono": ICONO_RADIO, "texto": "*Click* Unidad Roku ¿Me copia?"},
@@ -54,6 +58,7 @@ func _ready():
 		get_tree().paused = false # No pausar el juego
 		en_rama_final = true
 		respuesta_aceptada = true
+		_repeticion = true # Avanza solo, sin pedir espacio
 		dialogos = dialogos_si
 		_mostrar_linea()
 	# 2. Si ya vio la introducción pero rechazó las instrucciones:
@@ -66,7 +71,7 @@ func _ready():
 		get_tree().paused = true # Pausar juego solo la primera vez
 		_mostrar_linea()
 
-func _process(_delta):
+func _process(delta):
 	if tween_texto and tween_texto.is_running():
 		var char_actual = texto_label.visible_characters
 		if char_actual > _ultimo_caracter:
@@ -74,18 +79,30 @@ func _process(_delta):
 			_reproducir_blip()
 
 	if Input.is_action_just_pressed("ui_accept") and not opciones_container.visible:
+		_avanzar()
+	elif _repeticion and not opciones_container.visible:
+		# Repetición: cada línea se completa y pasa sola (espacio la apura).
 		if tween_texto and tween_texto.is_running():
-			tween_texto.kill()
-			texto_label.visible_ratio = 1.0
+			_tiempo_auto = 0.0
 		else:
-			indice_dialogo += 1
-			if indice_dialogo < dialogos.size():
-				_mostrar_linea()
+			_tiempo_auto += delta
+			if _tiempo_auto >= PAUSA_AUTO:
+				_avanzar()
+
+func _avanzar() -> void:
+	_tiempo_auto = 0.0
+	if tween_texto and tween_texto.is_running():
+		tween_texto.kill()
+		texto_label.visible_ratio = 1.0
+	else:
+		indice_dialogo += 1
+		if indice_dialogo < dialogos.size():
+			_mostrar_linea()
+		else:
+			if en_rama_final:
+				_finalizar_tutorial()
 			else:
-				if en_rama_final:
-					_finalizar_tutorial()
-				else:
-					_mostrar_opciones()
+				_mostrar_opciones()
 
 func _reproducir_blip():
 	if audio_blip and audio_blip.stream:

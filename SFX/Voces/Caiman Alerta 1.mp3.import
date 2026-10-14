@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bg6whvmsn3xyw"
+path="res://.godot/imported/Caiman Alerta 1.mp3-9a2677e3e5e03ba096777b97d78a0513.mp3str"
+
+[deps]
+
+source_file="res://SFX/Voces/Caiman Alerta 1.mp3"
+dest_files=["res://.godot/imported/Caiman Alerta 1.mp3-9a2677e3e5e03ba096777b97d78a0513.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

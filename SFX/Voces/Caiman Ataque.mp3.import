@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://30e7crlpys52"
+path="res://.godot/imported/Caiman Ataque.mp3-f99efb0ebd6507b83081dd081685f915.mp3str"
+
+[deps]
+
+source_file="res://SFX/Voces/Caiman Ataque.mp3"
+dest_files=["res://.godot/imported/Caiman Ataque.mp3-f99efb0ebd6507b83081dd081685f915.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

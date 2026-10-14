@@ -142,13 +142,13 @@ position = Vector2(425.00006, -83.333336)
 [node name="Pistola" type="Sprite2D" parent="PivoteBrazo" unique_id=1045399923]
 visible = false
 position = Vector2(48, -1)
-scale = Vector2(0.1, 0.1)
+scale = Vector2(0.08, 0.08)
 texture = ExtResource("5_pistnb")
 flip_h = true
 script = ExtResource("6_3smsa")
 
 [node name="PuntoDisparo" type="Marker2D" parent="PivoteBrazo/Pistola" unique_id=453096401]
-position = Vector2(160, 20)
+position = Vector2(174, -15)
 
 [node name="PistolaPlasma" parent="PivoteBrazo" unique_id=1502422774 instance=ExtResource("8_8erm5")]
 visible = false

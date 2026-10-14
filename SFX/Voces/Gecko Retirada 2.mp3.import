@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bws4tgsuusjbu"
+path="res://.godot/imported/Gecko Retirada 2.mp3-cb1c195aedb27b28e296f7b0f4732ccf.mp3str"
+
+[deps]
+
+source_file="res://SFX/Voces/Gecko Retirada 2.mp3"
+dest_files=["res://.godot/imported/Gecko Retirada 2.mp3-cb1c195aedb27b28e296f7b0f4732ccf.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
