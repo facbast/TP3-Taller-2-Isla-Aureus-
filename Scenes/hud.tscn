@@ -418,9 +418,11 @@ stretch_mode = 5
 
 [node name="AudioPeligro" type="AudioStreamPlayer" parent="." unique_id=427805844]
 stream = ExtResource("8_5ep0j")
+volume_db = -3.0
 
 [node name="AudioCritico" type="AudioStreamPlayer" parent="." unique_id=867286555]
 stream = ExtResource("9_4f5kr")
+volume_db = -3.0
 
 [node name="AudioRecarga" type="AudioStreamPlayer" parent="." unique_id=816082740]
 stream = ExtResource("10_piegi")

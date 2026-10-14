@@ -186,7 +186,6 @@ vertical_alignment = 1
 autowrap_mode = 2
 
 [node name="PanelControles" type="Panel" parent="." unique_id=1810869829]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -256,7 +255,7 @@ R: Recargar
 Tab: Cambiar Arma
 T: Alternar tipo de Granada
 E: Recoger Arma
-F: Ataque Cuerpo a Cuerpo (Patada)
+F: Ataque Cuerpo a Cuerpo
 Esc: Pausar"
 horizontal_alignment = 1
 
@@ -300,8 +299,7 @@ Arte de Personajes, props y UI:
 Margarita Monutti
 
 Arte de escenarios, props y Música:
-Rocío Leno
-"
+Rocío Leno"
 horizontal_alignment = 1
 
 [node name="BtnVolver" type="TextureButton" parent="PanelCreditos/VBoxContainer" unique_id=1224911382]
