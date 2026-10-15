@@ -22,13 +22,9 @@ MusicManager="*res://Scripts/music_manager.gd"
 
 [display]
 
-window/size/viewport_width=1152
-window/size/viewport_height=648
-# Same view on every machine: canvas scales keeping 1152x648 logic.
-window/stretch/mode="canvas_items"
-window/stretch/aspect="keep"
 mouse_cursor/custom_image="uid://cwd652ggsx788"
 mouse_cursor/custom_image_hotspot=Vector2(16, 16)
+#Sameviewoneverymachine:canvasscaleskeeping1152x648logic.window/stretch/mode="canvas_items"
 
 [input]
 
