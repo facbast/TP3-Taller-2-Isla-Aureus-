@@ -48,7 +48,7 @@ const VOCES_MUERTE := [
 	preload("res://SFX/Voces/Caiman Muerte 3.mp3"),
 ]
 const VOCES_ATAQUE := [
-	preload("res://SFX/Voces/Caiman Ataque.mp3"),
+	preload("res://SFX/Voces/Caiman Ataque 1.mp3"),
 	preload("res://SFX/Voces/Caiman Ataque 2.mp3"),
 	preload("res://SFX/Voces/Caiman Ataque 3.mp3"),
 ]

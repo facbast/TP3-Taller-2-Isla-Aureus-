@@ -64,7 +64,7 @@ const VOCES_ALERTA := [
 	preload("res://SFX/Voces/Gecko Alerta 3.mp3"),
 ]
 const VOCES_MUERTE := [
-	preload("res://SFX/Voces/Gecko Muerte.mp3"),
+	preload("res://SFX/Voces/Gecko Muerte 1.mp3"),
 	preload("res://SFX/Voces/Gecko Muerte 2.mp3"),
 	preload("res://SFX/Voces/Gecko Muerte 3.mp3"),
 ]
