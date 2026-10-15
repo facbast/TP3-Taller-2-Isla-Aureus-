@@ -13,12 +13,16 @@ size = Vector2(20, 670)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hi4ne"]
 size = Vector2(19, 676)
 
-[node name="ArenaFinal" type="Area2D" unique_id=855175810 node_paths=PackedStringArray("barrera_entrada", "barrera_salida", "contenedor_spawns")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_techo"]
+size = Vector2(1300, 20)
+
+[node name="ArenaFinal" type="Area2D" unique_id=855175810 node_paths=PackedStringArray("barrera_entrada", "barrera_salida", "barrera_techo", "contenedor_spawns")]
 collision_layer = 0
 script = ExtResource("1_vpple")
 escenas_enemigos = Array[PackedScene]([ExtResource("2_0kfrn"), ExtResource("3_cuxq6")])
 barrera_entrada = NodePath("BarreraEntrada")
 barrera_salida = NodePath("BarreraSalida")
+barrera_techo = NodePath("BarreraTecho")
 contenedor_spawns = NodePath("PuntosSpawneo")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=858921673]
@@ -52,6 +56,21 @@ offset_left = 1140.5
 offset_top = -10.0
 offset_right = 1159.5
 offset_bottom = 666.0
+mouse_filter = 2
+color = Color(0.2, 1, 0.4, 0.45)
+
+[node name="BarreraTecho" type="StaticBody2D" parent="."]
+collision_layer = 2
+position = Vector2(575, -150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BarreraTecho"]
+shape = SubResource("RectangleShape2D_techo")
+
+[node name="MuroEnergia" type="ColorRect" parent="BarreraTecho"]
+offset_left = -650.0
+offset_top = -10.0
+offset_right = 650.0
+offset_bottom = 10.0
 mouse_filter = 2
 color = Color(0.2, 1, 0.4, 0.45)
 

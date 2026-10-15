@@ -46,6 +46,8 @@ func _on_btn_nueva_partida_pressed():
 	Global.mision_actual = "res://Scenes/main.tscn"
 	Global.misiones_completadas = []
 	Global.checkpoints = {}
+	Global.segunda_mitad_m1 = false
+	Global.emboscada_nivel2 = false
 	Global.inicio_fresco_mision = true
 	Global.sesion_desde_cero = false
 	# Limpiamos restos del checkpoint anterior en memoria

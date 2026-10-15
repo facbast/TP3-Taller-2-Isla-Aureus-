@@ -55,6 +55,32 @@ const BALA_ENEMIGA = preload("res://Scenes/bala_enemiga.tscn")
 const ARMA_SOLTADA = preload("res://Scenes/arma_soltada.tscn") 
 const TEXTURA_GRANADA = preload("res://Assets/Granada HUD.png")
 
+# --- VOCES DEL GECKO (una por tipo se sortea para no monotonizar) ---
+# Segundos a saltar al inicio de cada voz (silencios de arranque).
+@export var recorte_inicial: float = 0.0
+const VOCES_ALERTA := [
+	preload("res://SFX/Voces/Gecko Alerta 1.mp3"),
+	preload("res://SFX/Voces/Gecko Alerta 2.mp3"),
+	preload("res://SFX/Voces/Gecko Alerta 3.mp3"),
+]
+const VOCES_MUERTE := [
+	preload("res://SFX/Voces/Gecko Muerte.mp3"),
+	preload("res://SFX/Voces/Gecko Muerte 2.mp3"),
+	preload("res://SFX/Voces/Gecko Muerte 3.mp3"),
+]
+const VOCES_RETIRADA := [
+	preload("res://SFX/Voces/Gecko Retirada 1.mp3"),
+	preload("res://SFX/Voces/Gecko Retirada 2.mp3"),
+	preload("res://SFX/Voces/Gecko Retirada 3.mp3"),
+]
+# Segundos mínimos entre voces del mismo gecko (no se pisa a sí mismo).
+# El anti-coro entre bichos es global (Global.puede_emitir_voz).
+const PAUSA_VOCES := 10.0
+# La primera huida del Nivel 2 abre con Retirada 3 (una vez por ejecución).
+static var _retirada_inicial_sonada: bool = false
+var _audio_voz: AudioStreamPlayer2D
+var _cd_voz: float = 0.0
+
 # --- SISTEMA DE SIGILO Y VISIÓN ---
 @export var angulo_vision: float = 70.0    # Apertura en grados del cono
 @export var distancia_vision: float = 380.0 # Alcance máximo de la linterna
@@ -63,6 +89,7 @@ var es_alerta: bool = false               # Estado de combate activado
 # --- VARIABLES DE MIEDO (LÍDER CAÍDO) ---
 var esta_aterrado: bool = false
 var tiempo_aterrado: float = 0.0
+var _muerta: bool = false
 
 # --- SORPRESA (reacción breve con filtro amarillo antes de alertar/huir) ---
 @export var duracion_sorpresa: float = 0.8
@@ -97,6 +124,19 @@ func _ready():
 		_jugador = get_parent().get_node_or_null("Player")
 
 	salud_maxima = salud # Referencia para la barra de daño
+
+	_audio_voz = AudioStreamPlayer2D.new()
+	_audio_voz.name = "AudioVoz"
+	add_child(_audio_voz)
+
+	# Primera huida del Nivel 2: abre con Retirada 3 (una vez por ejecución).
+	if huir_sin_pelear and not _retirada_inicial_sonada \
+			and get_tree().current_scene.scene_file_path.ends_with("Nivel2.tscn"):
+		_retirada_inicial_sonada = true
+		_audio_voz.stream = VOCES_RETIRADA[2]
+		_audio_voz.play()
+		_cd_voz = PAUSA_VOCES
+		Global.marcar_voz()
 		
 	# Si la casilla está marcada en el Inspector, voltea al enemigo al nacer
 	if mirar_izquierda_al_inicio:
@@ -113,6 +153,9 @@ func fijar_origen() -> void:
 	_dir_patrulla = 1.0 if _mirando_derecha else -1.0
 		
 func _physics_process(delta):
+	# Muriendo: el fundido manda, sin IA ni movimiento.
+	if _muerta:
+		return
 	if not is_on_floor():
 		velocity.y += gravity * delta
 
@@ -123,6 +166,9 @@ func _physics_process(delta):
 
 	if temporizador_granada > 0:
 		temporizador_granada -= delta
+
+	if _cd_voz > 0.0:
+		_cd_voz -= delta
 
 	# --- MODO HUIDA: corre a la izquierda sin detenerse ni pelear ---
 	# Salta escaneo, detección, sorpresa y combate: ni las granadas ni
@@ -371,6 +417,8 @@ func _orientar_brazo_adelante():
 		_pivote_brazo.scale.y = -1.0
 
 func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
+	if _muerta:
+		return
 	# --- BAJA INSTANTÁNEA POR SIGILO ---
 	if tipo_dano == "Melee" and not es_alerta:
 		salud = 0
@@ -378,7 +426,8 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 			Global.registrar_baja_enemigo(self)
 		_soltar_arma()
 		_intentar_soltar_granada()
-		queue_free()
+		_gritar_muerte()
+		_morir()
 		return
 
 	# Si no estaba en alerta y recibe daño, se entera inmediatamente
@@ -404,7 +453,19 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 			Global.registrar_baja_enemigo(self)
 		_soltar_arma()
 		_intentar_soltar_granada()
-		queue_free()
+		_gritar_muerte()
+		_morir()
+
+# Muerte con desvanecido (no desaparece de golpe): congela, funde y libera.
+func _morir() -> void:
+	_muerta = true
+	velocity = Vector2.ZERO
+	_pivote_brazo.hide()
+	$CollisionShape2D.set_deferred("disabled", true)
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.4)
+	await tween.finished
+	queue_free()
 
 func _soltar_arma():
 	var arma_caida = ARMA_SOLTADA.instantiate()
@@ -564,6 +625,30 @@ func asustar(duracion: float = 4.0):
 	# Primero la sorpresa amarilla, y al terminar arranca la huida
 	_sorprender(true, duracion)
 
+# Emite una voz sorteada del tipo dado (respeta pausa propia de 10s y
+# coro global para que no se encimen).
+func _emitir_voz(lista: Array) -> void:
+	if _audio_voz == null or lista.is_empty():
+		return
+	if _cd_voz > 0.0 or not Global.puede_emitir_voz():
+		return
+	_cd_voz = PAUSA_VOCES
+	Global.marcar_voz()
+	_audio_voz.stream = lista.pick_random()
+	_audio_voz.pitch_scale = randf_range(0.95, 1.05)
+	_audio_voz.play(recorte_inicial)
+
+# Grito de muerte: suena siempre (sin cooldown) en un player suelto para
+# que no se corte con el queue_free del gecko.
+func _gritar_muerte() -> void:
+	var voz = AudioStreamPlayer2D.new()
+	voz.stream = VOCES_MUERTE.pick_random()
+	voz.pitch_scale = randf_range(0.95, 1.05)
+	get_parent().add_child(voz)
+	voz.global_position = global_position
+	voz.play(recorte_inicial)
+	voz.finished.connect(voz.queue_free)
+
 # Inicia la sorpresa: filtro amarillo (el mismo de asustado) y quieto.
 func _sorprender(huir: bool, duracion_huida: float = 4.0):
 	# Sin esto, cada frame en el cono reiniciaría el reloj y nunca alertaría
@@ -573,6 +658,8 @@ func _sorprender(huir: bool, duracion_huida: float = 4.0):
 	_sorpresa_huida_duracion = duracion_huida
 	_sorpresa_tiempo = duracion_sorpresa
 	_sprite_cuerpo.modulate = Color(1.0, 1.0, 0.0)
+	# Voz según el caso: alerta al detectar, retirada al espantarse.
+	_emitir_voz(VOCES_RETIRADA if huir else VOCES_ALERTA)
 	queue_redraw()
 
 func _terminar_sorpresa():

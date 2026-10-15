@@ -35,12 +35,37 @@ var fuerza_lanzamiento_granada: float = 520.0
 
 const ARMA_SOLTADA = preload("res://Scenes/arma_soltada.tscn")
 
+# --- VOCES DEL CAIMÁN (una por tipo se sortea para no monotonizar) ---
+const VOCES_ALERTA := [
+	preload("res://SFX/Voces/Caiman Alerta 1.mp3"),
+	preload("res://SFX/Voces/Caiman Alerta 2.mp3"),
+]
+const VOZ_ALERTA_JUGADOR = preload("res://SFX/Voces/Caiman Alerta 3.mp3")
+const VOZ_ALERTA_AVISPA = preload("res://SFX/Voces/Caiman Alerta 4.mp3")
+const VOCES_MUERTE := [
+	preload("res://SFX/Voces/Caiman Muerte 1.mp3"),
+	preload("res://SFX/Voces/Caiman Muerte 2.mp3"),
+	preload("res://SFX/Voces/Caiman Muerte 3.mp3"),
+]
+const VOCES_ATAQUE := [
+	preload("res://SFX/Voces/Caiman Ataque.mp3"),
+	preload("res://SFX/Voces/Caiman Ataque 2.mp3"),
+	preload("res://SFX/Voces/Caiman Ataque 3.mp3"),
+]
+# Segundos a saltar al inicio de cada voz (silencios de arranque).
+@export var recorte_inicial: float = 0.0
+# Segundos mínimos entre voces del mismo caimán (no se pisa a sí mismo).
+const PAUSA_VOCES := 10.0
+var _audio_voz: AudioStreamPlayer2D
+var _cd_voz: float = 0.0
+
 var gravity = ProjectSettings.get_setting("physics/2d/default_gravity")
 var _mirando_derecha = true
 var _jugador = null
 # Objetivo actual de combate: el jugador o una avispa (bando contrario).
 # Los reptiles no se atacan entre sí; las avispas ya los cazan por su cuenta.
 var _objetivo: Node2D = null
+var _muerto: bool = false
 var _tween_escudo: Tween 
 
 # --- SISTEMA DE SIGILO Y VISIÓN ---
@@ -122,6 +147,9 @@ func _ready():
 		return
 	salud_actual = salud_maxima
 	escudo_actual = escudo_maximo
+	_audio_voz = AudioStreamPlayer2D.new()
+	_audio_voz.name = "AudioVoz"
+	add_child(_audio_voz)
 	_base_pivote_brazo = _pivote_brazo.position
 	_base_area_golpe_x = _area_golpe.position.x - _sprite_cuerpo.position.x
 	_base_colision_golpe_x = _colision_golpe.position.x
@@ -152,6 +180,9 @@ func despertar_tutorial():
 	queue_redraw()
 
 func _physics_process(delta):
+	# Muriendo: el fundido manda, sin IA ni movimiento.
+	if _muerto:
+		return
 	# Gravedad
 	if not is_on_floor():
 		if velocity.y > 0:
@@ -185,6 +216,9 @@ func _physics_process(delta):
 	if temporizador_granada > 0:
 		temporizador_granada -= delta
 
+	if _cd_voz > 0.0:
+		_cd_voz -= delta
+
 	# Enfriamiento del golpe melee
 	if temporizador_golpe > 0:
 		temporizador_golpe -= delta
@@ -213,7 +247,7 @@ func _physics_process(delta):
 		queue_redraw()
 		for candidato in _candidatos_hostiles():
 			if _detectar_en_cono(candidato):
-				_sorprender()
+				_sorprender(candidato)
 				break
 	else:
 		# En combate reevalúa cada frame: cambia a lo hostil más cercano.
@@ -376,6 +410,7 @@ func _iniciar_golpe() -> void:
 	_tiempo_golpe = 0.0
 	_sprite_cuerpo.modulate = COLOR_AVISO_GOLPE
 	_pivote_brazo.modulate = COLOR_AVISO_GOLPE
+	_emitir_voz(VOCES_ATAQUE)
 
 func _procesar_golpe(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0, SPEED)
@@ -488,14 +523,47 @@ func _orientar_brazo_adelante():
 		_pivote_brazo.scale.y = -1.0
 
 # Inicia la sorpresa: filtro amarillo (el mismo de grunt asustado) y quieto.
-func _sorprender():
+func _sorprender(detectado: Node2D):
 	if _sorpresa_tiempo > 0.0:
 		return
 	_sorpresa_tiempo = duracion_sorpresa
 	_sprite_cuerpo.modulate = Color(1.0, 1.0, 0.0)
+	# Alerta dedicada según el bando detectado (3 = jugador, 4 = avispa).
+	var pool: Array = VOCES_ALERTA.duplicate()
+	if is_instance_valid(detectado) and detectado.is_in_group("avispas"):
+		pool.append(VOZ_ALERTA_AVISPA)
+	else:
+		pool.append(VOZ_ALERTA_JUGADOR)
+	_emitir_voz(pool)
 	queue_redraw()
 
+# Emite una voz sorteada del tipo dado (respeta pausa propia de 10s y
+# coro global para que no se encimen).
+func _emitir_voz(lista: Array) -> void:
+	if _audio_voz == null or lista.is_empty():
+		return
+	if _cd_voz > 0.0 or not Global.puede_emitir_voz():
+		return
+	_cd_voz = PAUSA_VOCES
+	Global.marcar_voz()
+	_audio_voz.stream = lista.pick_random()
+	_audio_voz.pitch_scale = randf_range(0.95, 1.05)
+	_audio_voz.play(recorte_inicial)
+
+# Grito de muerte: suena siempre (sin cooldown) en un player suelto para
+# que no se corte con el queue_free del caimán.
+func _gritar_muerte() -> void:
+	var voz = AudioStreamPlayer2D.new()
+	voz.stream = VOCES_MUERTE.pick_random()
+	voz.pitch_scale = randf_range(0.95, 1.05)
+	get_parent().add_child(voz)
+	voz.global_position = global_position
+	voz.play(recorte_inicial)
+	voz.finished.connect(voz.queue_free)
+
 func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
+	if _muerto:
+		return
 	# Dormido para el tutorial: los disparos previos no le hacen nada
 	# (solo un destello de escudo como feedback) y no lo alertan.
 	if dormido_hasta_tutorial:
@@ -566,11 +634,23 @@ func _mostrar_efecto_escudo():
 	_tween_escudo.tween_property(self, "modulate", Color.WHITE, 0.5)
 
 func _morir():
+	if _muerto:
+		return
+	_muerto = true
 	if not has_meta("es_spawn_arena"):
 		Global.registrar_baja_enemigo(self)
 	_asustar_aliados(500.0) # 500 píxeles de radio para asustar
 	_soltar_arma()
 	_intentar_soltar_granada()
+	_gritar_muerte()
+	# Muerte con desvanecido: congela, funde y libera.
+	velocity = Vector2.ZERO
+	_pivote_brazo.hide()
+	_area_golpe.set_deferred("monitoring", false)
+	$CollisionShape2D.set_deferred("disabled", true)
+	var tween = create_tween()
+	tween.tween_property(self, "modulate:a", 0.0, 0.4)
+	await tween.finished
 	queue_free()
 
 func _asustar_aliados(radio: float):

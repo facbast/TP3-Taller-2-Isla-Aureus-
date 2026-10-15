@@ -265,6 +265,12 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 		_muerta = true
 		Global.registrar_baja_enemigo(self)
 		_soltar_arma()
+		# Desvanecido: congela, funde y libera.
+		velocity = Vector2.ZERO
+		$CollisionShape2D.set_deferred("disabled", true)
+		var tween = create_tween()
+		tween.tween_property(self, "modulate:a", 0.0, 0.4)
+		await tween.finished
 		queue_free()
 
 # Al caer deja tirada el arma que llevaba, con su munición restante.

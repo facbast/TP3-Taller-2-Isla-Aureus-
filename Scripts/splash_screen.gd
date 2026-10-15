@@ -6,6 +6,8 @@ var _tween: Tween
 var _cambiando_escena: bool = false
 
 func _ready():
+	# Los menús suenan con el set B.
+	MusicManager.iniciar_musica_menu()
 	# Inicia el logo completamente transparente
 	logo.modulate.a = 0.0
 	

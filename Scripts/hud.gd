@@ -440,7 +440,7 @@ func _on_btn_controles_pressed():
 func _on_btn_menu_pressed():
 	await hacer_fade_out(0.8).finished
 	get_tree().paused = false
-	MusicManager.detener_musica() # Al título se vuelve en silencio
+	MusicManager.detener_musica() # Al título vuelve el set B
 	# Salir al título sin pasar por un checkpoint no confirma nada.
 	Global.descartar_progreso_no_guardado()
 	get_tree().change_scene_to_file("res://Scenes/pantalla_titulo.tscn") # Ajusta a tu ruta real

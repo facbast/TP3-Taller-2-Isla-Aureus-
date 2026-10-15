@@ -9,6 +9,7 @@ extends Area2D
 @export_category("Referencias")
 @export var barrera_entrada: StaticBody2D
 @export var barrera_salida: StaticBody2D
+@export var barrera_techo: StaticBody2D
 @export var contenedor_spawns: Node2D
 
 var oleada_actual: int = 0
@@ -23,6 +24,9 @@ func _ready() -> void:
 	if barrera_salida:
 		barrera_salida.process_mode = PROCESS_MODE_DISABLED
 		barrera_salida.hide()
+	if barrera_techo:
+		barrera_techo.process_mode = PROCESS_MODE_DISABLED
+		barrera_techo.hide()
 
 	body_entered.connect(_on_body_entered)
 
@@ -35,6 +39,9 @@ func _on_body_entered(body: Node2D) -> void:
 
 func _iniciar_arena() -> void:
 	arena_activa = true
+
+	# En Misión 2, la primera emboscada despierta el set C.
+	MusicManager.notificar_emboscada()
 	
 	print_tree()
 	# Activar las barreras para bloquear al jugador
@@ -44,6 +51,9 @@ func _iniciar_arena() -> void:
 	if barrera_salida:
 		barrera_salida.process_mode = PROCESS_MODE_INHERIT
 		barrera_salida.show()
+	if barrera_techo:
+		barrera_techo.process_mode = PROCESS_MODE_INHERIT
+		barrera_techo.show()
 
 	_iniciar_siguiente_oleada()
 
@@ -108,11 +118,11 @@ func _spawnear_enemigo(puntos_spawn: Array[Node]) -> void:
 	if enemigo.has_method("forzar_caza"):
 		enemigo.forzar_caza()
 
-	# Las avispas atraviesan los muros de energía: vuelan por encima y los
-	# encuentros no son siempre encerrados. Geckos y caimanes siguen
+	# Las avispas atraviesan muros y techo de energía: vuelan por encima y
+	# los encuentros no son siempre encerrados. Geckos y caimanes siguen
 	# bloqueados (la excepción es solo para el grupo "avispas").
 	if enemigo.is_in_group("avispas"):
-		for muro in [barrera_entrada, barrera_salida]:
+		for muro in [barrera_entrada, barrera_salida, barrera_techo]:
 			if is_instance_valid(muro) and muro.has_method("add_collision_exception_with"):
 				muro.add_collision_exception_with(enemigo)
 
@@ -143,3 +153,6 @@ func _completar_arena() -> void:
 	if barrera_salida:
 		barrera_salida.process_mode = PROCESS_MODE_DISABLED
 		barrera_salida.hide()
+	if barrera_techo:
+		barrera_techo.process_mode = PROCESS_MODE_DISABLED
+		barrera_techo.hide()

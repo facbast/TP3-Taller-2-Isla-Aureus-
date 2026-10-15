@@ -11,6 +11,10 @@ func _on_body_entered(body: Node2D) -> void:
 
 	set_deferred("monitoring", false)
 
+	# La segunda mitad musical (set Aalt) arranca al pisar el trigger,
+	# haya aceptado o no el tutorial.
+	MusicManager.notificar_segunda_mitad()
+
 	if not Global.tutorial_aceptado:
 		print("Trigger Burla descartado: tutorial no aceptado")
 		queue_free()

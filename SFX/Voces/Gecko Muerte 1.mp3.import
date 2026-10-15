@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://bts1b1678bqe2"
+path="res://.godot/imported/Gecko Muerte 1.mp3-1c271167a829ee443c1d6db41985b72c.mp3str"
+
+[deps]
+
+source_file="res://SFX/Voces/Gecko Muerte 1.mp3"
+dest_files=["res://.godot/imported/Gecko Muerte 1.mp3-1c271167a829ee443c1d6db41985b72c.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

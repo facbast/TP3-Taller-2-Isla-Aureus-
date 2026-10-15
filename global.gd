@@ -83,6 +83,10 @@ func descartar_progreso_no_guardado() -> void:
 # Los enemigos solo lanzan granadas después de pisar el trigger del
 # tutorial 3, haya aceptado o rechazado el tutorial el jugador.
 var granadas_enemigas_desbloqueadas: bool = false
+# Fase musical: segunda mitad de la Misión 1 (set Aalt tras el trigger Burla)
+# y Misión 2 con emboscada ya activada (set C). Viajan en el snapshot.
+var segunda_mitad_m1: bool = false
+var emboscada_nivel2: bool = false
 
 # True si los enemigos pueden lanzar granadas ahora mismo.
 # El bloqueo tutorial solo rige en la Misión 1: del Nivel 2 en adelante
@@ -107,6 +111,16 @@ func combate_facciones_permitido(pos: Vector2) -> bool:
 		if is_instance_valid(j) and (j as Node2D).global_position.distance_to(pos) <= RADIO_COMBATE_FACCIONES:
 			return true
 	return false
+
+# Throttle global de voces enemigas (geckos y caimanes no se enciman).
+var ultima_voz_msec: int = 0
+const PAUSA_CORO_VOCES_MSEC := 1500
+
+func puede_emitir_voz() -> bool:
+	return Time.get_ticks_msec() - ultima_voz_msec >= PAUSA_CORO_VOCES_MSEC
+
+func marcar_voz() -> void:
+	ultima_voz_msec = Time.get_ticks_msec()
 
 # Al reaparecer en un checkpoint, el flag vuelve al último guardado:
 # morir después del trigger no puede desbloquearlas antes de él.
@@ -156,6 +170,8 @@ func _snapshot_checkpoint() -> void:
 		"tutorial_visto": tutorial_visto,
 		"tutorial_aceptado": tutorial_aceptado,
 		"granadas_desbloqueadas": granadas_enemigas_desbloqueadas,
+		"segunda_mitad": segunda_mitad_m1,
+		"emboscada_n2": emboscada_nivel2,
 		"bajas": enemigos_derrotados.duplicate(),
 		"items": items_recogidos.duplicate(),
 	}
@@ -173,6 +189,8 @@ func _restaurar_snapshot(snap: Dictionary) -> void:
 	tutorial_visto = snap.get("tutorial_visto", tutorial_visto)
 	tutorial_aceptado = snap.get("tutorial_aceptado", tutorial_aceptado)
 	granadas_enemigas_desbloqueadas = snap.get("granadas_desbloqueadas", granadas_enemigas_desbloqueadas)
+	segunda_mitad_m1 = snap.get("segunda_mitad", segunda_mitad_m1)
+	emboscada_nivel2 = snap.get("emboscada_n2", emboscada_nivel2)
 	enemigos_derrotados = Array(snap.get("bajas", []))
 	items_recogidos = Array(snap.get("items", []))
 
@@ -269,6 +287,11 @@ func seleccionar_mision(escena: String, desde_cero: bool) -> void:
 		_reset_working()
 		inicio_fresco_mision = true
 		sesion_desde_cero = true
+		# Replay limpio: la fase musical vuelve al inicio de esa misión.
+		if escena == ESCENA_MISION_1:
+			segunda_mitad_m1 = false
+		if escena == MISIONES[1]["escena"]:
+			emboscada_nivel2 = false
 	else:
 		sesion_desde_cero = false
 		if checkpoints.has(escena):

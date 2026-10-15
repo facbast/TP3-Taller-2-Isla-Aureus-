@@ -16520,7 +16520,7 @@ position = Vector2(12575, 1830)
 [node name="PlataformaMovil" parent="Oleadas/Oleada8" unique_id=1436603005 instance=ExtResource("24_k2e45")]
 position = Vector2(12453, 1113)
 desplazamiento = Vector2(0, 700)
-velocidad = 100.0
+velocidad = 150.0
 
 [node name="Oleada9" type="Node2D" parent="Oleadas" unique_id=1927150235]
 position = Vector2(2056, -9)
@@ -16715,7 +16715,7 @@ position = Vector2(24081, 762)
 [node name="PlataformaMovil4" parent="Oleadas/Oleada17" unique_id=716587737 instance=ExtResource("24_k2e45")]
 position = Vector2(22084, 1382.9999)
 desplazamiento = Vector2(1250, 0)
-velocidad = 150.0
+velocidad = 200.0
 
 [node name="ArmaSoltada3" parent="Oleadas/Oleada17" unique_id=2046707423 instance=ExtResource("25_jut3y")]
 position = Vector2(22839, 207)
