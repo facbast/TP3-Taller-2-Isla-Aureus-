@@ -30,4 +30,5 @@ shape = SubResource("RectangleShape2D_yg4hx")
 [node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1515838229]
 
 [node name="AudioDisparo" type="AudioStreamPlayer2D" parent="." unique_id=161979128]
+volume_db = -4.0
 stream = ExtResource("2_8fubx")

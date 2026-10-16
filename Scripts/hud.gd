@@ -405,6 +405,8 @@ func alternar_pausa():
 	menu_pausa.visible = nuevo_estado_pausa
 	# La música se congela con la pausa y sigue al reanudar.
 	MusicManager.set_nivel_pausado(nuevo_estado_pausa)
+	# Las alarmas del escudo también (si no, suenan sobre el menú).
+	_set_pausa_alarmas(nuevo_estado_pausa)
 	
 	# Nos aseguramos de resetear la vista cada vez que se abre la pausa
 	if nuevo_estado_pausa:
@@ -417,6 +419,7 @@ func _on_btn_reanudar_pressed():
 func _on_btn_checkpoint_pressed():
 	get_tree().paused = false # Siempre quitar la pausa antes de cambiar de escena
 	MusicManager.set_nivel_pausado(false)
+	_set_pausa_alarmas(false)
 	await hacer_fade_out(0.8).finished
 	# Volver al checkpoint descarta las bajas/items sin guardar.
 	Global.descartar_progreso_no_guardado()
@@ -450,6 +453,12 @@ func _on_btn_cerrar_controles_pressed():
 	# Ocultamos el panel y volvemos a mostrar los botones
 	panel_controles.hide()
 	contenedor_botones.show()
+
+# Congela o reanuda las alarmas del escudo junto con la pausa.
+func _set_pausa_alarmas(pausado: bool) -> void:
+	for audio in [audio_peligro, audio_critico, audio_recarga]:
+		if is_instance_valid(audio):
+			audio.stream_paused = pausado
 
 # Icono de música del menú de pausa: solo silencia/restaura la música,
 # los SFX siguen sonando igual.
