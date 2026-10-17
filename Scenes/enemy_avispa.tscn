@@ -1,10 +1,82 @@
 [gd_scene format=3 uid="uid://c5ho7tfdu48k7"]
 
 [ext_resource type="Script" uid="uid://nt3wwedrvv3v" path="res://Scripts/enemy_avispa.gd" id="1_avispa"]
-[ext_resource type="Texture2D" uid="uid://brohhi2f5bv3v" path="res://Assets/Avispa_A.png" id="2_avispa"]
+[ext_resource type="Texture2D" uid="uid://cpjt1fyl1p3o5" path="res://Assets/BEE_SPRITESHEET.png" id="2_7cvm1"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_avispa"]
 radius = 30.0
+
+[sub_resource type="Animation" id="Animation_1o0a1"]
+resource_name = "Ataque"
+length = 0.6
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.16, 0.32, 0.48),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [4, 5, 6, 7]
+}
+
+[sub_resource type="Animation" id="Animation_x28o2"]
+resource_name = "Muerte"
+length = 0.2
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [8]
+}
+
+[sub_resource type="Animation" id="Animation_7cvm1"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_ge7qi"]
+resource_name = "Vuelo"
+length = 0.2
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.05, 0.1, 0.15),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_1o0a1"]
+_data = {
+&"Ataque": SubResource("Animation_1o0a1"),
+&"Muerte": SubResource("Animation_x28o2"),
+&"RESET": SubResource("Animation_7cvm1"),
+&"Vuelo": SubResource("Animation_ge7qi")
+}
 
 [node name="EnemyAvispa" type="CharacterBody2D" unique_id=1388131478 groups=["avispas", "enemigos"]]
 collision_mask = 3
@@ -13,9 +85,14 @@ script = ExtResource("1_avispa")
 dano_aguijon = 30.0
 
 [node name="SpriteCuerpo" type="Sprite2D" parent="." unique_id=1857298986]
-position = Vector2(16.999998, -12.999999)
-scale = Vector2(0.2, 0.2)
-texture = ExtResource("2_avispa")
+position = Vector2(12.000002, -9.000001)
+scale = Vector2(0.15, 0.15)
+texture = ExtResource("2_7cvm1")
+hframes = 4
+vframes = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1513022516]
 shape = SubResource("CircleShape2D_avispa")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=831604538]
+libraries/ = SubResource("AnimationLibrary_1o0a1")

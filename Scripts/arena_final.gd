@@ -55,7 +55,22 @@ func _iniciar_arena() -> void:
 		barrera_techo.process_mode = PROCESS_MODE_INHERIT
 		barrera_techo.show()
 
+	# Las avispas del nivel (las que están puestas a mano en la escena, no
+	# las que aparecen por esta arena) también vuelan: si no, el trepamuros
+	# las empuja contra el techo de energía y quedan clavadas ahí arriba,
+	# porque la excepción solo se daba a las recién spawneadas.
+	for avispa in get_tree().get_nodes_in_group("avispas"):
+		_atrevesar_barreras(avispa)
+
 	_iniciar_siguiente_oleada()
+
+# Las avispas atraviesan muros y techo de energía: vuelan por encima y
+# los encuentros no son siempre encerrados. (Solo el grupo "avispas";
+# geckos y caimanes sí quedan bloqueados.)
+func _atrevesar_barreras(enemigo: Node2D) -> void:
+	for muro in [barrera_entrada, barrera_salida, barrera_techo]:
+		if is_instance_valid(muro) and muro.has_method("add_collision_exception_with"):
+			muro.add_collision_exception_with(enemigo)
 
 func _iniciar_siguiente_oleada() -> void:
 	oleada_actual += 1
@@ -118,13 +133,9 @@ func _spawnear_enemigo(puntos_spawn: Array[Node]) -> void:
 	if enemigo.has_method("forzar_caza"):
 		enemigo.forzar_caza()
 
-	# Las avispas atraviesan muros y techo de energía: vuelan por encima y
-	# los encuentros no son siempre encerrados. Geckos y caimanes siguen
-	# bloqueados (la excepción es solo para el grupo "avispas").
+	# Las avispas del nivel también vuelan (ver _iniciar_arena).
 	if enemigo.is_in_group("avispas"):
-		for muro in [barrera_entrada, barrera_salida, barrera_techo]:
-			if is_instance_valid(muro) and muro.has_method("add_collision_exception_with"):
-				muro.add_collision_exception_with(enemigo)
+		_atrevesar_barreras(enemigo)
 
 	# Detectar cuando el enemigo muera (cuando salga del árbol de escena / sea destruido)
 	enemigo.tree_exited.connect(_on_enemigo_derrotado)

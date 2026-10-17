@@ -61,9 +61,11 @@ var _tiempo_reevaluar: float = 0.0
 var _flash_dano: float = 0.0
 var _muerta: bool = false
 var _audio_llamado: AudioStreamPlayer2D
+var _atacando: bool = false
 
 @onready var _sprite_cuerpo = $SpriteCuerpo
 @onready var _pivote_brazo = $PivoteBrazo
+@onready var _anim: AnimationPlayer = $AnimationPlayer
 
 func _ready():
 	# Si ya la derrotamos en esta partida (checkpoint), no reaparece.
@@ -88,6 +90,8 @@ func _ready():
 	salud_maxima = salud
 	_pos_origen = global_position
 	_fase_vagar = randf() * TAU
+	_anim.play("Vuelo")
+	_anim.animation_finished.connect(_al_terminar_animacion)
 	_orientar_brazo_adelante()
 
 ## La emboscada lo llama tras posicionar el spawn: deriva y correa
@@ -196,14 +200,57 @@ func _cazar_rango() -> void:
 		vy = sign(diferencia.y) * velocidad * 0.8
 	velocity = Vector2(vx, vy)
 	# Trepa muros: si algo la frena de frente, sube para pasar por arriba.
-	if is_on_wall():
-		velocity.y = -velocidad * 1.2
+	_trepar_muro()
 	# Dispara solo alineada en altura, a rango y a la vista.
 	if absf(diferencia.y) <= tolerancia_vertical \
 			and diferencia.length() <= rango_max_disparo \
 			and _tiene_linea_de_vision(_objetivo) \
 			and _arma != null and _arma.has_method("intentar_disparar"):
-		_arma.intentar_disparar()
+		if _disparo_aceptado():
+			_iniciar_ataque()
+
+## Cuándo el arma realmente soltó el tiro. Las balísticas lo devuelven con
+## true; las de plasma arrancan la carga en silencio, así que se detecta el
+## cambio en su estado sin tocar esos scripts.
+func _disparo_aceptado() -> bool:
+	var antes := _firma_arma()
+	var resultado = _arma.intentar_disparar()
+	if resultado is bool:
+		return resultado
+	return _firma_arma() != antes
+
+# Cada familia de arma lleva su munición con nombres distintos, así que se
+# relevan todos los campos que cambian al aceptar un disparo.
+func _firma_arma() -> String:
+	var partes: Array[String] = []
+	for campo in ["municion_cargador", "bateria", "esta_cargando", "esta_recargando", "temporizador_disparo", "_tiempo_siguiente_disparo"]:
+		var valor = _arma.get(campo)
+		if valor != null:
+			partes.append("%s=%s" % [campo, valor])
+	return ";".join(partes)
+
+# La animación de ataque acompaña al tiro, sin repetir la cadencia.
+func _iniciar_ataque() -> void:
+	if _atacando:
+		return
+	_atacando = true
+	_anim.play("Ataque")
+
+func _al_terminar_animacion(nombre: String) -> void:
+	if nombre == "Ataque":
+		_terminar_ataque()
+
+func _terminar_ataque() -> void:
+	_atacando = false
+	_anim.play("Vuelo")
+
+# Trepa muros: si algo la frena de frente (dato del move anterior), sube
+# para pasar por encima volando en vez de vibrar contra la pared.
+# Si tiene techo encima NO sube: el empujón la dejaría clavada contra el
+# techo de energía de la emboscada, sin forma de bajar de ahí.
+func _trepar_muro() -> void:
+	if is_on_wall() and not is_on_ceiling():
+		velocity.y = -velocidad * 1.2
 
 # Sin objetivo: orbita lento el punto de aparición, siempre en el aire.
 func _vagar(delta: float) -> void:
@@ -220,6 +267,7 @@ func _vagar(delta: float) -> void:
 		_mirando_derecha = false
 		_sprite_cuerpo.flip_h = textura_mira_derecha
 		_orientar_brazo_adelante()
+	_trepar_muro()
 
 # El brazo clava el tiro horizontal: misma convención que el gecko
 # (rotación 0/PI + espejo vertical) para que el arma nunca quede boca
@@ -265,11 +313,13 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 		_muerta = true
 		Global.registrar_baja_enemigo(self)
 		_soltar_arma()
-		# Desvanecido: congela, funde y libera.
+		# Muerte: congela, deja el cuadro de la escena y funde el sprite.
+		_atacando = false
 		velocity = Vector2.ZERO
+		_anim.play("Muerte")
 		$CollisionShape2D.set_deferred("disabled", true)
 		var tween = create_tween()
-		tween.tween_property(self, "modulate:a", 0.0, 0.4)
+		tween.tween_property(_sprite_cuerpo, "modulate:a", 0.0, 0.4)
 		await tween.finished
 		queue_free()
 

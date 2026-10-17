@@ -1,3 +1,6 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Respaldos de editors de imagen (GIMP/Krita guardan "archivo~")
+*~

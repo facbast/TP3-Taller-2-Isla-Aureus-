@@ -32,8 +32,10 @@ var _cd_huevo: float = 0.0
 var _flash_dano: float = 0.0
 var _muerta: bool = false
 var _audio_llamado: AudioStreamPlayer2D
+var _atacando: bool = false
 
 @onready var _sprite_cuerpo = $SpriteCuerpo
+@onready var _anim: AnimationPlayer = $AnimationPlayer
 
 func _ready():
 	# Si ya la derrotamos en esta partida (checkpoint), no reaparece.
@@ -48,6 +50,8 @@ func _ready():
 	salud_maxima = salud
 	_pos_origen = global_position
 	_fase_vagar = randf() * TAU
+	_anim.play("Vuelo")
+	_anim.animation_finished.connect(_al_terminar_animacion)
 
 ## La emboscada lo llama tras posicionar el spawn: deriva y correa
 ## miden desde el marker, no desde el (0,0) previo al posicionado.
@@ -143,8 +147,7 @@ func _cazar_techo() -> void:
 	var diferencia: Vector2 = punto - global_position
 	velocity = Vector2(diferencia.x, diferencia.y * 0.9).limit_length(velocidad)
 	# Trepa muros: si algo la frena de frente, sube para pasar por arriba.
-	if is_on_wall():
-		velocity.y = -velocidad * 1.2
+	_trepar_muro()
 	# Suelta el huevo alineada en horizontal y con cadencia.
 	if absf(_objetivo.global_position.x - global_position.x) <= tolerancia_soltar \
 			and _cd_huevo <= 0.0:
@@ -158,6 +161,22 @@ func _soltar_huevo() -> void:
 	# No choca con quien lo puso (cae limpio a través suyo).
 	huevo.add_collision_exception_with(self)
 	huevo.linear_velocity = velocity * 0.3 + Vector2(0, 60)
+	_iniciar_ataque()
+
+# La animación de ataque acompaña la puesta del huevo.
+func _iniciar_ataque() -> void:
+	if _atacando:
+		return
+	_atacando = true
+	_anim.play("Ataque")
+
+func _al_terminar_animacion(nombre: String) -> void:
+	if nombre == "Ataque":
+		_terminar_ataque()
+
+func _terminar_ataque() -> void:
+	_atacando = false
+	_anim.play("Vuelo")
 
 # Sin objetivo: orbita lento el punto de aparición, siempre en el aire.
 func _vagar(delta: float) -> void:
@@ -165,6 +184,15 @@ func _vagar(delta: float) -> void:
 	var punto := _pos_origen + Vector2(cos(_fase_vagar), sin(_fase_vagar)) * radio_vagancia
 	var diferencia: Vector2 = punto - global_position
 	velocity = diferencia.limit_length(velocidad * 0.3)
+	_trepar_muro()
+
+# Trepa muros: si algo la frena de frente (dato del move anterior), sube
+# para pasar por encima volando en vez de vibrar contra la pared.
+# Si tiene techo encima NO sube: el empujón la dejaría clavada contra el
+# techo de energía de la emboscada, sin forma de bajar de ahí.
+func _trepar_muro() -> void:
+	if is_on_wall() and not is_on_ceiling():
+		velocity.y = -velocidad * 1.2
 
 ## La emboscada lo llama al spawnear: entra en caza del jugador de
 ## inmediato, sin esperar a detectarlo (está encerrado con ella).
@@ -198,10 +226,12 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	if salud <= 0:
 		_muerta = true
 		Global.registrar_baja_enemigo(self)
-		# Desvanecido: congela, funde y libera.
+		# Muerte: congela, deja el cuadro de la escena y funde el sprite.
+		_atacando = false
 		velocity = Vector2.ZERO
+		_anim.play("Muerte")
 		$CollisionShape2D.set_deferred("disabled", true)
 		var tween = create_tween()
-		tween.tween_property(self, "modulate:a", 0.0, 0.4)
+		tween.tween_property(_sprite_cuerpo, "modulate:a", 0.0, 0.4)
 		await tween.finished
 		queue_free()

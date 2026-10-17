@@ -16793,6 +16793,12 @@ position = Vector2(25230, 773)
 position = Vector2(25163, 186)
 total_oleadas = 3
 
+[node name="MarkerIzquierda" parent="Oleadas/Oleada20/ArenaFinal/PuntosSpawneo" parent_id_path=PackedInt32Array(1426254494, 561453922) index="0" unique_id=1390571666]
+position = Vector2(100, -96)
+
+[node name="MarkerDerecha" parent="Oleadas/Oleada20/ArenaFinal/PuntosSpawneo" parent_id_path=PackedInt32Array(1426254494, 561453922) index="1" unique_id=2077149841]
+position = Vector2(1050, -78)
+
 [node name="Triggers" type="Node2D" parent="." unique_id=2117203295]
 
 [node name="Tutorial1" type="Node2D" parent="Triggers" unique_id=1957520383]
@@ -16938,4 +16944,5 @@ shape = SubResource("RectangleShape2D_aa8k8")
 [editable path="Oleadas/Oleada10/ArenaFinal"]
 [editable path="Oleadas/Oleada10/ArmaSoltada2"]
 [editable path="Oleadas/Oleada17/ArmaSoltada3"]
+[editable path="Oleadas/Oleada20/ArenaFinal"]
 [editable path="ZonaMuerte"]

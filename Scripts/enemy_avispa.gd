@@ -13,6 +13,9 @@ extends CharacterBody2D
 @export var radio_vagancia: float = 140.0
 @export var amplitud_flote: float = 10.0
 @export var ritmo_flote: float = 3.0
+# Aguijón: se aleja del blanco y solo embiste en el último cuadro.
+@export var factor_retirada: float = 0.9
+@export var factor_embestida: float = 3.0
 # El sprite base mira a la izquierda: al moverse a la derecha se espeja.
 @export var textura_mira_derecha: bool = false
 
@@ -32,8 +35,13 @@ var _audio_llamado: AudioStreamPlayer2D
 # Reevalúa el blanco cada tanto: cambia a lo hostil más cercano aunque
 # ya cazara otra cosa (si no, fijado el primero ignoraría al resto).
 var _tiempo_reevaluar: float = 0.0
+var _atacando: bool = false
+var _golpe_dado: bool = false
+# Último cuadro de la animación Ataque: el del aguijón teledirigido.
+var _frame_embestida: int = 7
 
 @onready var _sprite_cuerpo = $SpriteCuerpo
+@onready var _anim: AnimationPlayer = $AnimationPlayer
 
 func _ready():
 	# Si ya la derrotamos en esta partida (checkpoint), no reaparece.
@@ -48,6 +56,23 @@ func _ready():
 	salud_maxima = salud
 	_pos_origen = global_position
 	_fase_vagar = randf() * TAU
+	_frame_embestida = _ultimo_cuadro_ataque()
+	_anim.play("Vuelo")
+	_anim.animation_finished.connect(_al_terminar_animacion)
+
+## El aguijón teledirigido se dispara en el último cuadro de la animación
+## Ataque (el de mayor frame), para no depender de los números del script.
+func _ultimo_cuadro_ataque() -> int:
+	var anim := _anim.get_animation("Ataque")
+	if anim == null:
+		return 7
+	var ultimo := 0
+	for i in range(anim.get_track_count()):
+		if String(anim.track_get_path(i)) != "SpriteCuerpo:frame":
+			continue
+		for k in range(anim.track_get_key_count(i)):
+			ultimo = maxi(ultimo, int(anim.track_get_key_value(i, k)))
+	return ultimo
 
 ## La emboscada lo llama tras posicionar el spawn: deriva y correa
 ## miden desde el marker, no desde el (0,0) previo al posicionado.
@@ -66,19 +91,26 @@ func _physics_process(delta):
 			_sprite_cuerpo.modulate = Color.WHITE
 
 	_tiempo_reevaluar -= delta
-	if _objetivo == null or _tiempo_reevaluar <= 0.0:
+	# Durante el aguijón no cambia de blanco: ya eligió a quién ataca.
+	if not _atacando and (_objetivo == null or _tiempo_reevaluar <= 0.0):
 		_tiempo_reevaluar = 0.4
 		_buscar_objetivo()
 
-	if is_instance_valid(_objetivo):
+	if _atacando:
+		_atacar(delta)
+	elif is_instance_valid(_objetivo):
 		_cazar(delta)
 	else:
 		_vagar(delta)
 
 	# Flote perpetuo: cabeceo visual sobre el cuerpo (no mueve la colisión).
 	_sprite_cuerpo.position.y = sin(_tiempo * ritmo_flote + _fase_vagar) * amplitud_flote
-	# El sprite siempre mira hacia donde se dirige.
-	if velocity.x > 5.0:
+	# El sprite siempre mira hacia donde se dirige, salvo durante el
+	# aguijón, que mantiene la vista en el blanco mientras se separa.
+	if _atacando and is_instance_valid(_objetivo):
+		var mira := _objetivo.global_position - global_position
+		_sprite_cuerpo.flip_h = (mira.x < 0.0) != textura_mira_derecha
+	elif velocity.x > 5.0:
 		_sprite_cuerpo.flip_h = not textura_mira_derecha
 	elif velocity.x < -5.0:
 		_sprite_cuerpo.flip_h = textura_mira_derecha
@@ -145,17 +177,56 @@ func _cazar(_delta: float) -> void:
 	if distancia > rango_aguijon and not _toca_al_objetivo():
 		velocity = direccion * velocidad
 	else:
-		# Encima del objetivo: presiona y aguijonea con cadencia.
+		# Encima del objetivo: se apoya contra él y espera el aguijón.
 		velocity = direccion * velocidad * 0.25
 		if _cd_aguijon <= 0.0:
-			_cd_aguijon = cadencia_aguijon
-			velocity = direccion * velocidad * 2.2 # Embestida del aguijón
+			_iniciar_ataque()
+# Trepa muros: si algo la frena de frente (dato del move anterior),
+	# sube para pasar por encima volando en vez de vibrar contra la pared.
+	_trepar_muro()
+
+# Trepa muros: si algo la frena de frente (dato del move anterior), sube
+# para pasar por encima volando en vez de vibrar contra la pared.
+# Si tiene techo encima NO sube: el empujón la dejaría clavada contra el
+# techo de energía de la emboscada, sin forma de bajar de ahí.
+func _trepar_muro() -> void:
+	if is_on_wall() and not is_on_ceiling():
+		velocity.y = -velocidad * 1.2
+
+## Aguijón: se separa del blanco que eligió y solo lo pica en el último
+## cuadro, cuando embiste teledirigida hacia donde esté en ese instante.
+func _atacar(_delta: float) -> void:
+	if not is_instance_valid(_objetivo):
+		_terminar_ataque()
+		return
+	var hacia_blanco: Vector2 = _objetivo.global_position - global_position
+	var direccion := hacia_blanco.normalized() if hacia_blanco.length() > 1.0 else Vector2.ZERO
+	if _sprite_cuerpo.frame < _frame_embestida:
+		velocity = -direccion * velocidad * factor_retirada
+	else:
+		velocity = direccion * velocidad * factor_embestida
+		if not _golpe_dado:
+			_golpe_dado = true
 			if _objetivo.has_method("recibir_dano"):
 				_objetivo.recibir_dano(dano_aguijon, "Aguijon")
-	# Trepa muros: si algo la frena de frente (dato del move anterior),
-	# sube para pasar por arriba volando en vez de vibrar contra la pared.
-	if is_on_wall():
-		velocity.y = -velocidad * 1.2
+	# Mismo trepamuros que en la caza: sin esto el aguijón la deja
+	# empujada contra el muro durante toda la animación.
+	_trepar_muro()
+
+func _iniciar_ataque() -> void:
+	_atacando = true
+	_golpe_dado = false
+	_cd_aguijon = cadencia_aguijon
+	_anim.play("Ataque")
+
+func _al_terminar_animacion(nombre: String) -> void:
+	if nombre == "Ataque":
+		_terminar_ataque()
+
+func _terminar_ataque() -> void:
+	_atacando = false
+	_golpe_dado = false
+	_anim.play("Vuelo")
 
 # Contacto físico con el objetivo (dato del move anterior): los cuerpos
 # grandes chocan antes de entrar en rango numérico, y sin esto la avispa
@@ -174,6 +245,7 @@ func _vagar(delta: float) -> void:
 	var punto := _pos_origen + Vector2(cos(_fase_vagar), sin(_fase_vagar)) * radio_vagancia
 	var diferencia: Vector2 = punto - global_position
 	velocity = diferencia.limit_length(velocidad * 0.3)
+	_trepar_muro()
 
 ## La emboscada lo llama al spawnear: entra en caza del jugador de
 ## inmediato, sin esperar a detectarlo (está encerrado con ella).
@@ -207,10 +279,12 @@ func recibir_dano(cantidad: float, tipo_dano: String = "Balistica"):
 	if salud <= 0:
 		_muerta = true
 		Global.registrar_baja_enemigo(self)
-		# Desvanecido: congela, funde y libera.
+		# Muerte: congela, deja el cuadro de la escena y funde el sprite.
+		_atacando = false
 		velocity = Vector2.ZERO
+		_anim.play("Muerte")
 		$CollisionShape2D.set_deferred("disabled", true)
 		var tween = create_tween()
-		tween.tween_property(self, "modulate:a", 0.0, 0.4)
+		tween.tween_property(_sprite_cuerpo, "modulate:a", 0.0, 0.4)
 		await tween.finished
 		queue_free()
