@@ -14,6 +14,7 @@ extends StaticBody2D
 
 @onready var _sprite: Sprite2D = $Sprite
 @onready var _zona: Area2D = $ZonaRebote
+@onready var _audio: AudioStreamPlayer2D = $AudioRebote
 
 var _tween_gelatina: Tween
 
@@ -30,6 +31,15 @@ func _on_cuerpo_en_zona(cuerpo: Node2D) -> void:
 	var impulso = clampf(vel_caida * multiplicador_caida + impulso_extra, impulso_minimo, impulso_maximo)
 	_aplicar_rebote(cuerpo, impulso)
 	_gelatina()
+	_sonido_rebote()
+
+# Curar.wav reciclado para el rebote: suena a muelle. El pitch se sortea
+# para que dos rebotes seguidos no suenen clones.
+func _sonido_rebote() -> void:
+	if _audio == null or _audio.stream == null:
+		return
+	_audio.pitch_scale = randf_range(0.92, 1.1)
+	_audio.play()
 
 func _velocidad_caida_de(cuerpo: Node2D) -> float:
 	if cuerpo is CharacterBody2D:

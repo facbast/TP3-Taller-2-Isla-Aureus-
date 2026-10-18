@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dda4oe7qt26og" path="res://Scripts/hongo_trampolin.gd" id="1_hongo"]
 [ext_resource type="Texture2D" uid="uid://boj17so5dnuld" path="res://Assets/Hongo.png" id="2_hongo"]
+[ext_resource type="AudioStream" uid="uid://ctrdt33hcu020" path="res://SFX/Curar.wav" id="3_curar"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hongo_solido"]
 size = Vector2(300, 24)
@@ -28,3 +29,7 @@ collision_layer = 0
 [node name="CollisionShape2D" type="CollisionShape2D" parent="ZonaRebote" unique_id=110195184]
 position = Vector2(0, -111)
 shape = SubResource("RectangleShape2D_hongo_zona")
+
+[node name="AudioRebote" type="AudioStreamPlayer2D" parent="."]
+volume_db = -4.0
+stream = ExtResource("3_curar")
