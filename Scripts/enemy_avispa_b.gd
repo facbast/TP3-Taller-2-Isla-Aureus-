@@ -39,6 +39,8 @@ const SONIDO_LLAMADO = preload("res://SFX/Panal/Llamado_Avispa.wav")
 @export var radio_vagancia: float = 140.0
 @export var amplitud_flote: float = 10.0
 @export var ritmo_flote: float = 3.0
+# No baje tanto que el arma (que cuelga del cuerpo) quede debajo del suelo.
+@export var altura_minima_suelo: float = 140.0
 # El sprite base mira a la izquierda: al moverse a la derecha se espeja.
 @export var textura_mira_derecha: bool = false
 
@@ -198,6 +200,9 @@ func _cazar_rango() -> void:
 	var vy := 0.0
 	if absf(diferencia.y) > tolerancia_vertical:
 		vy = sign(diferencia.y) * velocidad * 0.8
+	# No baje si el suelo está demasiado cerca: el arma quedaría bajo los tiles.
+	if _está_demasiado_cerca_del_suelo() and vy > 0.0:
+		vy = 0.0
 	velocity = Vector2(vx, vy)
 	# Trepa muros: si algo la frena de frente, sube para pasar por arriba.
 	_trepar_muro()
@@ -252,12 +257,24 @@ func _trepar_muro() -> void:
 	if is_on_wall() and not is_on_ceiling():
 		velocity.y = -velocidad * 1.2
 
+# ¿Hay suelo demasiado cerca por debajo? Si sí, el arma chocaría contra
+# los tiles y no podría disparar.
+func _está_demasiado_cerca_del_suelo() -> bool:
+	var space_state = get_world_2d().direct_space_state
+	var query = PhysicsRayQueryParameters2D.create(global_position, global_position + Vector2(0, altura_minima_suelo))
+	query.exclude = [self]
+	var res = space_state.intersect_ray(query)
+	return res.size() > 0
+
 # Sin objetivo: orbita lento el punto de aparición, siempre en el aire.
 func _vagar(delta: float) -> void:
 	_fase_vagar += 0.45 * delta
 	var punto := _pos_origen + Vector2(cos(_fase_vagar), sin(_fase_vagar)) * radio_vagancia
 	var diferencia: Vector2 = punto - global_position
 	velocity = diferencia.limit_length(velocidad * 0.3)
+	# No baje si el suelo está demasiado cerca: el arma quedaría bajo los tiles.
+	if _está_demasiado_cerca_del_suelo() and velocity.y > 0.0:
+		velocity.y = 0.0
 	# Sin blanco se mira según la marcha.
 	if velocity.x > 5.0:
 		_mirando_derecha = true
