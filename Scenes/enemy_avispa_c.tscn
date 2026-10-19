@@ -92,6 +92,7 @@ vframes = 3
 region_rect = Rect2(0, 0, 1365.2764, 874.8184)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=657239236]
+visible = false
 shape = SubResource("CircleShape2D_avisc")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2008445046]
