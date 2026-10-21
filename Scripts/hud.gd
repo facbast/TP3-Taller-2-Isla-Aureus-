@@ -397,7 +397,7 @@ func _crear_label_recoger_arma() -> void:
 func mostrar_recoger_arma(nombre_arma: String):
 	if label_recoger_arma == null:
 		return
-	var mensaje_traducido = "Mantén E para recoger [" + nombre_arma + "]"
+	var mensaje_traducido = "Mantén E para recoger " + nombre_arma
 	for clave in NOMBRES_VISUALES.keys():
 		mensaje_traducido = mensaje_traducido.replace(clave, NOMBRES_VISUALES[clave])
 
