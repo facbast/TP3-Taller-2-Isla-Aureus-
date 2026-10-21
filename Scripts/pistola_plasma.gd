@@ -19,11 +19,20 @@ var nivel_carga: float = 0.0
 var tiempo_para_sobrecarga: float = 1.0 # 1 segundo para cargar a tope
 var esta_cargando: bool = false
 
+# Barra de carga visual sobre el jugador (solo cuando el jugador usa el arma).
+var _es_jugador: bool = false
+var _jugador: Node2D
+var _barra_carga: ColorRect
+const ANCHO_BARRA: float = 100.0
+const ALTO_BARRA: float = 8.0
+
 func _ready():
 	# Auto-detectamos si el arma pertenece a un enemigo buscando en la jerarquía
 	var dueno = get_parent().get_parent()
 	if dueno != null and dueno.is_in_group("enemigos"):
 		es_de_enemigo = true
+	_es_jugador = dueno != null and dueno.is_in_group("player")
+	_jugador = dueno
 
 func _process(delta):
 	# Temporizador normal de cadencia
@@ -39,7 +48,9 @@ func _process(delta):
 				if audio_carga:
 					audio_carga.play()
 			
-			queue_redraw() # <-- ACTUALIZA EL DIBUJO CADA FRAME
+				queue_redraw() # <-- ACTUALIZA EL DIBUJO CADA FRAME
+				if _es_jugador:
+					_actualizar_barra_carga()
 		else:
 			# El jugador SOLTÓ el clic: efectuamos el disparo
 			_soltar_disparo()
@@ -53,11 +64,15 @@ func intentar_disparar():
 	if _tiempo_siguiente_disparo <= 0 and not esta_cargando:
 		esta_cargando = true
 		nivel_carga = 0.0
+		if _es_jugador:
+			_crear_barra_carga()
 
 func _soltar_disparo():
 	esta_cargando = false
 	_tiempo_siguiente_disparo = cadencia
 	queue_redraw() # <-- BORRA EL CÍRCULO AL DISPARAR
+	if _es_jugador:
+		_destruir_barra_carga()
 	
 	if nivel_carga >= tiempo_para_sobrecarga and bateria >= costo_disparo_cargado:
 		bateria -= costo_disparo_cargado
@@ -116,3 +131,28 @@ func _draw():
 		# Dibuja el círculo en la posición del PuntoDisparo
 		# Color: (Rojo, Verde, Azul, Transparencia). 1,1,0 es amarillo brillante.
 		draw_circle(punto_disparo.position, radio_actual, Color(1.0, 1.0, 0.2, 0.8))
+
+# Crea la barra de carga amarilla limón sobre el jugador.
+func _crear_barra_carga() -> void:
+	if _barra_carga != null:
+		return
+	_barra_carga = ColorRect.new()
+	_barra_carga.name = "BarraCargaPlasma"
+	_barra_carga.color = Color(1.0, 1.0, 0.0, 1.0) # Amarillo limón
+	_barra_carga.size = Vector2(0, ALTO_BARRA)
+	_barra_carga.position = Vector2(-ANCHO_BARRA / 2, -40) # Sobre la cabeza del jugador
+	if _jugador != null:
+		_jugador.add_child(_barra_carga)
+
+# Actualiza el ancho de la barra según el porcentaje de carga.
+func _actualizar_barra_carga() -> void:
+	if _barra_carga == null:
+		return
+	var porcentaje = clamp(nivel_carga / tiempo_para_sobrecarga, 0.0, 1.0)
+	_barra_carga.size = Vector2(ANCHO_BARRA * porcentaje, ALTO_BARRA)
+
+# Elimina la barra de carga cuando termina el disparo.
+func _destruir_barra_carga() -> void:
+	if _barra_carga != null:
+		_barra_carga.queue_free()
+		_barra_carga = null

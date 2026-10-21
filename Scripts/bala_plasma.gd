@@ -2,10 +2,10 @@ extends Area2D
 
 var velocidad: float = 1200.0
 var es_de_enemigo: bool = false
-# Bando del tirador: "reptiles" o "avispas". Cada bando daña al otro,
-# nunca al propio (ni reptiles entre sí ni avispas entre sí).
+# Bando del tirador: "reptiles" o "avispas". Cada bando da��a al otro,
+# nunca al propio (ni reptiles entre s�� ni avispas entre s��).
 var bando: String = "reptiles"
-var dano: float = 6.0
+var dano: float = 6.25  # Un cuarto del da��o de la pistola balística (25.0)
 @export var tipo_dano: String = "Plasma"
 @export var efecto_impacto: PackedScene
 
