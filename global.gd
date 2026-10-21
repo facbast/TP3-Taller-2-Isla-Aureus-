@@ -29,6 +29,9 @@ var inventario_guardado: Dictionary = {}
 # Estados del tutorial
 var tutorial_visto: bool = false
 var tutorial_aceptado: bool = false # Declarada para evitar el error
+# Bandera para mostrar recordatorio de controles tras re-spawnear (muere y
+# recarga la escena; se consume en el _ready del jugador).
+var mostrar_recordatorio_controles: bool = false
 
 # Bajas y objetos ya consumidos (por ruta de nodo, estable entre recargas).
 # Solo cuentan cuando se llega a un checkpoint que guarda el progreso:

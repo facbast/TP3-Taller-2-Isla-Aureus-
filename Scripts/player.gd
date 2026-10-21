@@ -76,6 +76,13 @@ var _pos_pivote_stand = Vector2(-1, -1)
 var _pos_pivote_crouch = Vector2(-1, 15) # Baja el pivote de las armas
 
 var _esta_muerto: bool = false
+# Barreras suaves de controles: registra si el jugador ya usó movimiento y salto
+# tras el tutorial, para mostrar recordatorios sólo si realmente no los sabe.
+var _uso_movimiento: bool = false
+var _uso_salto: bool = false
+var _tiempo_inicio_controles: float = 0.0
+var _recordatorio_movimiento_mostrado: bool = false
+var _recordatorio_salto_mostrado: bool = false
 
 @onready var audio_salto = $AudioSalto
 @onready var audio_muerte = $AudioMuerte
@@ -196,6 +203,13 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton and event.pressed:
 		if event.button_index == MOUSE_BUTTON_RIGHT:
 			lanzar_granada()
+	# Barreras suaves: registra que el jugador ya usó movimiento y salto
+	# (solo cuando el juego no está pausado, para no contar el diálogo).
+	if event is InputEventKey and event.pressed and not event.echo and not get_tree().paused:
+		if event.keycode == KEY_A or event.keycode == KEY_D:
+			_uso_movimiento = true
+		elif event.keycode == KEY_SPACE:
+			_uso_salto = true
 
 func ejecutar_patada():
 	if temporizador_patada > 0:
@@ -230,6 +244,20 @@ func cambiar_arma():
 func _physics_process(delta):
 	if _esta_muerto:
 		return
+	# Barreras suaves: recordatorios de controles básicos si no se han usado.
+	var ahora := Time.get_ticks_msec()
+	if ahora - _tiempo_inicio_controles > 20000 and not _recordatorio_movimiento_mostrado:
+		if not _uso_movimiento:
+			var hud = get_parent().get_node_or_null("HUD")
+			if hud != null and hud.has_method("mostrar_notificacion"):
+				hud.mostrar_notificacion("Muevete con A y D")
+				_recordatorio_movimiento_mostrado = true
+	if ahora - _tiempo_inicio_controles > 25000 and not _recordatorio_salto_mostrado:
+		if not _uso_salto:
+			var hud = get_parent().get_node_or_null("HUD")
+			if hud != null and hud.has_method("mostrar_notificacion"):
+				hud.mostrar_notificacion("Salta con ESPACIO")
+				_recordatorio_salto_mostrado = true
 	# Control de temporizadores
 	if temporizador_granada > 0:
 		temporizador_granada -= delta
@@ -437,7 +465,9 @@ func _morir():
 	# Morir descarta lo avanzado desde el último checkpoint: los enemigos
 	# derrotados y los items recogidos sin guardar reaparecen.
 	Global.descartar_progreso_no_guardado()
-	# Recargar la escena (al iniciar, el HUD ejecutará hacer_fade_in automáticamente)
+	# Recordatorio de controles tras morir (se consume en el _ready tras recargar)
+	Global.mostrar_recordatorio_controles = true
+	# Recargar la escena (al iniciar, el HUD ejecutarǭ hacer_fade_in automǭticamente)
 	get_tree().reload_current_scene()
 	
 	
@@ -513,8 +543,18 @@ func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
 		elif "bateria" in _arma_actual:
 			_arma_actual.bateria = cantidad_municion
 			
-		if _arma_actual.has_method("_actualizar_hud"):
-			_arma_actual._actualizar_hud()
+	if _arma_actual.has_method("_actualizar_hud"):
+		_arma_actual._actualizar_hud()
+
+	# Recordatorio de controles tras morir y re-spawnear.
+	if Global.mostrar_recordatorio_controles:
+		Global.mostrar_recordatorio_controles = false
+		var hud = get_parent().get_node_or_null("HUD")
+		if hud != null and hud.has_method("mostrar_notificacion"):
+			hud.mostrar_notificacion("Puedes ver los controles pulsando ESC")
+
+	# Marca cuándo arrancó el nivel para medir los recordatorios suaves.
+	_tiempo_inicio_controles = Time.get_ticks_msec()
 			
 		var hud = get_parent().get_node_or_null("HUD")
 		if hud != null:
