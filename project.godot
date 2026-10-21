@@ -22,6 +22,8 @@ MusicManager="*res://Scripts/music_manager.gd"
 
 [display]
 
+window/size/mode=4
+window/stretch/mode="canvas_items"
 mouse_cursor/custom_image="uid://cwd652ggsx788"
 mouse_cursor/custom_image_hotspot=Vector2(16, 16)
 #Sameviewoneverymachine:canvasscaleskeeping1152x648logic.window/stretch/mode="canvas_items"

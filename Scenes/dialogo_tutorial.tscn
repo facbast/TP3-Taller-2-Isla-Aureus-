@@ -37,6 +37,20 @@ theme_override_fonts/normal_font = ExtResource("2_trwf0")
 theme_override_font_sizes/normal_font_size = 30
 text = "Hola hoola"
 
+[node name="LabelContinuar" type="Label" parent="Panel" unique_id=999999001]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -38.0
+offset_right = 220.0
+offset_bottom = -8.0
+theme_override_fonts/normal_font = ExtResource("2_trwf0")
+theme_override_font_sizes/normal_font_size = 20
+text = "Click o Space para continuar"
+
 [node name="OpcionesMenu" type="VBoxContainer" parent="Panel" unique_id=1844314354]
 layout_mode = 1
 anchors_preset = 7

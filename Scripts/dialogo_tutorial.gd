@@ -5,6 +5,7 @@ signal tutorial_omitido
 
 @onready var icono_rect = $Panel/IconoPersonaje
 @onready var texto_label = $Panel/TextoDialogo
+@onready var lbl_continuar = $Panel/LabelContinuar
 @onready var opciones_container = $Panel/OpcionesMenu
 @onready var btn_si = $Panel/OpcionesMenu/BtnSi
 @onready var btn_no = $Panel/OpcionesMenu/BtnNo
@@ -89,6 +90,14 @@ func _process(delta):
 			if _tiempo_auto >= PAUSA_AUTO:
 				_avanzar()
 
+func _input(event: InputEvent) -> void:
+	# Click izquierdo para avanzar el diálogo (equivalente a Space).
+	if event is InputEventMouseButton \
+			and event.button_index == MOUSE_BUTTON_LEFT \
+			and event.pressed \
+			and not opciones_container.visible:
+		_avanzar()
+
 func _avanzar() -> void:
 	_tiempo_auto = 0.0
 	if tween_texto and tween_texto.is_running():
@@ -113,6 +122,7 @@ func _mostrar_linea():
 	var linea = dialogos[indice_dialogo]
 	icono_rect.texture = linea["icono"]
 	texto_label.text = linea["texto"]
+	lbl_continuar.visible = true
 	
 	texto_label.visible_characters = 0
 	_ultimo_caracter = 0
@@ -130,6 +140,7 @@ func _mostrar_opciones():
 	icono_rect.texture = ICONO_CONEJO
 	texto_label.text = "¿Qué debo responder?"
 	texto_label.visible_ratio = 1.0
+	lbl_continuar.visible = false
 	opciones_container.show()
 	btn_si.grab_focus()
 
