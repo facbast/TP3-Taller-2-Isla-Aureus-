@@ -555,13 +555,7 @@ func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
 
 	# Marca cuándo arrancó el nivel para medir los recordatorios suaves.
 	_tiempo_inicio_controles = Time.get_ticks_msec()
-			
-		var hud = get_parent().get_node_or_null("HUD")
-		if hud != null:
-			hud.mostrar_notificacion("Arma cambiada por: " + nombre_arma)
-		return true
-		
-	return false
+
 
 func _tirar_arma_actual_al_suelo():
 	var arma_caida = ARMA_SOLTADA.instantiate()
