@@ -45,7 +45,7 @@ var dialogos_si = [
 ]
 
 var dialogos_no = [
-	{"icono": ICONO_RADIO, "texto": "Recuerda que puedes ver tus controles pulsando ESC y abriendo el menú de controles. ¡Buena suerte, soldado!"}
+	{"icono": ICONO_RADIO, "texto": "Recuerda que puedes ver tus controles pulsando ESC y abriendo el menú de controles."}
 ]
 
 func _ready():
@@ -53,6 +53,15 @@ func _ready():
 	btn_si.pressed.connect(_on_opcion_si)
 	btn_no.pressed.connect(_on_opcion_no)
 	opciones_container.hide()
+
+	# Recordatorio de controles tras morir y re-spawnear
+	if Global.mostrar_recordatorio_controles:
+		Global.mostrar_recordatorio_controles = false
+		en_rama_final = true
+		respuesta_aceptada = false
+		dialogos = dialogos_no
+		_mostrar_linea()
+		return
 
 	# 1. Si el jugador ya aceptó el tutorial previamente (al reiniciar/morir):
 	if Global.tutorial_aceptado:

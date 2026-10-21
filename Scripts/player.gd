@@ -167,6 +167,12 @@ func _ready():
 	if _arma_actual.has_method("_actualizar_hud"):
 		_arma_actual._actualizar_hud()
 
+	# Recordatorio de controles tras morir y re-spawnear.
+	if Global.mostrar_recordatorio_controles:
+		Global.mostrar_recordatorio_controles = false
+		var dialogo = load("res://Scenes/dialogo_tutorial.tscn").instantiate()
+		get_parent().add_child(dialogo)
+
 # Luz propia del jugador para niveles oscuros (sin sombras: barata).
 func _crear_linterna() -> void:
 	if get_node_or_null("Linterna") != null:
