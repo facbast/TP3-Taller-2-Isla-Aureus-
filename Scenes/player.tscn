@@ -18,6 +18,34 @@ size = Vector2(35, 103)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_f1ek2"]
 size = Vector2(50, 80)
 
+[sub_resource type="Animation" id="Animation_7dp3o"]
+resource_name = "Agachado"
+length = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("SpriteCuerpo:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.033333335, 0.06666667),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 1,
+"values": [21, 22, 23]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PivoteBrazo:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.035887066, 0.07348304),
+"transitions": PackedFloat32Array(1, 1, 1),
+"update": 0,
+"values": [Vector2(-1, -1), Vector2(-1, 22), Vector2(-1, 39)]
+}
+
 [sub_resource type="Animation" id="Animation_pu2lt"]
 resource_name = "Aterrizar"
 length = 0.2
@@ -31,7 +59,36 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.033333335),
 "transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [10, 11]
+"values": [10, 22]
+}
+
+[sub_resource type="Animation" id="Animation_h4iuc"]
+resource_name = "Caminar_Agachado"
+length = 0.3
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("PivoteBrazo:position")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-1, 39)]
+}
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("SpriteCuerpo:frame")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.2, 0.26666668),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1),
+"update": 1,
+"values": [23, 24, 25, 26, 27]
 }
 
 [sub_resource type="Animation" id="Animation_f1ek2"]
@@ -81,6 +138,18 @@ tracks/0/keys = {
 "update": 1,
 "values": [7]
 }
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("PivoteBrazo:position")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector2(-1, -1)]
+}
 
 [sub_resource type="Animation" id="Animation_gymyn"]
 resource_name = "Saltar"
@@ -95,12 +164,14 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0, 0.06666667, 0.13333334, 0.8333333, 0.9),
 "transitions": PackedFloat32Array(1, 1, 1, 1, 1),
 "update": 1,
-"values": [7, 8, 9, 10, 11]
+"values": [8, 9, 10, 10, 11]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_gymyn"]
 _data = {
+&"Agachado": SubResource("Animation_7dp3o"),
 &"Aterrizar": SubResource("Animation_pu2lt"),
+&"Caminar_Agachado": SubResource("Animation_h4iuc"),
 &"Correr": SubResource("Animation_f1ek2"),
 &"Patear": SubResource("Animation_ukyrk"),
 &"RESET": SubResource("Animation_tx1dd"),
@@ -123,7 +194,7 @@ scale = Vector2(0.15, 0.15)
 texture = ExtResource("2_f1ek2")
 centered = false
 hframes = 7
-vframes = 3
+vframes = 5
 frame = 7
 region_rect = Rect2(0, 0, 9471, 4188)
 

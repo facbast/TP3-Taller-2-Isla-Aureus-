@@ -62,10 +62,6 @@ var tiempo_espera_escudo = 4.0
 var tiempo_sin_dano = 0.0           
 var velocidad_recarga_escudo = 40.0 
 
-# --- SPRITES AGACHADO ---
-const TEXTURA_CROUCH = preload("res://Assets/Conejo_crouch.png")
-const TEXTURA_MELEE_CROUCH = preload("res://Assets/Conejo_melee_crouch.png")
-
 const CROUCH_SPEED = 150.0 
 var _agachado: bool = false
 var _tecla_agacharse_presionada: bool = false # <--- NUEVA VARIABLE
@@ -273,8 +269,10 @@ func _physics_process(delta):
 		
 	if temporizador_patada > 0:
 		temporizador_patada -= delta
-		# Eliminamos la línea que restauraba la textura aquí, 
-		# ya que el AnimationPlayer maneja los cuadros visuales.
+		# La patada usa frames de pie: al terminar, si el jugador siguió
+		# agachado, volvemos a la pose agachada en vez de quedarnos de pie.
+		if temporizador_patada <= 0 and _agachado:
+			_anim_player.play("Agachado")
 
 # --- CONTROL DE AGACHARSE (TOGGLE) ---
 	var presiona_agacharse = Input.is_key_pressed(KEY_CTRL) or Input.is_key_pressed(KEY_C)
@@ -322,13 +320,22 @@ func _physics_process(delta):
 		# lo maneja _apuntar_al_mouse() según el lado del mouse.
 			
 		# Solo reproducimos "Correr" si está en el suelo, NO está pateando, 
-		# NO está aterrizando y NO está agachado.
-		if is_on_floor() and temporizador_patada <= 0 and _anim_player.current_animation != "Aterrizar" and not _agachado:
-			_anim_player.play("Correr")
+		# NO está aterrizando y NO está agachado. Agachado usa su propio
+		# caminar ("Caminar_Agachado").
+		if is_on_floor() and temporizador_patada <= 0 and _anim_player.current_animation != "Aterrizar":
+			if _agachado:
+				if _anim_player.current_animation != "Caminar_Agachado":
+					_anim_player.play("Caminar_Agachado")
+			else:
+				_anim_player.play("Correr")
 	else:
 		velocity.x = move_toward(velocity.x, 0, vel_actual)
-		if is_on_floor() and temporizador_patada <= 0 and _anim_player.current_animation == "Correr":
-			_anim_player.stop()
+		if is_on_floor() and temporizador_patada <= 0:
+			# Crouch-walk en loop: al parar, se congela en la pose agachada.
+			if _agachado and _anim_player.current_animation == "Caminar_Agachado":
+				_anim_player.stop()
+			elif not _agachado and _anim_player.current_animation == "Correr":
+				_anim_player.stop()
 			
 	# Escudos
 	if salud_actual > 0 and escudo_actual < escudo_maximo:
@@ -349,7 +356,10 @@ func _physics_process(delta):
 	
 	# 3. Comprobamos INMEDIATAMENTE si acaba de tocar el suelo
 	if is_on_floor() and _estaba_en_el_aire:
-		_anim_player.play("Aterrizar")
+		# Agachado: Aterrizar usa frames de pie; los saltamos para no
+		# romper la pose agachada.
+		if not _agachado:
+			_anim_player.play("Aterrizar")
 
 	# Acciones delegadas
 	if Input.is_physical_key_pressed(KEY_R):
@@ -672,10 +682,10 @@ func _agacharse():
 	_area_patada.position.y = 20.0
 	
 	if temporizador_patada <= 0:
-		_anim_player.stop() # Detenemos otras animaciones
-		_sprite_cuerpo.frame = 7 # Frame de estar quieto
-		_sprite_cuerpo.scale = Vector2(0.15, 0.075) # Lo aplastamos a la mitad
-		_sprite_cuerpo.position.y = -11.0 # Lo bajamos al suelo (Solo eje Y)
+		# El AnimationPlayer hace todo el trabajo: dibuja el conejo ya
+		# agachado (frames 21-23 del spritesheet, sin aplastar el sprite)
+		# y baja el pivote de los brazos a su altura agachada.
+		_anim_player.play("Agachado")
 
 func _desagacharse():
 	_agachado = false
@@ -685,9 +695,9 @@ func _desagacharse():
 	_area_patada.position.y = 0.0
 	
 	if temporizador_patada <= 0:
-		_sprite_cuerpo.frame = 7
-		_sprite_cuerpo.scale = Vector2(0.15, 0.15) # Escala original
-		_sprite_cuerpo.position.y = -79.0 # Altura original (Solo eje Y)
+		# RESET devuelve el cuerpo al frame de reposo (7) y el pivote de
+		# los brazos a su altura original, sin escala extraña.
+		_anim_player.play("RESET")
 		
 func activar_sobreescudo() -> bool:
 	# El escudo base es 150, le sumamos 2 capas extra (300 más), llegando a 450
@@ -738,6 +748,10 @@ func _puede_desagacharse() -> bool:
 	return true
 
 func _sincronizar_brazos():
+	# Agachado: las animaciones (Caminar_Agachado / Agachado) ya mueven el
+	# pivote a la altura crouch; no lo pisamos desde aquí.
+	if _agachado:
+		return
 	# 1. Definimos la altura base (agachado o de pie)
 	var base_y = _pos_pivote_crouch.y if _agachado else _pos_pivote_stand.y
 	var base_x = _pos_pivote_stand.x # La posición X original (-1)
