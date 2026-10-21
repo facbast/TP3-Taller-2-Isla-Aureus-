@@ -538,7 +538,8 @@ func _tiene_linea_de_vision(nodo: Node2D) -> bool:
 		return false
 
 	var space_state = get_world_2d().direct_space_state
-	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position + Vector2(0, -15))
+	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position)
+		# El destino es el centro del nodo objetivo (dentro de su collider tanto de pie como agachado).
 	parametro_rayo.exclude = [self]
 
 	var resultado = space_state.intersect_ray(parametro_rayo)

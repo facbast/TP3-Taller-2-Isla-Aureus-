@@ -737,8 +737,8 @@ func _tiene_linea_de_vision(nodo: Node2D) -> bool:
 		return false
 
 	var space_state = get_world_2d().direct_space_state
-	# Lanzamos un rayo desde el enemigo hacia el centro del objetivo
-	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position + Vector2(0, -15))
+	var parametro_rayo = PhysicsRayQueryParameters2D.create(global_position + Vector2(0, -15), nodo.global_position)
+		# Lanzamos un rayo desde el enemigo hacia el centro del objetivo (dentro de su collider aunque se agache).
 	parametro_rayo.exclude = [self] # Ignorar la colisión del propio enemigo
 
 	var resultado = space_state.intersect_ray(parametro_rayo)
