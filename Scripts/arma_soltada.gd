@@ -160,6 +160,9 @@ func _on_body_entered(body):
 		else:
 			# Obligamos al jugador a usar la tecla 'E' para armas nuevas o de energía
 			jugador_cerca = body
+			var hud = get_tree().get_first_node_in_group("hud")
+			if hud != null:
+				hud.mostrar_recoger_arma(tipo_arma)
 
 func _on_body_exited(body):
 	if body == jugador_cerca:

@@ -43,6 +43,8 @@ var _calor_arma: float = 0.0
 var barra_escudo_morada: ProgressBar
 var barra_escudo_roja: ProgressBar
 var _tween_notificacion: Tween
+var _tween_recoger: Tween
+var label_recoger_arma: Label = null
 
 var _overlay_negro: ColorRect
 
@@ -73,6 +75,7 @@ func _ready():
 	add_to_group("hud") # Registrar el nodo en el grupo
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_crear_capas_sobreescudo()
+	_crear_label_recoger_arma()
 	_material_recarga_init()
 	hacer_fade_in(1.0)
 	menu_pausa.hide()
@@ -359,29 +362,60 @@ func mostrar_notificacion(mensaje: String):
 		_tween_notificacion.kill()
 		
 	_tween_notificacion = create_tween()
-	_tween_notificacion.tween_interval(2.0)
+	_tween_notificacion.tween_interval(3.0)
 	_tween_notificacion.tween_property(label_notificacion, "modulate:a", 0.0, 1.5)
+
+# Etiqueta independiente para el aviso de recoger arma: así este aviso
+# y las notificaciones generales no se interrumpen entre sí.
+func _crear_label_recoger_arma() -> void:
+	if label_recoger_arma != null or has_node("LabelRecogerArma"):
+		return
+	label_recoger_arma = Label.new()
+	label_recoger_arma.name = "LabelRecogerArma"
+	add_child(label_recoger_arma)
+	label_recoger_arma.anchor_left = 0.5
+	label_recoger_arma.anchor_right = 0.5
+	label_recoger_arma.anchor_top = 1.0
+	label_recoger_arma.anchor_bottom = 1.0
+	label_recoger_arma.offset_left = -320.0
+	label_recoger_arma.offset_right = 320.0
+	label_recoger_arma.offset_top = -140.0
+	label_recoger_arma.offset_bottom = -104.0
+	label_recoger_arma.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label_recoger_arma.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	label_recoger_arma.add_theme_font_size_override("font_size", 22)
+	label_recoger_arma.add_theme_color_override("font_color", Color(2.887845e-06, 0.9591798, 0.9365927, 1))
+	label_recoger_arma.add_theme_color_override("font_outline_color", Color(0, 0, 0, 1))
+	label_recoger_arma.add_theme_constant_override("outline_size", 5)
+	label_recoger_arma.add_theme_constant_override("shadow_outline_size", 1)
+	label_recoger_arma.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label_recoger_arma.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	label_recoger_arma.modulate.a = 0.0
 
 # Muestra el aviso de recoger arma mientras el jugador esté cerca del ítem.
 # Se mantiene visible hasta que se llame a ocultar_recoger_arma() o se recoja.
 func mostrar_recoger_arma(nombre_arma: String):
+	if label_recoger_arma == null:
+		return
 	var mensaje_traducido = "Mantén E para recoger [" + nombre_arma + "]"
 	for clave in NOMBRES_VISUALES.keys():
 		mensaje_traducido = mensaje_traducido.replace(clave, NOMBRES_VISUALES[clave])
-		
-	label_notificacion.text = mensaje_traducido
-	label_notificacion.modulate.a = 1.0
-	
-	if _tween_notificacion and _tween_notificacion.is_valid():
-		_tween_notificacion.kill()
+
+	if _tween_recoger and _tween_recoger.is_valid():
+		_tween_recoger.kill()
+
+	label_recoger_arma.text = mensaje_traducido
+	label_recoger_arma.modulate.a = 1.0
 
 # Oculta el aviso de recoger arma (cuando el jugador se aleja o lo recoge).
+# Solo toca su propia etiqueta: nunca corta las notificaciones generales.
 func ocultar_recoger_arma():
-	if _tween_notificacion and _tween_notificacion.is_valid():
-		_tween_notificacion.kill()
-		
-	_tween_notificacion = create_tween()
-	_tween_notificacion.tween_property(label_notificacion, "modulate:a", 0.0, 0.5)
+	if label_recoger_arma == null:
+		return
+	if _tween_recoger and _tween_recoger.is_valid():
+		_tween_recoger.kill()
+	_tween_recoger = create_tween()
+	_tween_recoger.tween_property(label_recoger_arma, "modulate:a", 0.0, 0.4)
 	
 func actualizar_granadas(frag_cant: int, plasma_cant: int, maximo: int, usando_plasma: bool):
 	label_frag.text = "x" + str(frag_cant) + " / " + str(maximo)
