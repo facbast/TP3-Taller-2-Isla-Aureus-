@@ -361,6 +361,27 @@ func mostrar_notificacion(mensaje: String):
 	_tween_notificacion = create_tween()
 	_tween_notificacion.tween_interval(2.0)
 	_tween_notificacion.tween_property(label_notificacion, "modulate:a", 0.0, 1.5)
+
+# Muestra el aviso de recoger arma mientras el jugador esté cerca del ítem.
+# Se mantiene visible hasta que se llame a ocultar_recoger_arma() o se recoja.
+func mostrar_recoger_arma(nombre_arma: String):
+	var mensaje_traducido = "Mantén E para recoger [" + nombre_arma + "]"
+	for clave in NOMBRES_VISUALES.keys():
+		mensaje_traducido = mensaje_traducido.replace(clave, NOMBRES_VISUALES[clave])
+		
+	label_notificacion.text = mensaje_traducido
+	label_notificacion.modulate.a = 1.0
+	
+	if _tween_notificacion and _tween_notificacion.is_valid():
+		_tween_notificacion.kill()
+
+# Oculta el aviso de recoger arma (cuando el jugador se aleja o lo recoge).
+func ocultar_recoger_arma():
+	if _tween_notificacion and _tween_notificacion.is_valid():
+		_tween_notificacion.kill()
+		
+	_tween_notificacion = create_tween()
+	_tween_notificacion.tween_property(label_notificacion, "modulate:a", 0.0, 0.5)
 	
 func actualizar_granadas(frag_cant: int, plasma_cant: int, maximo: int, usando_plasma: bool):
 	label_frag.text = "x" + str(frag_cant) + " / " + str(maximo)

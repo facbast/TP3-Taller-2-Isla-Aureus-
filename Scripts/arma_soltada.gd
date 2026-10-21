@@ -126,6 +126,9 @@ func _process(delta):
 	if tiempo_manteniendo >= float(TIEMPO_POR_VALOR.get(valor_item, tiempo_requerido)):
 		var recogido = jugador_cerca.recoger_arma(tipo_arma, cantidad_municion)
 		if recogido:
+			var hud = get_tree().get_first_node_in_group("hud")
+			if hud != null:
+				hud.ocultar_recoger_arma()
 			queue_free()
 		else:
 			# Si la rechazó (ej. batería inferior), reiniciamos el temporizador
@@ -162,6 +165,9 @@ func _on_body_exited(body):
 	if body == jugador_cerca:
 		jugador_cerca = null
 		tiempo_manteniendo = 0.0
+		var hud = get_tree().get_first_node_in_group("hud")
+		if hud != null:
+			hud.ocultar_recoger_arma()
 
 func _textura_para_arma(nombre: String) -> Texture2D:
 	for clave in NOMBRES_ARMA.keys():
