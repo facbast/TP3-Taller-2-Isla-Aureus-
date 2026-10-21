@@ -543,18 +543,12 @@ func recoger_arma(nombre_arma: String, cantidad_municion: int) -> bool:
 		elif "bateria" in _arma_actual:
 			_arma_actual.bateria = cantidad_municion
 			
-	if _arma_actual.has_method("_actualizar_hud"):
-		_arma_actual._actualizar_hud()
+		if _arma_actual.has_method("_actualizar_hud"):
+			_arma_actual._actualizar_hud()
+		
+		return true
 
-	# Recordatorio de controles tras morir y re-spawnear.
-	if Global.mostrar_recordatorio_controles:
-		Global.mostrar_recordatorio_controles = false
-		var hud = get_parent().get_node_or_null("HUD")
-		if hud != null and hud.has_method("mostrar_notificacion"):
-			hud.mostrar_notificacion("Puedes ver los controles pulsando ESC")
-
-	# Marca cuándo arrancó el nivel para medir los recordatorios suaves.
-	_tiempo_inicio_controles = Time.get_ticks_msec()
+	return false
 
 
 func _tirar_arma_actual_al_suelo():
