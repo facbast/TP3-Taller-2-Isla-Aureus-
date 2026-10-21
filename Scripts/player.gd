@@ -69,7 +69,9 @@ var _tecla_agacharse_presionada: bool = false # <--- NUEVA VARIABLE
 # Posiciones y dimensiones para la colisión y pivote del brazo
 @onready var _colision_cuerpo = $CollisionShape2D
 var _pos_pivote_stand = Vector2(-1, -1)
-var _pos_pivote_crouch = Vector2(-1, 15) # Baja el pivote de las armas
+var _pos_pivote_crouch = Vector2(-1, 39) # Altura de agachado: igual a la
+# clave final de la pista del pivote en las animaciones Agachado y
+# Caminar_Agachado del spritesheet.
 
 var _esta_muerto: bool = false
 # Barreras suaves de controles: registra si el jugador ya usó movimiento y salto
@@ -748,11 +750,9 @@ func _puede_desagacharse() -> bool:
 	return true
 
 func _sincronizar_brazos():
-	# Agachado: las animaciones (Caminar_Agachado / Agachado) ya mueven el
-	# pivote a la altura crouch; no lo pisamos desde aquí.
-	if _agachado:
-		return
-	# 1. Definimos la altura base (agachado o de pie)
+	# 1. Definimos la altura base (agachado o de pie). La agachada usa la
+	# misma clave (y=39) que las animaciones de crouch del spritesheet,
+	# así el pivote siempre cae en el hombro del conejo agachado.
 	var base_y = _pos_pivote_crouch.y if _agachado else _pos_pivote_stand.y
 	var base_x = _pos_pivote_stand.x # La posición X original (-1)
 	
